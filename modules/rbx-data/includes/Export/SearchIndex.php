@@ -39,24 +39,32 @@ final class SearchIndex {
 					);
 				}
 			}
-			$pages = get_posts(
-				array(
-					'post_type'      => 'page',
-					'post_status'    => 'publish',
-					'posts_per_page' => 100,
-					'meta_key'       => '_rbx_game', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-					'meta_value'     => $game->key(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-					'no_found_rows'  => true,
-				)
-			);
-			foreach ( $pages as $p ) {
-				$items[] = array(
-					'n' => get_the_title( $p ),
-					't' => __( 'Page', 'rbx-data' ),
-					'g' => $game->key(),
-					'u' => wp_make_link_relative( (string) get_permalink( $p ) ),
-					'a' => '',
+			// Every published Page under the game's folder (hub, calculator, lists, codes, guides), not only
+			// the ones with a _rbx_game meta (UO-31). Pages kept out of search engines stay out here too.
+			$hub = get_page_by_path( $game->folder() );
+			if ( $hub && 'publish' === $hub->post_status ) {
+				$pages = array_merge(
+					array( $hub ),
+					get_pages(
+						array(
+							'child_of'    => $hub->ID,
+							'post_status' => 'publish',
+						)
+					)
 				);
+				$skip  = \RBX\Data\Render\Seo::empty_update_pages();
+				foreach ( $pages as $p ) {
+					if ( in_array( (int) $p->ID, $skip, true ) ) {
+						continue;
+					}
+					$items[] = array(
+						'n' => html_entity_decode( wp_strip_all_tags( get_the_title( $p ) ), ENT_QUOTES, 'UTF-8' ),
+						't' => __( 'Page', 'rbx-data' ),
+						'g' => $game->key(),
+						'u' => wp_make_link_relative( (string) get_permalink( $p ) ),
+						'a' => $game->short_name() . '|' . $p->post_name,
+					);
+				}
 			}
 		}
 		$games = array();

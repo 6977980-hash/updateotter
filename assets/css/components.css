@@ -413,10 +413,52 @@ summary.rbx-chip {
 	flex-wrap: wrap;
 	gap: var(--sp-1) var(--sp-3);
 }
+.rbx-game-card__links {
+	gap: var(--sp-2);
+}
 .rbx-game-card__links a {
 	min-height: 44px;
 	display: inline-flex;
 	align-items: center;
+	padding-inline: var(--sp-3);
+	border: 1px solid var(--border-strong);
+	border-radius: 999px;
+	text-decoration: none;
+	font-weight: 600;
+}
+.rbx-home-search {
+	margin-block: var(--sp-3);
+}
+.rbx-home-search label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: var(--sp-1);
+}
+.rbx-home-search__row {
+	display: flex;
+	gap: var(--sp-2);
+}
+.rbx-home-search input {
+	flex: 1;
+	min-width: 0;
+	min-height: 44px;
+}
+.rbx-popular {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--sp-1) var(--sp-3);
+}
+.rbx-popular a {
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	padding-inline: var(--sp-3);
+	border-radius: 999px;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	text-decoration: none;
+	font-weight: 600;
 }
 .rbx-update-card {
 	padding: var(--sp-4);

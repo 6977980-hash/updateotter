@@ -24,23 +24,31 @@ function updateotter_game_url( \RBX\Data\Config\Game $g, string $path = '' ): st
 	return updateotter_url( $g->folder() . ( '' !== $path ? '/' . trim( $path, '/' ) : '' ) );
 }
 
-/** Link to the other language of this page (TECH-20 pairs only). */
+/**
+ * EN | ID switch for pages with a twin (TECH-20 pairs only). It sits on the breadcrumb line, so
+ * it no longer takes the first line above the H1 (UO-40); hreflang links stay in the head.
+ */
 function updateotter_lang_switch(): void {
 	$pair = class_exists( '\RBX\Data\Content\Lang' ) ? \RBX\Data\Content\Lang::pair() : null;
 	if ( null === $pair ) {
 		return;
 	}
-	if ( \RBX\Data\Content\Lang::is_id() ) {
-		echo '<p class="lang-switch"><a href="' . esc_url( $pair['en'] ) . '" hreflang="en" lang="en">Read this page in English</a></p>';
-	} else {
-		echo '<p class="lang-switch"><a href="' . esc_url( $pair['id'] ) . '" hreflang="id" lang="id">Baca dalam Bahasa Indonesia</a></p>';
-	}
+	$id = \RBX\Data\Content\Lang::is_id();
+	echo '<p class="lang-switch">'
+		. ( $id ? '<a href="' . esc_url( $pair['en'] ) . '" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>' : '<span aria-current="true">EN</span>' )
+		. ' <span aria-hidden="true">|</span> '
+		. ( $id ? '<span aria-current="true">ID</span>' : '<a href="' . esc_url( $pair['id'] ) . '" hreflang="id" lang="id" aria-label="Baca dalam Bahasa Indonesia">ID</a>' )
+		. '</p>';
 }
 
-/** @return array<int, array{0: string, 1: string}> label, url of each menu entry in config order. */
+/**
+ * @return array<int, array{0: string, 1: string}> label, url of each menu entry: tool, codes, tier
+ * list, then the lists (UO-42), so a phone shows the most used ones without a sideways swipe.
+ */
 function updateotter_game_sections( \RBX\Data\Config\Game $g ): array {
-	$out = array();
-	foreach ( $g->menu_order() as $slug ) {
+	$out   = array();
+	$order = class_exists( '\RBX\Data\Render\Sections' ) ? \RBX\Data\Render\Sections::priority_sections( $g ) : $g->menu_order();
+	foreach ( $order as $slug ) {
 		$s = $g->section( $slug );
 		// An updates list is linked only once it has a published update (UO-15).
 		if ( null !== $s && 'updates' === ( $s['type'] ?? '' ) && class_exists( '\RBX\Data\Render\Ui' ) && '' === \RBX\Data\Render\Ui::updates_url( $g ) ) {
@@ -83,7 +91,10 @@ function updateotter_game_menu(): void {
 	$here = trailingslashit( (string) strtok( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), '?' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	echo '<nav class="game-menu" aria-label="' . esc_attr( sprintf( /* translators: %s: game */ __( '%s sections', 'updateotter' ), $g->name() ) ) . '"><div class="container"><ul class="game-menu__list">';
 	$hub = updateotter_game_url( $g );
-	echo '<li><a href="' . esc_url( $hub ) . '"' . ( wp_make_link_relative( $hub ) === $here ? ' aria-current="page"' : '' ) . '>' . esc_html( $g->short_name() ) . '</a></li>';
+	// On the hub itself the first item would only repeat the page (UO-42).
+	if ( wp_make_link_relative( $hub ) !== $here ) {
+		echo '<li><a href="' . esc_url( $hub ) . '">' . esc_html( $g->short_name() ) . '</a></li>';
+	}
 	foreach ( updateotter_game_sections( $g ) as [ $label, $url ] ) {
 		$rel = wp_make_link_relative( $url );
 		$cur = $rel === $here || ( str_starts_with( $here, $rel ) && is_singular() && ! is_page() );
@@ -94,10 +105,12 @@ function updateotter_game_menu(): void {
 
 /** Breadcrumbs (TECH-18 data from RBX Data; visual per UX-23). Called by plugin templates too. */
 function updateotter_breadcrumbs(): void {
+	echo '<div class="crumbs-row">';
 	if ( ! is_front_page() && class_exists( '\RBX\Data\Render\Breadcrumbs' ) ) {
 		echo \RBX\Data\Render\Breadcrumbs::html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Breadcrumbs.
 	}
 	updateotter_lang_switch();
+	echo '</div>';
 }
 add_action( 'updateotter_breadcrumbs', 'updateotter_breadcrumbs' );
 
