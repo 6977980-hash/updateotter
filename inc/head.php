@@ -15,14 +15,16 @@ function updateotter_consent_default(): void {
 	echo "<script data-no-optimize=\"1\" data-no-defer=\"1\" data-cfasync=\"false\">\n";
 	echo "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}\n";
 	echo "gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IS','IE','IT','LV','LI','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','GB','CH'],wait_for_update:500});\n";
-	echo "gtag('consent','default',{ad_storage:'granted',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});\n";
+	// UO-68: made for children, so ad storage stays denied everywhere (no personalised ads, no ad cookies).
+	echo "gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});\n";
 	echo "gtag('set','ads_data_redaction',true);\n";
 	echo "</script>\n";
 }
 
-/** Sets data-theme before paint; `theme` is the only localStorage key on the site (UX-28). */
+/** Sets data-theme and the js class before paint; `theme` is the only localStorage key on the site (UX-28). */
 function updateotter_theme_script(): void {
-	echo '<script data-no-optimize="1" data-no-defer="1">try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>' . "\n";
+	// The "js" class lets CSS reserve room for JS-only controls before they appear (UO-55, no layout shift).
+	echo '<script data-no-optimize="1" data-no-defer="1">document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>' . "\n";
 }
 
 add_action(

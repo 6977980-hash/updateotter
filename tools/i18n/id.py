@@ -38,6 +38,7 @@ RBX_DATA = {
     'Yes': 'Ya',
     'No': 'Tidak',
     'Search this list': 'Cari di daftar ini',
+    'Show all {n}': 'Tampilkan semua {n}',
     'Full guides to %s': 'Panduan lengkap %s',
     'Sources:': 'Sumber:',
     "each item's page on the %s": 'halaman tiap item di %s',

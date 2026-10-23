@@ -10,3 +10,17 @@
 
 RedirectMatch 403 /wp-content/themes/[^/]+/(data|content|tools|languages|patterns|\.github|\.git)(/|$)
 RedirectMatch 403 /wp-content/themes/[^/]+/modules/[^/]+/(games|tests|languages|includes|data)(/|$)
+
+# UO-56: CSS, JS and SVG with a ?ver= (filemtime) query never change under that URL, so browsers
+# keep them for a year. Files fetched without ?ver= keep the host's normal 7-day cache.
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteCond %{QUERY_STRING} (^|&)ver=
+	RewriteRule \.(css|js|svg)$ - [E=UO_VERSIONED:1]
+</IfModule>
+<IfModule mod_headers.c>
+	<FilesMatch "\.(css|js|svg)$">
+		Header set Cache-Control "public, max-age=31536000, immutable" env=UO_VERSIONED
+		Header unset Expires env=UO_VERSIONED
+	</FilesMatch>
+</IfModule>

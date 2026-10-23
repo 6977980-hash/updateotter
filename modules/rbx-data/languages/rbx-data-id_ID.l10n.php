@@ -113,6 +113,7 @@ return array( 'domain' => 'rbx-data', 'language' => 'id_ID', 'plural-forms' => '
 	'Search this list' => 'Cari di daftar ini',
 	'See the full tier list' => 'Lihat tier list lengkap',
 	'Send report' => 'Kirim laporan',
+	'Show all {n}' => 'Tampilkan semua {n}',
 	'Show removed' => 'Tampilkan yang sudah dihapus',
 	'Showing %1$s of %2$s %3$s' => 'Menampilkan %1$s dari %2$s %3$s',
 	'Size' => 'Ukuran',
