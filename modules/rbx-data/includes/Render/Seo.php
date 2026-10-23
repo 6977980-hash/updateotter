@@ -506,7 +506,6 @@ final class Seo {
 		}
 		if ( 'update' === $c['kind'] && $c['post'] && $game ) {
 			$post   = $c['post'];
-			$author = get_userdata( (int) $post->post_author );
 			$node   = array(
 				'@type'            => 'BlogPosting',
 				'@id'              => $url . '#article',
@@ -519,12 +518,12 @@ final class Seo {
 			if ( '' === $node['dateModified'] ) {
 				unset( $node['dateModified'] );
 			}
-			if ( $author ) {
-				$au             = (string) get_user_meta( $author->ID, 'rbx_author_page', true );
+			$au = Ui::author( $post->ID );
+			if ( $au ) {
 				$node['author'] = array(
 					'@type' => 'Person',
-					'name'  => $author->display_name,
-					'url'   => '' !== $au ? $au : home_url( '/authors/' . $author->user_nicename . '/' ),
+					'name'  => $au['name'],
+					'url'   => $au['url'],
 				);
 			}
 			$thumb = (int) get_post_thumbnail_id( $post );

@@ -301,17 +301,39 @@ final class Ui {
 	}
 
 	/** Byline: "By {Author}" plus " · Checked by {Reviewer}" when a different person (CONT-41, REV C-38). */
+	/**
+	 * Public author of a post: name and author page URL. The WordPress account name is used only
+	 * when it has its own author page (user meta rbx_author_page); otherwise the site's author from
+	 * the theme's content/author.json, so a login name like "admin" never shows.
+	 *
+	 * @return array{name: string, url: string}|null
+	 */
+	public static function author( int $post_id ): ?array {
+		$post = get_post( $post_id );
+		$user = $post ? get_userdata( (int) $post->post_author ) : false;
+		if ( $user ) {
+			$url = (string) get_user_meta( $user->ID, 'rbx_author_page', true );
+			if ( '' !== $url ) {
+				return array( 'name' => (string) $user->display_name, 'url' => $url );
+			}
+		}
+		$file = get_template_directory() . '/content/author.json';
+		$site = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( is_array( $site ) && ! empty( $site['name'] ) && ! empty( $site['url'] ) ) {
+			return array( 'name' => (string) $site['name'], 'url' => home_url( (string) $site['url'] ) );
+		}
+		return $user ? array( 'name' => (string) $user->display_name, 'url' => home_url( '/authors/' . $user->user_nicename . '/' ) ) : null;
+	}
+
 	public static function byline( int $post_id, string $reviewer = '' ): string {
-		$post   = get_post( $post_id );
-		$author = $post ? get_userdata( (int) $post->post_author ) : false;
+		$author = self::author( $post_id );
 		if ( ! $author ) {
 			return '';
 		}
-		$url  = (string) get_user_meta( $author->ID, 'rbx_author_page', true );
-		$url  = '' !== $url ? $url : home_url( '/authors/' . $author->user_nicename . '/' );
 		/* translators: %s: author name with link */
-		$html = sprintf( esc_html__( 'By %s', 'rbx-data' ), '<a href="' . esc_url( $url ) . '" rel="author">' . esc_html( $author->display_name ) . '</a>' );
-		if ( '' !== $reviewer && 0 !== strcasecmp( trim( $reviewer ), $author->display_name ) ) {
+		$html = sprintf( esc_html__( 'By %s', 'rbx-data' ), '<a href="' . esc_url( $author['url'] ) . '" rel="author">' . esc_html( $author['name'] ) . '</a>' );
+		// AI drafting is explained on the methodology page; "claude" is not a reviewer name.
+		if ( '' !== $reviewer && 0 !== strcasecmp( trim( $reviewer ), $author['name'] ) && 0 !== strcasecmp( trim( $reviewer ), 'claude' ) ) {
 			/* translators: %s: reviewer name */
 			$html .= ' <span aria-hidden="true">·</span> ' . sprintf( esc_html__( 'Checked by %s', 'rbx-data' ), esc_html( $reviewer ) );
 		}
