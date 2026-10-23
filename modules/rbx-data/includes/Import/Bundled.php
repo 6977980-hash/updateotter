@@ -36,8 +36,8 @@ final class Bundled {
 	}
 
 	/**
-	 * Public, read-only status (`/wp-json/rbx/v1/bundled`): lets a deploy be checked without an
-	 * admin login. Holds only what the published pages show anyway (counts and issue texts).
+	 * Read-only status (`/wp-json/rbx/v1/bundled`): lets a deploy be checked without an admin
+	 * login. Without login it holds only the hashes and status (UO-60); admins get the details.
 	 */
 	public static function routes(): void {
 		register_rest_route(
@@ -46,9 +46,21 @@ final class Bundled {
 			array(
 				'methods'             => 'GET',
 				'permission_callback' => '__return_true',
-				'callback'            => array( self::class, 'status' ),
+				'callback'            => array( self::class, 'rest_status' ),
 			)
 		);
+	}
+
+	/** @return array<string, mixed> Full status for admins, hashes and status for everyone else. */
+	public static function rest_status(): array {
+		$out = self::status();
+		if ( current_user_can( 'manage_options' ) ) {
+			return $out;
+		}
+		foreach ( $out as $k => $v ) {
+			$out[ $k ] = array_intersect_key( (array) $v, array_flip( array( 'deployed_hash', 'imported_hash', 'synced_hash', 'status', 'at', 'queued' ) ) );
+		}
+		return $out;
 	}
 
 	/** @return array<string, mixed> */
@@ -133,12 +145,32 @@ final class Bundled {
 		$dir   = self::dir( $game );
 		$files = array_merge( (array) glob( $dir . '/*.csv' ), (array) glob( $dir . '/' . self::APPROVALS ), (array) glob( $dir . '/media/*' ) );
 		sort( $files );
+		// UO-65: hashing ~880 KB on every uncached request is wasted work; the hash only changes
+		// when a file is added, removed or rewritten (a deploy sets new mtimes), so cache it by that.
+		$sig = '';
+		foreach ( $files as $f ) {
+			$sig .= basename( (string) $f ) . ':' . (int) @filemtime( (string) $f ) . ':' . (int) @filesize( (string) $f ) . ';'; // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		$key    = 'rbx_bundled_hash_' . $game->key();
+		$cached = get_transient( $key );
+		if ( is_array( $cached ) && ( $cached['sig'] ?? '' ) === md5( $sig ) && is_string( $cached['hash'] ?? null ) ) {
+			return $cached['hash'];
+		}
 		$h = hash_init( 'sha256' );
 		foreach ( $files as $f ) {
 			hash_update( $h, basename( (string) $f ) . "\0" );
 			hash_update_file( $h, (string) $f );
 		}
-		return substr( hash_final( $h ), 0, 16 );
+		$hash = substr( hash_final( $h ), 0, 16 );
+		set_transient(
+			$key,
+			array(
+				'sig'  => md5( $sig ),
+				'hash' => $hash,
+			),
+			DAY_IN_SECONDS
+		);
+		return $hash;
 	}
 
 	/** @return array<string, mixed> */

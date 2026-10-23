@@ -37,6 +37,8 @@ final class Hardening {
 		remove_action( 'wp_head', 'rsd_link' );
 		remove_action( 'wp_head', 'wlwmanifest_link' );
 		remove_action( 'wp_head', 'wp_generator' );
+		// UO-63: no WordPress version in feeds, OPML or anywhere else the_generator is printed.
+		add_filter( 'the_generator', '__return_empty_string' );
 	}
 
 	public static function deny_comment(): void {
