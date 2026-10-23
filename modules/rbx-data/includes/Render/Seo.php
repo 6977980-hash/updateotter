@@ -1,0 +1,679 @@
+<?php
+/**
+ * Search output from data (TECH-11..27, CONT-06/08, DATA-20/31): robots, titles, descriptions,
+ * breadcrumbs, JSON-LD and sitemap entries. Rank Math hooks when it is active; core fallbacks
+ * (wp_robots, document title, a minimal JSON-LD graph) when it is not.
+ *
+ * @package RBX\Data
+ */
+
+declare( strict_types=1 );
+
+namespace RBX\Data\Render;
+
+use RBX\Data\Codes\CheckLog;
+use RBX\Data\Config\Game;
+use RBX\Data\Data\Repository;
+use RBX\Data\Gate\PageState;
+use RBX\Data\Plugin;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Hook names verified against Rank Math 1.0.280 (§12.2 item).
+ */
+final class Seo {
+
+	public const BRAND = 'UpdateOtter';
+
+	public static function boot(): void {
+		add_filter( 'rank_math/frontend/robots', array( self::class, 'rm_robots' ) );
+		add_filter( 'rank_math/frontend/title', array( self::class, 'rm_title' ) );
+		add_filter( 'rank_math/frontend/description', array( self::class, 'rm_description' ) );
+		add_filter( 'rank_math/frontend/breadcrumb/items', array( self::class, 'rm_breadcrumbs' ), 10, 1 );
+		add_filter( 'rank_math/json_ld', array( self::class, 'rm_json_ld' ), 99, 1 );
+		add_filter( 'rank_math/sitemap/entry', array( self::class, 'rm_sitemap_entry' ), 10, 3 );
+		add_action( 'rank_math/vars/register_extra_replacements', array( self::class, 'rm_vars' ) );
+		add_filter( 'wp_robots', array( self::class, 'core_robots' ) );
+		add_filter( 'pre_get_document_title', array( self::class, 'core_title' ) );
+		add_action( 'wp_head', array( self::class, 'core_head' ), 2 );
+		add_filter( 'request', array( self::class, 'feed' ) );
+	}
+
+	private static function rank_math(): bool {
+		return defined( 'RANK_MATH_VERSION' );
+	}
+
+	/**
+	 * What the current request shows.
+	 *
+	 * @return array{kind: string, game: ?Game, rec: ?array<string, mixed>, post: ?\WP_Post, section: string}
+	 */
+	public static function context(): array {
+		$ctx  = array(
+			'kind'    => 'other',
+			'game'    => null,
+			'rec'     => null,
+			'post'    => null,
+			'section' => '',
+		);
+		if ( is_front_page() ) {
+			$ctx['kind'] = 'home';
+			return $ctx;
+		}
+		$post = get_queried_object();
+		if ( ! is_singular() || ! $post instanceof \WP_Post ) {
+			return $ctx;
+		}
+		$ctx['post'] = $post;
+		if ( in_array( $post->post_type, Plugin::post_types(), true ) ) {
+			$found = Repository::for_post( $post->ID );
+			if ( $found ) {
+				$ctx['game'] = $found[0];
+				$ctx['rec']  = $found[1];
+				$ctx['kind'] = 'UPD' === $found[1]['entity'] ? 'update' : 'item';
+			}
+			return $ctx;
+		}
+		if ( 'page' !== $post->post_type ) {
+			return $ctx;
+		}
+		if ( 'report' === $post->post_name && 0 === (int) $post->post_parent ) {
+			$ctx['kind'] = 'report';
+			return $ctx;
+		}
+		if ( 'guide' === get_post_meta( $post->ID, '_rbx_template', true ) ) {
+			$ctx['kind'] = 'guide';
+		}
+		$game = Breadcrumbs::game_for( $post );
+		if ( null === $game ) {
+			$parent = $post->post_parent ? get_post( $post->post_parent ) : null;
+			if ( $parent && 'authors' === $parent->post_name ) {
+				$ctx['kind'] = 'author';
+			}
+			return $ctx;
+		}
+		$ctx['game'] = $game;
+		if ( 0 === (int) $post->post_parent ) {
+			$ctx['kind'] = 'hub';
+			return $ctx;
+		}
+		$parent = get_post( (int) $post->post_parent );
+		if ( 'guide' !== $ctx['kind'] && $parent && $parent->post_name === $game->folder() ) {
+			$s = $game->section( $post->post_name );
+			if ( $s ) {
+				$ctx['section'] = $post->post_name;
+				$ctx['kind']    = match ( (string) ( $s['type'] ?? '' ) ) {
+					'tool' => 'tool',
+					'list', 'mutations', 'tier_list' => 'list',
+					'codes' => 'codes',
+					'updates' => 'updates',
+					default => 'page',
+				};
+				return $ctx;
+			}
+		}
+		if ( 'guide' !== $ctx['kind'] ) {
+			$ctx['kind'] = 'page';
+		}
+		return $ctx;
+	}
+
+	/** Page state for the current shell: index | noindex | '' (not a shell). */
+	private static function state(): string {
+		$c = self::context();
+		if ( in_array( $c['kind'], array( 'item', 'update' ), true ) && $c['post'] ) {
+			$s = (string) get_post_meta( $c['post']->ID, '_rbx_page_state', true );
+			return '' === $s ? PageState::NOINDEX : $s;
+		}
+		if ( 'report' === $c['kind'] ) {
+			return PageState::NOINDEX;
+		}
+		return '';
+	}
+
+	/* ---------------------------------------------------------------- robots */
+
+	/** @param array<string, string> $robots Rank Math robots. */
+	public static function rm_robots( array $robots ): array {
+		$s = self::state();
+		if ( PageState::NOINDEX === $s ) {
+			$robots['index']  = 'noindex';
+			$robots['follow'] = 'follow';
+			unset( $robots['max-snippet'], $robots['max-image-preview'], $robots['max-video-preview'] );
+		} elseif ( PageState::INDEX === $s ) {
+			$robots['index']  = 'index';
+			$robots['follow'] = 'follow';
+		}
+		return $robots;
+	}
+
+	/** @param array<string, bool|string> $robots Core robots. */
+	public static function core_robots( array $robots ): array {
+		if ( self::rank_math() ) {
+			return $robots;
+		}
+		if ( PageState::NOINDEX === self::state() ) {
+			$robots['noindex'] = true;
+			$robots['follow']  = true;
+			unset( $robots['max-image-preview'] );
+		} elseif ( ! isset( $robots['noindex'] ) ) {
+			$robots['max-image-preview'] = 'large';
+			$robots['max-snippet']       = '-1';
+			$robots['max-video-preview'] = '-1';
+		}
+		return $robots;
+	}
+
+	/* ---------------------------------------------------------------- titles and descriptions */
+
+	/** Generated title for shells (CONT-06); null leaves the CMS title alone. */
+	public static function title(): ?string {
+		$c = self::context();
+		if ( ! $c['game'] || ! $c['rec'] ) {
+			return null;
+		}
+		$game = $c['game'];
+		$rec  = $c['rec'];
+		$ds   = Repository::dataset( $game );
+		if ( 'update' === $c['kind'] ) {
+			return Update::heading( $game, $rec ) . ' | ' . self::BRAND;
+		}
+		$name  = (string) $rec['name'];
+		$parts = array();
+		switch ( $rec['entity'] ) {
+			case 'PET':
+				if ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) ) {
+					$parts[] = __( 'Egg', 'rbx-data' );
+				}
+				$st = $ds->field_state( $rec, 'base_income_per_s' );
+				if ( 'verified' === $st['state'] && $st['mechanic_ok'] ) {
+					$parts[] = __( 'Income', 'rbx-data' );
+				}
+				$lead = sprintf( /* translators: 1: item, 2: game */ __( '%1$s in %2$s', 'rbx-data' ), $name, $game->name() );
+				break;
+			case 'EGG':
+				if ( $ds->children( 'DRP', 'egg_id', (string) $rec['id'] ) ) {
+					$parts[] = __( 'Pets', 'rbx-data' );
+					foreach ( $ds->children( 'DRP', 'egg_id', (string) $rec['id'] ) as $d ) {
+						$st = $ds->field_state( $d, 'chance_prob' );
+						if ( 'verified' === $st['state'] && 'official' === $st['source_type'] ) {
+							$parts[] = __( 'Odds', 'rbx-data' );
+							break;
+						}
+					}
+				}
+				if ( 'verified' === $ds->field_state( $rec, 'hatch_time_s' )['state'] ) {
+					$parts[] = __( 'Hatch Time', 'rbx-data' );
+				}
+				$lead = sprintf( /* translators: 1: item, 2: game */ __( '%1$s in %2$s', 'rbx-data' ), $name, $game->name() );
+				break;
+			case 'MUT':
+				if ( 'verified' === $ds->field_state( $rec, 'income_mult' )['state'] ) {
+					$parts[] = __( 'Multiplier', 'rbx-data' );
+				}
+				if ( ! empty( $rec['data']['obtain_method_text__en'] ) ) {
+					$parts[] = __( 'How to Get It', 'rbx-data' );
+				}
+				$lead = sprintf( /* translators: 1: mutation, 2: game */ __( '%1$s Mutation in %2$s', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', $name ), $game->name() );
+				break;
+			default:
+				$lead = sprintf( '%1$s in %2$s', $name, $game->name() );
+		}
+		$parts = array_slice( $parts, 0, 2 );
+		return $lead . ( $parts ? ': ' . implode( ' & ', $parts ) : '' ) . ' | ' . self::BRAND;
+	}
+
+	/** Generated description for shells (CONT-08): what the page gives, a fact, freshness. */
+	public static function description(): ?string {
+		$c = self::context();
+		if ( ! $c['game'] || ! $c['rec'] || ! $c['post'] ) {
+			return null;
+		}
+		$ex = trim( (string) $c['post']->post_excerpt );
+		if ( '' !== $ex ) {
+			return wp_strip_all_tags( $ex );
+		}
+		$game = $c['game'];
+		$rec  = $c['rec'];
+		$ds   = Repository::dataset( $game );
+		if ( 'update' === $c['kind'] ) {
+			return wp_trim_words( wp_strip_all_tags( (string) ( $rec['data']['summary__en'] ?? '' ) ), 26 );
+		}
+		$bits = array();
+		$rar  = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
+		/* translators: 1: item name, 2: entity label, 3: game */
+		$bits[] = sprintf( __( 'Stats, sources and change history for %1$s, a %2$s in %3$s.', 'rbx-data' ), $rec['name'], strtolower( ( $rar ? $rar['name'] . ' ' : '' ) . $game->entity_label( (string) $rec['entity'] ) ), $game->name() );
+		if ( 'PET' === $rec['entity'] ) {
+			$eggs = array();
+			foreach ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) as $d ) {
+				$eggs[] = (string) ( $ds->get( (string) $d['data']['egg_id'] )['name'] ?? '' );
+			}
+			$eggs = array_values( array_filter( array_unique( $eggs ) ) );
+			if ( $eggs ) {
+				/* translators: %s: egg names */
+				$bits[] = sprintf( __( 'Hatches from %s.', 'rbx-data' ), implode( ', ', array_slice( $eggs, 0, 2 ) ) );
+			}
+		}
+		$plv = (string) get_post_meta( $c['post']->ID, '_rbx_page_last_verified', true );
+		if ( '' !== $plv ) {
+			/* translators: %s: date */
+			$bits[] = sprintf( __( 'Checked in game on %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
+		}
+		return implode( ' ', $bits );
+	}
+
+	public static function rm_title( string $title ): string {
+		return self::title() ?? $title;
+	}
+
+	public static function rm_description( string $desc ): string {
+		return self::description() ?? $desc;
+	}
+
+	public static function core_title( string $title ): string {
+		if ( self::rank_math() ) {
+			return $title;
+		}
+		return self::title() ?? $title;
+	}
+
+	/* ---------------------------------------------------------------- breadcrumbs */
+
+	/** @param array<int, array<int|string, mixed>> $crumbs Rank Math crumbs. */
+	public static function rm_breadcrumbs( array $crumbs ): array {
+		$trail = Breadcrumbs::trail();
+		if ( ! $trail ) {
+			return $crumbs;
+		}
+		$out = array();
+		$n   = count( $trail );
+		foreach ( $trail as $i => $c ) {
+			$link  = $i === $n - 1 ? ( is_singular() ? (string) get_permalink() : '' ) : $c[1];
+			$out[] = array( $c[0], $link, 'hide_in_schema' => '' === $link );
+		}
+		return $out;
+	}
+
+	/* ---------------------------------------------------------------- JSON-LD (TECH-24/25) */
+
+	/**
+	 * @param array<string, mixed> $data Rank Math graph pieces keyed by name.
+	 * @return array<string, mixed>
+	 */
+	public static function rm_json_ld( array $data ): array {
+		$c = self::context();
+		foreach ( $data as $k => $node ) {
+			$t = is_array( $node ) ? ( $node['@type'] ?? '' ) : '';
+			if ( in_array( $t, array( 'Article', 'BlogPosting', 'NewsArticle', 'Product', 'FAQPage', 'HowTo' ), true ) && 'guide' !== $c['kind'] ) {
+				unset( $data[ $k ] );
+			}
+		}
+		$url  = is_singular() ? (string) get_permalink() : home_url( '/' );
+		$page = self::page_node( $c, $url );
+		if ( null === $page ) {
+			return $data;
+		}
+		$key = isset( $data['WebPage'] ) ? 'WebPage' : null;
+		if ( null !== $key && is_array( $data[ $key ] ) ) {
+			$data[ $key ] = array_merge( $data[ $key ], $page );
+		} else {
+			$data['WebPage'] = $page;
+		}
+		foreach ( self::extra_nodes( $c, $url ) as $name => $node ) {
+			$data[ $name ] = $node;
+		}
+		return $data;
+	}
+
+	/**
+	 * WebPage overrides: type, about, isPartOf, dateModified.
+	 *
+	 * @param array<string, mixed> $c Context.
+	 * @return array<string, mixed>|null
+	 */
+	private static function page_node( array $c, string $url ): ?array {
+		if ( 'other' === $c['kind'] || 'home' === $c['kind'] ) {
+			return null;
+		}
+		$node = array(
+			'@type' => 'WebPage',
+			'@id'   => $url . '#webpage',
+			'url'   => $url,
+		);
+		if ( $c['post'] ) {
+			$lc = (string) get_post_meta( $c['post']->ID, '_rbx_last_changed', true );
+			if ( '' !== $lc ) {
+				$node['dateModified'] = $lc;
+			}
+		}
+		$game = $c['game'];
+		$hub  = $game ? Breadcrumbs::page_url( $game->folder() ) : '';
+		switch ( $c['kind'] ) {
+			case 'hub':
+				$node['@type'] = 'CollectionPage';
+				$node['about'] = self::video_game( $game );
+				break;
+			case 'list':
+				$node['@type'] = 'CollectionPage';
+				if ( '' !== $hub ) {
+					$node['isPartOf'] = array( '@id' => $hub . '#webpage' );
+				}
+				break;
+			case 'item':
+				$node['about'] = array(
+					'@type' => 'Thing',
+					'name'  => (string) $c['rec']['name'],
+				);
+				if ( '' !== $hub ) {
+					$node['isPartOf'] = array( '@id' => $hub . '#webpage' );
+				}
+				$img = self::item_image( $game, $c['rec'] );
+				if ( '' !== $img ) {
+					$node['primaryImageOfPage'] = array(
+						'@type' => 'ImageObject',
+						'url'   => $img,
+					);
+				}
+				break;
+			case 'tool':
+			case 'codes':
+			case 'updates':
+			case 'update':
+			case 'page':
+			case 'report':
+				if ( '' !== $hub && $game ) {
+					$node['isPartOf'] = array( '@id' => $hub . '#webpage' );
+				}
+				break;
+			case 'author':
+				$node['@type'] = 'ProfilePage';
+				break;
+		}
+		return $node;
+	}
+
+	/**
+	 * @param array<string, mixed> $c Context.
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function extra_nodes( array $c, string $url ): array {
+		$out  = array();
+		$game = $c['game'];
+		if ( 'tool' === $c['kind'] && $c['post'] && $game ) {
+			$out['WebApplication'] = array(
+				'@type'               => 'WebApplication',
+				'@id'                 => $url . '#app',
+				'name'                => wp_strip_all_tags( get_the_title( $c['post'] ) ),
+				'url'                 => $url,
+				'applicationCategory' => 'GameApplication',
+				'operatingSystem'     => 'Any (web browser)',
+				'browserRequirements' => 'Requires JavaScript',
+				'isAccessibleForFree' => true,
+				'offers'              => array(
+					'@type'         => 'Offer',
+					'price'         => '0',
+					'priceCurrency' => 'USD',
+				),
+				'about'               => self::video_game( $game ),
+			);
+		}
+		if ( 'list' === $c['kind'] && $game ) {
+			$s      = $game->section( $c['section'] );
+			$entity = (string) ( $s['entity'] ?? '' );
+			$items  = array();
+			if ( '' !== $entity && 'tier_list' !== ( $s['type'] ?? '' ) ) {
+				$pos = 0;
+				foreach ( Repository::dataset( $game )->all( $entity, array( 'live', 'limited' ) ) as $r ) {
+					$pid = (int) ( $r['post_id'] ?? 0 );
+					if ( $pid && 'publish' === get_post_status( $pid ) && PageState::INDEX === get_post_meta( $pid, '_rbx_page_state', true ) ) {
+						$items[] = array(
+							'@type'    => 'ListItem',
+							'position' => ++$pos,
+							'url'      => (string) get_permalink( $pid ),
+							'name'     => (string) $r['name'],
+						);
+					}
+				}
+			}
+			if ( $items ) {
+				$out['ItemList'] = array(
+					'@type'           => 'ItemList',
+					'@id'             => $url . '#items',
+					'itemListElement' => $items,
+				);
+			}
+		}
+		if ( 'update' === $c['kind'] && $c['post'] && $game ) {
+			$post   = $c['post'];
+			$author = get_userdata( (int) $post->post_author );
+			$node   = array(
+				'@type'            => 'BlogPosting',
+				'@id'              => $url . '#article',
+				'headline'         => Update::heading( $game, $c['rec'] ),
+				'datePublished'    => get_post_time( 'c', true, $post ),
+				'dateModified'     => (string) get_post_meta( $post->ID, '_rbx_last_changed', true ),
+				'mainEntityOfPage' => array( '@id' => $url . '#webpage' ),
+				'publisher'        => array( '@id' => home_url( '/#organization' ) ),
+			);
+			if ( '' === $node['dateModified'] ) {
+				unset( $node['dateModified'] );
+			}
+			if ( $author ) {
+				$au             = (string) get_user_meta( $author->ID, 'rbx_author_page', true );
+				$node['author'] = array(
+					'@type' => 'Person',
+					'name'  => $author->display_name,
+					'url'   => '' !== $au ? $au : home_url( '/authors/' . $author->user_nicename . '/' ),
+				);
+			}
+			$thumb = (int) get_post_thumbnail_id( $post );
+			if ( $thumb ) {
+				$imgs = array();
+				foreach ( array( 'rbx-feat-169', 'rbx-feat-43', 'rbx-feat-11' ) as $size ) {
+					$src = wp_get_attachment_image_src( $thumb, $size );
+					if ( $src ) {
+						$imgs[] = $src[0];
+					}
+				}
+				if ( $imgs ) {
+					$node['image'] = array_values( array_unique( $imgs ) );
+				}
+			}
+			$out['BlogPosting'] = $node;
+		}
+		return $out;
+	}
+
+	/** @return array<string, string> */
+	private static function video_game( ?Game $game ): array {
+		if ( ! $game ) {
+			return array();
+		}
+		$node  = array(
+			'@type'        => 'VideoGame',
+			'name'         => $game->name(),
+			'gamePlatform' => 'Roblox',
+		);
+		$place = $game->place_id() ?? (string) ( Repository::dataset( $game )->meta( 'roblox_place_id' ) ?? '' );
+		if ( '' !== (string) $place ) {
+			$node['url'] = 'https://www.roblox.com/games/' . rawurlencode( (string) $place );
+		}
+		return $node;
+	}
+
+	private static function item_image( Game $game, array $rec ): string {
+		foreach ( Repository::dataset( $game )->media_for( (string) $rec['id'] ) as $m ) {
+			$u = Media::url( (string) $m['data']['file_name'] );
+			if ( '' !== $u ) {
+				return $u;
+			}
+		}
+		return '';
+	}
+
+	/* ---------------------------------------------------------------- sitemap (DATA-31, TECH-13/14) */
+
+	/**
+	 * @param array<string, mixed>|false $url  Entry.
+	 * @param string                     $type Entry type.
+	 * @param mixed                      $obj  Post/term/user.
+	 * @return array<string, mixed>|false
+	 */
+	public static function rm_sitemap_entry( $url, $type, $obj ) {
+		if ( 'post' !== $type || ! $obj instanceof \WP_Post || ! is_array( $url ) ) {
+			return $url;
+		}
+		if ( in_array( $obj->post_type, Plugin::post_types(), true ) ) {
+			if ( PageState::INDEX !== get_post_meta( $obj->ID, '_rbx_page_state', true ) ) {
+				return false;
+			}
+		}
+		if ( 'page' === $obj->post_type && 'report' === $obj->post_name && 0 === (int) $obj->post_parent ) {
+			return false;
+		}
+		$lc = (string) get_post_meta( $obj->ID, '_rbx_last_changed', true );
+		if ( '' !== $lc ) {
+			$url['mod'] = $lc . 'T00:00:00+00:00';
+		}
+		return $url;
+	}
+
+	/* ---------------------------------------------------------------- Rank Math variables (DATA-30) */
+
+	public static function rm_vars(): void {
+		if ( ! function_exists( 'rank_math_register_var_replacement' ) ) {
+			return;
+		}
+		rank_math_register_var_replacement(
+			'rbx_value',
+			array(
+				'name'        => __( 'Game data value', 'rbx-data' ),
+				'description' => __( 'A value from the dataset: %rbx_value(SAE-MUT-0003,income_mult)%', 'rbx-data' ),
+				'variable'    => 'rbx_value(id,field)',
+				'example'     => '×2.5',
+			),
+			static function ( $args = '' ) {
+				$p = array_map( 'trim', explode( ',', (string) $args ) );
+				$v = Shortcodes::lookup( (string) ( $p[0] ?? '' ), sanitize_key( (string) ( $p[1] ?? '' ) ), (string) ( $p[2] ?? '' ) );
+				return null === $v ? '' : $v['text'];
+			}
+		);
+		rank_math_register_var_replacement(
+			'rbx_count',
+			array(
+				'name'        => __( 'Game data count', 'rbx-data' ),
+				'description' => __( 'Number of live records: %rbx_count(sae,PET)%', 'rbx-data' ),
+				'variable'    => 'rbx_count(game,entity)',
+				'example'     => '208',
+			),
+			static function ( $args = '' ) {
+				$p    = array_map( 'trim', explode( ',', (string) $args ) );
+				$game = \RBX\Data\Config\Loader::game( sanitize_key( (string) ( $p[0] ?? '' ) ) );
+				return $game ? (string) Repository::dataset( $game )->count( strtoupper( (string) ( $p[1] ?? '' ) ) ) : '';
+			}
+		);
+		rank_math_register_var_replacement(
+			'rbx_checked_month',
+			array(
+				'name'        => __( 'Codes last-check month', 'rbx-data' ),
+				'description' => __( 'Month of the newest codes check: %rbx_checked_month(sae)% (CONT-07)', 'rbx-data' ),
+				'variable'    => 'rbx_checked_month(game)',
+				'example'     => 'October 2026',
+			),
+			static function ( $args = '' ) {
+				$game = \RBX\Data\Config\Loader::game( sanitize_key( trim( (string) $args ) ) );
+				$d    = $game ? CheckLog::last_checked( $game ) : '';
+				return '' === $d ? '' : wp_date( 'F Y', (int) strtotime( $d . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) );
+			}
+		);
+		rank_math_register_var_replacement(
+			'rbx_last_verified',
+			array(
+				'name'        => __( 'Page last verified', 'rbx-data' ),
+				'description' => __( 'The page\'s Verified date', 'rbx-data' ),
+				'variable'    => 'rbx_last_verified',
+				'example'     => '22 Oct 2026',
+			),
+			static function () {
+				$id = get_queried_object_id();
+				$d  = $id ? (string) get_post_meta( $id, '_rbx_page_last_verified', true ) : '';
+				return '' === $d ? '' : wp_date( 'j M Y', (int) strtotime( $d . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) );
+			}
+		);
+	}
+
+	/* ---------------------------------------------------------------- fallback head without Rank Math */
+
+	public static function core_head(): void {
+		if ( self::rank_math() || is_admin() ) {
+			return;
+		}
+		$desc = self::description();
+		if ( null !== $desc && '' !== $desc ) {
+			echo '<meta name="description" content="' . esc_attr( $desc ) . "\">\n";
+		}
+		$c   = self::context();
+		$url = is_singular() ? (string) get_permalink() : home_url( '/' );
+		$graph = array();
+		if ( 'home' === $c['kind'] ) {
+			$graph[] = array(
+				'@type'         => 'WebSite',
+				'@id'           => home_url( '/#website' ),
+				'name'          => self::BRAND,
+				'alternateName' => (string) wp_parse_url( home_url(), PHP_URL_HOST ),
+				'url'           => home_url( '/' ),
+			);
+			$graph[] = array(
+				'@type' => 'Organization',
+				'@id'   => home_url( '/#organization' ),
+				'name'  => self::BRAND,
+				'url'   => home_url( '/' ),
+				'logo'  => home_url( '/logo-organization.png' ),
+			);
+		}
+		$page = self::page_node( $c, $url );
+		if ( $page ) {
+			$graph[] = $page;
+		}
+		foreach ( self::extra_nodes( $c, $url ) as $n ) {
+			$graph[] = $n;
+		}
+		$trail = Breadcrumbs::trail();
+		if ( count( $trail ) >= 2 ) {
+			$items = array();
+			foreach ( $trail as $i => $t ) {
+				$items[] = array(
+					'@type'    => 'ListItem',
+					'position' => $i + 1,
+					'name'     => $t[0],
+					'item'     => '' !== $t[1] ? $t[1] : $url,
+				);
+			}
+			$graph[] = array(
+				'@type'           => 'BreadcrumbList',
+				'@id'             => $url . '#breadcrumb',
+				'itemListElement' => $items,
+			);
+		}
+		if ( $graph ) {
+			echo '<script type="application/ld+json">' . wp_json_encode(
+				array(
+					'@context' => 'https://schema.org',
+					'@graph'   => $graph,
+				),
+				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+			) . "</script>\n";
+		}
+	}
+
+	/* ---------------------------------------------------------------- feed (REV-G14) */
+
+	/** @param array<string, mixed> $qv Query vars. */
+	public static function feed( array $qv ): array {
+		if ( isset( $qv['feed'] ) && ! isset( $qv['post_type'] ) && empty( $qv['withcomments'] ) ) {
+			$qv['post_type'] = array( 'rbx_update' );
+		}
+		return $qv;
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "rbx/data-section",
+	"title": "Game data section",
+	"category": "widgets",
+	"icon": "database",
+	"description": "Shows a list, table or status box from the game dataset. Numbers always come from the data.",
+	"textdomain": "rbx-data",
+	"attributes": {
+		"game": { "type": "string", "default": "" },
+		"section": { "type": "string", "default": "" },
+		"entity": { "type": "string", "default": "" },
+		"limit": { "type": "number", "default": 5 }
+	},
+	"supports": { "html": false, "reusable": false, "align": [ "wide" ] },
+	"editorScript": "file:./editor.js",
+	"render": "file:./render.php"
+}
