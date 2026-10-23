@@ -1,0 +1,9 @@
+id,slug,name,sort_order,ui_color_hex,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+GAG-RAR-0001,common,Common,1,#A0A0A0,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0002,uncommon,Uncommon,2,#3CB043,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0003,rare,Rare,3,#2F80ED,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0004,legendary,Legendary,4,#F2C94C,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0005,mythical,Mythical,5,#9B51E0,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0006,divine,Divine,6,#F2994A,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0007,prismatic,Prismatic,7,#EB5CA8,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,
+GAG-RAR-0008,transcendent,Transcendent,8,#1ABC9C,live,community,https://growagarden.fandom.com/wiki/Crops,,Crop rarity tiers from the wiki crop list,2026-10-23,claude,,,,

@@ -1,0 +1,396 @@
+{
+  "game_code": "GAG2",
+  "name": "Grow a Garden 2",
+  "short_name": "Grow a Garden 2",
+  "nav_order": 3,
+  "folder": "grow-a-garden-2",
+  "roblox_universe_id": "10200395747",
+  "roblox_place_id": "97598239454123",
+  "schema_version": "1.0",
+  "locales": [
+    "en"
+  ],
+  "freshness_days": 30,
+  "min_formula_tests": 1,
+  "community_single_source_calc": true,
+  "index_community_data": true,
+  "wiki_formula_ok": true,
+  "_owner_decision": "2026-10-23 Ali: build the lean Grow a Garden section now (\"next phase\"), on community wiki data like SAE. No in-game checks are asked of Ali, so the calculator formula runs on the wiki's published price formula (wiki_formula_ok: tests without screenshots, mechanics may be partially_confirmed) and every value shows 'Source: community wiki'. Pages index once they have our own reviewed note.",
+  "game_accent": "#C2185B",
+  "notifier": {
+    "update_windows": []
+  },
+  "menu_order": [
+    "calculator",
+    "plants",
+    "mutations",
+    "codes"
+  ],
+  "sections": {
+    "calculator": {
+      "label__en": "Calculator",
+      "type": "tool",
+      "tool": "calculator"
+    },
+    "plants": {
+      "label__en": "Crops",
+      "type": "list",
+      "entity": "PLT"
+    },
+    "mutations": {
+      "label__en": "Mutations",
+      "type": "mutations",
+      "entity": "MUT"
+    },
+    "codes": {
+      "label__en": "Codes",
+      "type": "codes"
+    }
+  },
+  "entities": {
+    "CUR": {
+      "tab": "currencies",
+      "label__en": "Currency",
+      "plural__en": "Currencies",
+      "named": true,
+      "page": false,
+      "fields": {
+        "symbol_text": {
+          "type": "string",
+          "label__en": "Symbol"
+        },
+        "is_premium": {
+          "type": "bool",
+          "label__en": "Premium currency"
+        }
+      }
+    },
+    "RAR": {
+      "tab": "rarities",
+      "label__en": "Rarity",
+      "plural__en": "Rarities",
+      "named": true,
+      "page": false,
+      "fields": {
+        "sort_order": {
+          "type": "int",
+          "label__en": "Sort order",
+          "required": true
+        },
+        "ui_color_hex": {
+          "type": "string",
+          "label__en": "Colour",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "PLT": {
+      "tab": "plants",
+      "post_type": "rbx_plant",
+      "path": "plants",
+      "label__en": "Crop",
+      "plural__en": "Crops",
+      "named": true,
+      "page": true,
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        },
+        "rarity_id": {
+          "type": "ref",
+          "target": "RAR",
+          "label__en": "Rarity",
+          "required_for_index": true,
+          "list": true,
+          "facet": true
+        },
+        "base_value": {
+          "type": "decimal",
+          "label__en": "Base value",
+          "currency_field": "currency_id",
+          "requires_mechanics": [
+            "value_formula"
+          ],
+          "required_for_index": true,
+          "display_format": "abbr",
+          "compare": true,
+          "list": true
+        },
+        "currency_id": {
+          "type": "ref",
+          "target": "CUR",
+          "label__en": "Currency"
+        },
+        "base_weight_kg": {
+          "type": "decimal",
+          "label__en": "Base weight (kg)",
+          "requires_mechanics": [
+            "weight_scaling"
+          ],
+          "display_format": "decimal(2)",
+          "list": true
+        },
+        "size_exponent": {
+          "type": "decimal",
+          "label__en": "Size exponent",
+          "requires_mechanics": [
+            "weight_scaling"
+          ],
+          "display_format": "decimal(2)",
+          "internal": false
+        },
+        "min_size_mult": {
+          "type": "decimal",
+          "label__en": "Smallest size (x base weight)",
+          "requires_mechanics": [
+            "weight_scaling"
+          ],
+          "display_format": "decimal(2)"
+        },
+        "is_multi_harvest": {
+          "type": "bool",
+          "label__en": "Multi-harvest",
+          "facet": true
+        },
+        "prime_time_s": {
+          "type": "duration_s",
+          "label__en": "Stays fresh for",
+          "requires_mechanics": [
+            "decay"
+          ],
+          "display_format": "duration"
+        },
+        "never_decays": {
+          "type": "bool",
+          "label__en": "Never decays"
+        },
+        "notes__en": {
+          "type": "text",
+          "label__en": "Notes",
+          "editorial": true
+        },
+        "notes_reviewed_by": {
+          "type": "string",
+          "label__en": "Notes reviewed by",
+          "internal": true
+        },
+        "notes_reviewed_on": {
+          "type": "date",
+          "label__en": "Notes reviewed on",
+          "internal": true
+        }
+      },
+      "siblings_by": [
+        "rarity_id"
+      ],
+      "require_screenshot_for_index": true
+    },
+    "MUT": {
+      "tab": "mutations",
+      "post_type": "rbx_mutation",
+      "path": "mutations",
+      "label__en": "Mutation",
+      "plural__en": "Mutations",
+      "named": true,
+      "page": true,
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        },
+        "income_mult": {
+          "type": "mult",
+          "label__en": "Sheckle multiplier",
+          "requires_mechanics": [
+            "mutation_multiplier"
+          ],
+          "required_for_index": true,
+          "display_format": "mult",
+          "compare": true,
+          "list": true
+        },
+        "stack_rule": {
+          "type": "enum",
+          "enum": [
+            "multiply",
+            "add_bonus",
+            "max_only",
+            "exclusive",
+            "unknown"
+          ],
+          "label__en": "How it stacks",
+          "requires_mechanics": [
+            "mutation_stacking"
+          ]
+        },
+        "obtain_method_text__en": {
+          "type": "text",
+          "label__en": "How to get",
+          "required_for_index": true,
+          "list": true
+        },
+        "chance_prob": {
+          "type": "prob",
+          "label__en": "Chance at harvest",
+          "display_format": "prob"
+        },
+        "notes__en": {
+          "type": "text",
+          "label__en": "Notes",
+          "editorial": true
+        },
+        "notes_reviewed_by": {
+          "type": "string",
+          "label__en": "Notes reviewed by",
+          "internal": true
+        },
+        "notes_reviewed_on": {
+          "type": "date",
+          "label__en": "Notes reviewed on",
+          "internal": true
+        }
+      },
+      "require_screenshot_for_index": true
+    },
+    "COD": {
+      "tab": "codes",
+      "label__en": "Code",
+      "plural__en": "Codes",
+      "named": false,
+      "page": false,
+      "fields": {
+        "code": {
+          "type": "string",
+          "label__en": "Code",
+          "required": true
+        },
+        "reward_text__en": {
+          "type": "text",
+          "label__en": "Reward"
+        },
+        "reward_items": {
+          "type": "json",
+          "label__en": "Reward items",
+          "json_shape": "reward_items"
+        },
+        "code_status": {
+          "type": "enum",
+          "enum": [
+            "active",
+            "expired",
+            "unverified"
+          ],
+          "label__en": "Code status",
+          "required": true
+        },
+        "first_seen": {
+          "type": "date",
+          "label__en": "First seen"
+        },
+        "last_tested_at": {
+          "type": "datetime",
+          "label__en": "Last tested"
+        },
+        "tested_by": {
+          "type": "string",
+          "label__en": "Tested by"
+        },
+        "expires_at": {
+          "type": "datetime",
+          "label__en": "Expires",
+          "future_ok": true
+        }
+      }
+    },
+    "UPD": {
+      "tab": "updates",
+      "post_type": "rbx_update",
+      "path": "updates",
+      "label__en": "Update",
+      "plural__en": "Updates",
+      "named": false,
+      "slugged": true,
+      "page": true,
+      "fields": {
+        "title__en": {
+          "type": "text",
+          "label__en": "Title",
+          "required": true
+        },
+        "release_date": {
+          "type": "date",
+          "label__en": "Release date",
+          "required_for_index": true
+        },
+        "roblox_updated_at": {
+          "type": "datetime",
+          "label__en": "Roblox update time"
+        },
+        "official_source_url": {
+          "type": "url",
+          "label__en": "Official notes"
+        },
+        "summary__en": {
+          "type": "text",
+          "label__en": "Summary",
+          "required_for_index": true,
+          "editorial": true
+        },
+        "affected_record_ids": {
+          "type": "ref_list",
+          "target": "*",
+          "label__en": "Affected items"
+        }
+      },
+      "slug_pattern": "^\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(-[a-z0-9]+)*$",
+      "require_screenshot_for_index": false
+    }
+  },
+  "tools": [
+    {
+      "key": "calculator",
+      "path": "calculator",
+      "label__en": "Grow a Garden 2 Calculator",
+      "slices": [
+        "core",
+        "plants"
+      ],
+      "inputs": [
+        {
+          "key": "plant",
+          "type": "ref",
+          "target": "PLT",
+          "label__en": "Crop",
+          "group_by": "rarity_id"
+        },
+        {
+          "key": "weight",
+          "type": "number",
+          "label__en": "Weight in kg (optional)",
+          "optional": true,
+          "min": 0.01,
+          "max": 1000000
+        },
+        {
+          "key": "mutation",
+          "type": "ref",
+          "target": "MUT",
+          "label__en": "Mutation",
+          "optional": true,
+          "none_label__en": "No mutation"
+        },
+        {
+          "key": "count",
+          "type": "number",
+          "label__en": "How many fruits",
+          "min": 1,
+          "max": 1000000,
+          "default": 1,
+          "integer": true
+        }
+      ]
+    }
+  ],
+  "sibling_game": "gag"
+}

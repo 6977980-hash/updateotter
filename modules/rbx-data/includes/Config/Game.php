@@ -78,6 +78,15 @@ final class Game {
 		return ! empty( $this->config['index_community_data'] );
 	}
 
+	/**
+	 * Owner decision: the calculator may run on a formula the community wiki publishes. Formula tests
+	 * then need no screenshot and `partially_confirmed` mechanics count as confirmed; the page still
+	 * labels every value "Source: community wiki" and the glossary marks the rule as not tested.
+	 */
+	public function wiki_formula_ok(): bool {
+		return ! empty( $this->config['wiki_formula_ok'] );
+	}
+
 	public function schema_version(): string {
 		return (string) ( $this->config['schema_version'] ?? '1.0' );
 	}

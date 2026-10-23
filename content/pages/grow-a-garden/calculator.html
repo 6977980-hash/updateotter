@@ -1,0 +1,103 @@
+<!-- uo:page {"title": "Grow a Garden Calculator"} -->
+<!-- wp:paragraph -->
+<p>This calculator shows how many Sheckles a Grow a Garden fruit sells for, from its crop, weight, variant and mutations.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/calculator {"game":"gag","tool":"calculator"} /-->
+
+<!-- wp:heading {"anchor":"how-to-use"} -->
+<h2 class="wp-block-heading" id="how-to-use">How to use it</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list">
+<!-- wp:list-item -->
+<li>Pick your crop. Crops are grouped by rarity.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Type the fruit's weight in kg. Leave it empty to use the crop's base weight.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Pick the variant (Normal, Silver, Gold, Rainbow and others). A fruit has only one.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Pick up to three different mutations. Leave the rest on "No mutation".</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Set how many fruits you are selling, then use "Copy link" to share the result.</li>
+<!-- /wp:list-item -->
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"anchor":"how-it-is-calculated"} -->
+<h2 class="wp-block-heading" id="how-it-is-calculated">How it is calculated</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Sell value = base value × weight factor × variant multiplier × mutation total. The result is rounded to a whole Sheckle.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li><strong>Weight factor:</strong> (your weight ÷ base weight), squared. A fruit lighter than 95% of the base weight still counts as 95%, so small fruit never sells for much less than the base value. <!-- rbx-allow-number: formula constants (square, price floor), not game values --></li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Mutation total:</strong> mutations add up. Start at 1 and add each mutation's multiplier minus 1. Shocked and Frozen together make 1 + 99 + 9 = 109, not 100 × 10.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Variant:</strong> Silver, Gold, Rainbow and the other variants multiply the whole result, mutations included.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>This is the price rule the community wiki publishes. We have not tested it in the game ourselves yet, so the result is marked "Source: community wiki". The exact formula is shown under the calculator.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:shortcode -->
+[uo_ad slot="below-tool"]
+<!-- /wp:shortcode -->
+
+<!-- wp:heading {"anchor":"worked-example"} -->
+<h2 class="wp-block-heading" id="worked-example">Worked example</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The calculator starts with a Carrot at its base weight of [rbx_value id="GAG-PLT-0003" field="base_weight_kg"] kg, so it shows the Carrot's base value: [rbx_value id="GAG-PLT-0003" field="base_value"] Sheckles. Make it a Gold Carrot ([rbx_value id="GAG-VAR-0003" field="value_mult"]) with Shocked ([rbx_value id="GAG-MUT-0173" field="income_mult"]) and Frozen ([rbx_value id="GAG-MUT-0069" field="income_mult"]), and the mutation total becomes 109, so the Carrot sells for 20 × 20 × 109 = 43,600 Sheckles. <!-- rbx-allow-number: worked example arithmetic from the bound values --></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"anchor":"inputs"} -->
+<h2 class="wp-block-heading" id="inputs">What each input means</h2>
+<!-- /wp:heading -->
+
+<!-- wp:html -->
+<dl><dt>Crop</dt><dd>The plant the fruit came from.</dd><dt>Weight in kg</dt><dd>The weight shown when you hold the fruit.</dd><dt>Variant</dt><dd>Normal, or the rare Silver, Gold, Rainbow, Diamond, Jelly or Ember look a fruit can grow with.</dd><dt>Mutations</dt><dd>Effects from weather, pets, gear or other crops, such as Wet, Chilled or Shocked. Pick each one only once.</dd><dt>How many fruits</dt><dd>How many identical fruits you are selling.</dd></dl>
+<!-- /wp:html -->
+
+<!-- wp:heading {"anchor":"limits"} -->
+<h2 class="wp-block-heading" id="limits">Limits and known gaps</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li>The formula and every crop value come from the community wiki and are not tested in game by us yet.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Some mutations fuse into a new one when their ingredients meet (for example Wet and Chilled become Frozen). Pick the mutation the fruit actually shows, not the ingredients.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Crops with the Honey trait use a different variant rule that the calculator does not cover yet. Friend boosts and other sell bonuses are not included.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>The calculator gives the sell value only. It does not give trade values, because trading prices are player opinions, not game data.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>The calculator reads the <a href="/grow-a-garden/plants/">crops list</a> and the <a href="/grow-a-garden/mutations/">mutations list</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/data-section {"game":"gag","section":"changes"} /-->

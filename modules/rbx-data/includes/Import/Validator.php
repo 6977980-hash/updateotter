@@ -518,7 +518,8 @@ final class Validator {
 			if ( ! $ds->mechanics_confirmed( (array) ( $d['requires_mechanics'] ?? array() ) ) ) {
 				$this->issues->error( 'formula', __( 'Formula is live but one of its mechanics is not confirmed (DATA-12).', 'rbx-data' ), $this->tab( $id ), $this->row( $id ), $id, 'status' );
 			}
-			$live = array_filter( $ds->tests_for( $id ), static fn( $t ) => 'live' === ( $t['data']['status'] ?? '' ) && ! empty( $t['data']['evidence_media_id'] ) );
+			$wiki = $ds->game()->wiki_formula_ok();
+			$live = array_filter( $ds->tests_for( $id ), static fn( $t ) => 'live' === ( $t['data']['status'] ?? '' ) && ( $wiki || ! empty( $t['data']['evidence_media_id'] ) ) );
 			if ( count( $live ) < $ds->game()->min_formula_tests() ) {
 				/* translators: %d: minimum number of live tests */
 				$this->issues->error( 'formula_tests', sprintf( __( 'Live formulas need at least %d live tests with screenshot evidence (DATA-34).', 'rbx-data' ), $ds->game()->min_formula_tests() ), $this->tab( $id ), $this->row( $id ), $id, 'status' );
@@ -530,7 +531,7 @@ final class Validator {
 			}
 		}
 		foreach ( $this->records as $id => $r ) {
-			if ( 'TST' === $r['entity'] && 'live' === ( $r['data']['status'] ?? '' ) && empty( $r['data']['evidence_media_id'] ) ) {
+			if ( 'TST' === $r['entity'] && 'live' === ( $r['data']['status'] ?? '' ) && empty( $r['data']['evidence_media_id'] ) && ! $ds->game()->wiki_formula_ok() ) {
 				$this->issues->error( 'formula_tests', __( 'Live tests need evidence_media_id (a screenshot of the in-game result).', 'rbx-data' ), $this->tab( $id ), $this->row( $id ), $id, 'evidence_media_id' );
 			}
 		}

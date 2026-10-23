@@ -1,0 +1,75 @@
+<!-- uo:page {"title": "Grow a Garden 2 Calculator"} -->
+<!-- wp:paragraph -->
+<p>This calculator shows what a fresh Grow a Garden 2 fruit sells for, from its crop, weight and mutation.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/calculator {"game":"gag2","tool":"calculator"} /-->
+
+<!-- wp:heading {"anchor":"how-to-use"} -->
+<h2 class="wp-block-heading" id="how-to-use">How to use it</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list">
+<!-- wp:list-item -->
+<li>Pick your crop. Crops are grouped by tier.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Type the fruit's weight in kg. Leave it empty to use the crop's base weight.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Pick its mutation, or leave "No mutation". A crop can only have one.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Set how many fruits you are selling, then use "Copy link" to share the result.</li>
+<!-- /wp:list-item -->
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"anchor":"how-it-is-calculated"} -->
+<h2 class="wp-block-heading" id="how-it-is-calculated">How it is calculated</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Fresh sell value = base value × size factor × mutation multiplier, rounded down to a whole number.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The size factor is (your weight ÷ base weight) to the power 2.5 for most crops; Mushroom and Bamboo use a smaller power. A fruit below the smallest size still counts as that size: 95% of the base weight for single-harvest crops and 85% for multi-harvest crops. This is the rule the community wiki publishes; we have not tested it in the game ourselves yet. <!-- rbx-allow-number: formula constants from the community wiki --></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:shortcode -->
+[uo_ad slot="below-tool"]
+<!-- /wp:shortcode -->
+
+<!-- wp:heading {"anchor":"worked-example"} -->
+<h2 class="wp-block-heading" id="worked-example">Worked example</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The calculator starts with a Carrot at its base weight of [rbx_value id="GAG2-PLT-0002" field="base_weight_kg"] kg, so it shows the Carrot's base value: [rbx_value id="GAG2-PLT-0002" field="base_value"] Sheckles. A Carrot twice that weight with the Gold mutation ([rbx_value id="GAG2-MUT-0001" field="income_mult"]) is worth 5 × 2^2.5 × 10, which rounds down to 282 Sheckles. <!-- rbx-allow-number: worked example arithmetic from the bound values --></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"anchor":"limits"} -->
+<h2 class="wp-block-heading" id="limits">Limits and known gaps</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li>The result is the <strong>fresh</strong> value. Decayed fruit sells for less, and we do not model decay yet.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Friend bonuses and other sell boosts are not included.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Every number comes from the community wiki and is not tested in game by us yet. Some crops sell for Leaves or Candy Corn; the crops list shows which.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>The calculator reads the <a href="/grow-a-garden-2/plants/">crops list</a> and the <a href="/grow-a-garden-2/mutations/">mutations list</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/data-section {"game":"gag2","section":"changes"} /-->

@@ -96,6 +96,8 @@ final class Loader {
 			$game                             = new Game( $config );
 			self::$games[ $game->key() ] = $game;
 		}
+		// Navigation, footer and home cards list games by `nav_order` (lowest first), then by name.
+		uasort( self::$games, static fn( Game $a, Game $b ) => ( (int) ( $a->raw()['nav_order'] ?? 99 ) <=> (int) ( $b->raw()['nav_order'] ?? 99 ) ) ?: strcmp( $a->name(), $b->name() ) );
 	}
 
 	public static function reset(): void {

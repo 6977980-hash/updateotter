@@ -35,6 +35,46 @@
     "title": "Steal an Egg Updates: Weekly Patch Notes & Changes | UpdateOtter",
     "description": "Steal an Egg updates we have tracked, newest first, and what changed in our data after each one."
   },
+  "grow-a-garden": {
+    "title": "Grow a Garden Wiki: Crops, Mutations & Codes | UpdateOtter",
+    "description": "Fan-made Grow a Garden wiki: every crop with its base value and weight, all crop mutations, a sell-value calculator and the codes list."
+  },
+  "grow-a-garden/calculator": {
+    "title": "Grow a Garden Calculator: Crop Value with Mutations | UpdateOtter",
+    "description": "Work out what a Grow a Garden fruit sells for from its crop, weight, variant and up to three mutations. Free, no sign-up, works on phones."
+  },
+  "grow-a-garden/plants": {
+    "title": "Grow a Garden Crops List: Values & Weights | UpdateOtter",
+    "description": "Every Grow a Garden crop by rarity with its base sell value, base weight and harvest type. Filter by rarity or sort by value."
+  },
+  "grow-a-garden/mutations": {
+    "title": "Grow a Garden Mutations: Multipliers & Stacking | UpdateOtter",
+    "description": "Every Grow a Garden crop mutation with its Sheckle multiplier and how to get it, plus how mutations and Gold or Rainbow variants stack."
+  },
+  "grow-a-garden/codes": {
+    "title": "Grow a Garden Codes ({month}): Active & Expired | UpdateOtter",
+    "description": "Are there working Grow a Garden codes? The current list, the expired codes, how to redeem them and how to avoid fake code sites."
+  },
+  "grow-a-garden-2": {
+    "title": "Grow a Garden 2 Wiki: Crops, Mutations & Codes | UpdateOtter",
+    "description": "Fan-made Grow a Garden 2 wiki: every crop with its base value, all mutations, a fresh-value calculator, codes and what changed from the first game."
+  },
+  "grow-a-garden-2/calculator": {
+    "title": "Grow a Garden 2 Calculator: Crop Value & Mutations | UpdateOtter",
+    "description": "Work out what a fresh Grow a Garden 2 fruit sells for from its crop, weight and mutation. Free, no sign-up, works on phones."
+  },
+  "grow-a-garden-2/plants": {
+    "title": "Grow a Garden 2 Crops List: Values, Weights & Tiers | UpdateOtter",
+    "description": "Every Grow a Garden 2 crop by tier with its base sell value, base weight, sell currency and harvest type."
+  },
+  "grow-a-garden-2/mutations": {
+    "title": "Grow a Garden 2 Mutations: Multipliers & Sources | UpdateOtter",
+    "description": "Every Grow a Garden 2 mutation with its multiplier, harvest chance and where it comes from. Crops carry one mutation, so they never stack."
+  },
+  "grow-a-garden-2/codes": {
+    "title": "Grow a Garden 2 Codes ({month}) & Rewards | UpdateOtter",
+    "description": "Grow a Garden 2 codes reported on the community wiki, with rewards and how to redeem them. We mark which ones we have not tested yet."
+  },
   "about": {
     "title": "About UpdateOtter: Who Runs This Fan Site | UpdateOtter",
     "description": "UpdateOtter is an unofficial, fan-made Roblox helper site run by Ali Ahmad. Why it exists, how we gather data and how to reach us."

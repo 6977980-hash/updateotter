@@ -256,6 +256,14 @@ final class Seo {
 				}
 				$lead = sprintf( /* translators: 1: mutation, 2: game */ __( '%1$s Mutation in %2$s', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', $name ), $game->name() );
 				break;
+			case 'PLT':
+				if ( $ds->field_state( $rec, 'base_value' )['calc_usable'] ) {
+					$parts[] = __( 'Price', 'rbx-data' );
+					$parts[] = __( 'Weight', 'rbx-data' );
+					$parts[] = __( 'Mutations', 'rbx-data' );
+				}
+				$lead = sprintf( /* translators: 1: crop, 2: game */ __( '%1$s Value in %2$s', 'rbx-data' ), $name, $game->name() );
+				break;
 			default:
 				$lead = sprintf( '%1$s in %2$s', $name, $game->name() );
 		}
@@ -285,7 +293,16 @@ final class Seo {
 		$rar  = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
 		$inc  = 'PET' === $rec['entity'] ? $ds->field_state( $rec, 'base_income_per_s' ) : null;
 		$mul  = 'MUT' === $rec['entity'] ? $ds->field_state( $rec, 'income_mult' ) : null;
-		if ( $inc && $inc['calc_usable'] && is_numeric( $inc['value'] ) ) {
+		$val  = 'PLT' === $rec['entity'] ? $ds->field_state( $rec, 'base_value' ) : null;
+		$crop = null !== $game->entity( 'PLT' );
+		if ( $val && $val['calc_usable'] && is_numeric( $val['value'] ) ) {
+			$cur = $ds->get( (string) ( $rec['data']['currency_id'] ?? '' ) );
+			/* translators: 1: crop, 2: game, 3: rarity, 4: value, 5: currency */
+			$bits[] = sprintf( __( 'How much a %1$s sells for in %2$s: a %3$s crop worth %4$s %5$s at its base weight, with every mutation and at heavier weights.', 'rbx-data' ), $rec['name'], $game->name(), $rar ? $rar['name'] : '', \RBX\Data\Format\Number::format( $val['value'] + 0, 'abbr', 'en' ), $cur ? $cur['name'] : 'Sheckles' );
+		} elseif ( $crop && $mul && is_numeric( $mul['value'] ) ) {
+			/* translators: 1: mutation, 2: game, 3: multiplier */
+			$bits[] = sprintf( __( 'The %1$s mutation in %2$s multiplies a crop\'s sell value by %3$s. How to get it, how it stacks, and what it does to real crops.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), $game->name(), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ) );
+		} elseif ( $inc && $inc['calc_usable'] && is_numeric( $inc['value'] ) ) {
 			/* translators: 1: pet, 2: game, 3: rarity, 4: income per second */
 			$bits[] = sprintf( __( 'How much the %1$s earns in %2$s: a %3$s pet with %4$s Cash per second base income, with every mutation and at higher weights.', 'rbx-data' ), $rec['name'], $game->name(), $rar ? $rar['name'] : '', \RBX\Data\Format\Number::format( $inc['value'] + 0, 'abbr', 'en' ) );
 		} elseif ( $mul && is_numeric( $mul['value'] ) ) {

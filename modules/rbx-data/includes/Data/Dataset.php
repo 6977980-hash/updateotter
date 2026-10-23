@@ -180,8 +180,9 @@ final class Dataset {
 
 	/** @param array<int, string> $keys Mechanic keys. */
 	public function mechanics_confirmed( array $keys ): bool {
+		$ok = $this->game->wiki_formula_ok() ? array( 'confirmed', 'partially_confirmed' ) : array( 'confirmed' );
 		foreach ( $keys as $k ) {
-			if ( 'confirmed' !== $this->mechanic_status( (string) $k ) ) {
+			if ( ! in_array( $this->mechanic_status( (string) $k ), $ok, true ) ) {
 				return false;
 			}
 		}
