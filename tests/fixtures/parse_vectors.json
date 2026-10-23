@@ -1,0 +1,536 @@
+[
+    {
+        "text": "1.5M",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "1,500",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500.0,
+            "error": null
+        }
+    },
+    {
+        "text": "2.5x",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "mult": true
+        },
+        "out": {
+            "ok": true,
+            "value": 2.5,
+            "error": null
+        }
+    },
+    {
+        "text": "x2.5",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "mult": true
+        },
+        "out": {
+            "ok": true,
+            "value": 2.5,
+            "error": null
+        }
+    },
+    {
+        "text": "×3",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "mult": true
+        },
+        "out": {
+            "ok": true,
+            "value": 3.0,
+            "error": null
+        }
+    },
+    {
+        "text": "abc",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "1e9",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "-1",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "negative"
+        }
+    },
+    {
+        "text": "-1",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "allow_negative": true
+        },
+        "out": {
+            "ok": true,
+            "value": -1.0,
+            "error": null
+        }
+    },
+    {
+        "text": "999T",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 999000000000000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "empty"
+        }
+    },
+    {
+        "text": "   ",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "empty"
+        }
+    },
+    {
+        "text": "1.5",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "M",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "1.5M",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "K",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "1,5",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "ambiguous"
+        }
+    },
+    {
+        "text": "1 500 000",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "12,345.67",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 12345.67,
+            "error": null
+        }
+    },
+    {
+        "text": "1.2.3",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "1,50",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "ambiguous"
+        }
+    },
+    {
+        "text": "2k",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 2000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "2 K",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 2000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "3q",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "1.5",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "integer": true
+        },
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "not_integer"
+        }
+    },
+    {
+        "text": "10",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "integer": true,
+            "max": 5
+        },
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "too_big"
+        }
+    },
+    {
+        "text": "0",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "min": 1
+        },
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "too_small"
+        }
+    },
+    {
+        "text": "9007199254740993",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {
+            "integer": true
+        },
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "too_big"
+        }
+    },
+    {
+        "text": "NaN",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "Infinity",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "1.25B",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1250000000.0,
+            "error": null
+        }
+    },
+    {
+        "text": " 42 ",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 42.0,
+            "error": null
+        }
+    },
+    {
+        "text": ".5",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "5.",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "1,234,567",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1234567.0,
+            "error": null
+        }
+    },
+    {
+        "text": "1,2345",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "ambiguous"
+        }
+    },
+    {
+        "text": "7",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "T",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 7000000000000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "2.5Qa",
+        "locale": "en",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "invalid"
+        }
+    },
+    {
+        "text": "2.5Qa",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 2500000000000000.0,
+            "error": null
+        }
+    },
+    {
+        "text": "1,5",
+        "locale": "id",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1.5,
+            "error": null
+        }
+    },
+    {
+        "text": "1.500",
+        "locale": "id",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500.0,
+            "error": null
+        }
+    },
+    {
+        "text": "1.500,25",
+        "locale": "id",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": true,
+            "value": 1500.25,
+            "error": null
+        }
+    },
+    {
+        "text": "1.5",
+        "locale": "id",
+        "ladder": null,
+        "suffix": "",
+        "opts": {},
+        "out": {
+            "ok": false,
+            "value": null,
+            "error": "ambiguous"
+        }
+    }
+]

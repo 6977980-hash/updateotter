@@ -1,0 +1,241 @@
+{
+  "game_code": "SAE",
+  "name": "Steal an Egg",
+  "short_name": "Steal an Egg",
+  "folder": "steal-an-egg",
+  "roblox_universe_id": null,
+  "roblox_place_id": null,
+  "schema_version": "1.0",
+  "locales": ["en"],
+  "freshness_days": 30,
+  "game_accent": "#0B6E5B",
+  "notifier": { "update_windows": [] },
+  "menu_order": ["calculator", "pets", "eggs", "mutations", "codes", "updates", "tier-list"],
+  "sections": {
+    "calculator": { "label__en": "Calculator", "type": "tool", "tool": "calculator" },
+    "pets": { "label__en": "Pets", "type": "list", "entity": "PET" },
+    "eggs": { "label__en": "Eggs", "type": "list", "entity": "EGG" },
+    "mutations": { "label__en": "Mutations", "type": "mutations", "entity": "MUT" },
+    "codes": { "label__en": "Codes", "type": "codes" },
+    "updates": { "label__en": "Updates", "type": "updates" },
+    "tier-list": { "label__en": "Tier list", "type": "tier_list", "entity": "PET" }
+  },
+  "entities": {
+    "CUR": {
+      "tab": "currencies", "label__en": "Currency", "plural__en": "Currencies", "named": true, "page": false,
+      "fields": {
+        "symbol_text": { "type": "string", "label__en": "Symbol" },
+        "is_premium": { "type": "bool", "label__en": "Premium currency" }
+      }
+    },
+    "RAR": {
+      "tab": "rarities", "label__en": "Rarity", "plural__en": "Rarities", "named": true, "page": false,
+      "fields": {
+        "sort_order": { "type": "int", "label__en": "Sort order", "required": true },
+        "ui_color_hex": { "type": "string", "label__en": "Colour", "pattern": "^#[0-9A-Fa-f]{6}$" }
+      }
+    },
+    "BIO": {
+      "tab": "biomes", "post_type": "rbx_biome", "path": "biomes", "label__en": "Biome", "plural__en": "Biomes", "named": true, "page": false,
+      "fields": {
+        "order_index": { "type": "int", "label__en": "Order" },
+        "unlock_requirement_text__en": { "type": "text", "label__en": "How to unlock" },
+        "unlock_speed_required": { "type": "decimal", "label__en": "Speed needed", "requires_mechanics": ["speed_requirement"], "display_format": "abbr" },
+        "unlock_cost": { "type": "decimal", "label__en": "Unlock cost", "currency_field": "unlock_currency_id", "display_format": "abbr" },
+        "unlock_currency_id": { "type": "ref", "target": "CUR", "label__en": "Unlock currency" }
+      }
+    },
+    "EGG": {
+      "tab": "eggs", "post_type": "rbx_egg", "path": "eggs", "label__en": "Egg", "plural__en": "Eggs", "named": true, "page": true,
+      "fields": {
+        "aliases": { "type": "string", "label__en": "Also called" },
+        "rarity_id": { "type": "ref", "target": "RAR", "label__en": "Rarity", "list": true, "facet": true },
+        "biome_ids": { "type": "ref_list", "target": "BIO", "label__en": "Found in", "list": true, "facet": true },
+        "cost": { "type": "decimal", "label__en": "Cost", "currency_field": "currency_id", "display_format": "abbr", "list": true, "compare": true },
+        "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "hatch_time_s": { "type": "duration_s", "label__en": "Hatch time", "requires_mechanics": ["hatch_time"], "display_format": "duration", "list": true, "compare": true },
+        "is_lab_egg": { "type": "bool", "label__en": "Lab egg (Dr. Scramble)" },
+        "obtain_method": { "type": "enum", "enum": ["biome_spawn", "shop", "lab", "event", "game_pass", "other"], "label__en": "How to get", "required_for_index": true, "facet": true },
+        "odds_published": { "type": "bool", "label__en": "Odds published by the developer" },
+        "notes__en": { "type": "text", "label__en": "Notes from testing", "editorial": true },
+        "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
+        "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
+      },
+      "index_any_of": [["rarity_id", "cost"]],
+      "required_relations_for_index": [{ "entity": "DRP", "field": "egg_id", "min": 1 }],
+      "siblings_by": ["rarity_id"],
+      "require_screenshot_for_index": true
+    },
+    "DRP": {
+      "tab": "egg_drops", "label__en": "Egg drop", "plural__en": "Egg drops", "named": false, "page": false,
+      "fields": {
+        "egg_id": { "type": "ref", "target": "EGG", "label__en": "Egg", "required": true },
+        "pet_id": { "type": "ref", "target": "PET", "label__en": "Pet", "required": true },
+        "chance_prob": { "type": "prob", "label__en": "Chance", "display_format": "prob" },
+        "observed_rate": { "type": "prob", "label__en": "Observed rate", "display_format": "prob" },
+        "sample_size": { "type": "int", "label__en": "Hatches observed" },
+        "condition_text__en": { "type": "text", "label__en": "Condition" }
+      }
+    },
+    "PET": {
+      "tab": "pets", "post_type": "rbx_pet", "path": "pets", "label__en": "Pet", "plural__en": "Pets", "named": true, "page": true,
+      "fields": {
+        "aliases": { "type": "string", "label__en": "Also called" },
+        "rarity_id": { "type": "ref", "target": "RAR", "label__en": "Rarity", "required_for_index": true, "list": true, "facet": true },
+        "base_income_per_s": { "type": "decimal", "label__en": "Base income per second", "currency_field": "currency_id", "requires_mechanics": ["income_formula"], "required_for_index": true, "display_format": "abbr", "compare": true, "list": true },
+        "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "base_speed": { "type": "decimal", "label__en": "Base speed", "requires_mechanics": ["speed_requirement"], "display_format": "decimal(2)", "compare": true },
+        "is_secret": { "type": "bool", "label__en": "Secret pet", "facet": true },
+        "is_mountable": { "type": "bool", "label__en": "Can be ridden", "requires_mechanics": ["mounts"] },
+        "tier_list_rank": { "type": "enum", "enum": ["S", "A", "B", "C", "D"], "label__en": "Tier", "opinion": true },
+        "tier_rationale__en": { "type": "text", "label__en": "Why this tier", "opinion": true },
+        "notes__en": { "type": "text", "label__en": "Notes from testing", "editorial": true },
+        "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
+        "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
+      },
+      "required_relations_for_index": [{ "entity": "SRC", "field": "pet_id", "min": 1 }],
+      "siblings_by": ["rarity_id"],
+      "require_screenshot_for_index": true
+    },
+    "SRC": {
+      "tab": "pet_sources", "label__en": "Pet source", "plural__en": "Pet sources", "named": false, "page": false,
+      "fields": {
+        "pet_id": { "type": "ref", "target": "PET", "label__en": "Pet", "required": true },
+        "source_kind": { "type": "enum", "enum": ["egg", "fusion", "ritual", "lab", "event", "shop", "game_pass", "code", "other"], "label__en": "Source", "required": true },
+        "source_ref_id": { "type": "ref", "target": ["EGG", "FUS", "RIT", "LAB", "GPS", "COD", "UPD"], "label__en": "Source record" },
+        "note__en": { "type": "text", "label__en": "Note" }
+      }
+    },
+    "MUT": {
+      "tab": "mutations", "post_type": "rbx_mutation", "path": "mutations", "label__en": "Mutation", "plural__en": "Mutations", "named": true, "page": true,
+      "fields": {
+        "aliases": { "type": "string", "label__en": "Also called" },
+        "applies_to": { "type": "enum", "enum": ["pet", "egg"], "label__en": "Applies to", "facet": true },
+        "income_mult": { "type": "mult", "label__en": "Income multiplier", "requires_mechanics": ["mutation_multiplier"], "required_for_index": true, "display_format": "mult", "compare": true, "list": true },
+        "other_effect_text__en": { "type": "text", "label__en": "Other effect" },
+        "stack_group": { "type": "string", "label__en": "Stack group" },
+        "stack_rule": { "type": "enum", "enum": ["multiply", "add_bonus", "max_only", "exclusive", "unknown"], "label__en": "How it stacks", "requires_mechanics": ["mutation_stacking"] },
+        "obtain_method_text__en": { "type": "text", "label__en": "How to get", "required_for_index": true, "list": true },
+        "visual_color_hex": { "type": "string", "label__en": "Colour", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "chance_prob": { "type": "prob", "label__en": "Chance", "display_format": "prob" },
+        "notes__en": { "type": "text", "label__en": "Notes from testing", "editorial": true },
+        "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
+        "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
+      },
+      "siblings_by": ["applies_to"],
+      "require_screenshot_for_index": true
+    },
+    "SIZ": {
+      "tab": "sizes", "label__en": "Size", "plural__en": "Sizes", "named": true, "page": false,
+      "fields": {
+        "order_index": { "type": "int", "label__en": "Order" },
+        "income_mult": { "type": "mult", "label__en": "Income multiplier", "requires_mechanics": ["size_multiplier"], "display_format": "mult" },
+        "scale_min": { "type": "decimal", "label__en": "Scale from", "requires_mechanics": ["size_multiplier"], "display_format": "decimal(2)" },
+        "scale_max": { "type": "decimal", "label__en": "Scale to", "requires_mechanics": ["size_multiplier"], "display_format": "decimal(2)" },
+        "chance_prob": { "type": "prob", "label__en": "Chance", "display_format": "prob" }
+      }
+    },
+    "FUS": {
+      "tab": "fusion_recipes", "label__en": "Fusion recipe", "plural__en": "Fusion recipes", "named": true, "page": false,
+      "fields": {
+        "inputs": { "type": "json", "label__en": "Ingredients", "json_shape": "recipe_inputs", "required": true },
+        "output_pet_id": { "type": "ref", "target": "PET", "label__en": "Result" },
+        "outcome_table": { "type": "json", "label__en": "Possible results", "json_shape": "outcome_table" },
+        "success_prob": { "type": "prob", "label__en": "Success chance", "requires_mechanics": ["fusion_odds"], "display_format": "prob" },
+        "cost": { "type": "decimal", "label__en": "Cost", "currency_field": "currency_id", "display_format": "abbr" },
+        "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "station_text__en": { "type": "text", "label__en": "Where" }
+      }
+    },
+    "RIT": {
+      "tab": "rituals", "label__en": "Ritual", "plural__en": "Rituals", "named": true, "page": false,
+      "fields": {
+        "inputs": { "type": "json", "label__en": "Ingredients", "json_shape": "recipe_inputs", "required": true },
+        "output_pet_id": { "type": "ref", "target": "PET", "label__en": "Result" },
+        "outcome_table": { "type": "json", "label__en": "Possible results", "json_shape": "outcome_table" },
+        "success_prob": { "type": "prob", "label__en": "Success chance", "requires_mechanics": ["fusion_odds"], "display_format": "prob" },
+        "cost": { "type": "decimal", "label__en": "Cost", "currency_field": "currency_id", "display_format": "abbr" },
+        "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "station_text__en": { "type": "text", "label__en": "Where" },
+        "required_biome_id": { "type": "ref", "target": "BIO", "label__en": "Biome" },
+        "cooldown_s": { "type": "duration_s", "label__en": "Cooldown", "display_format": "duration" }
+      }
+    },
+    "LAB": {
+      "tab": "lab_recipes", "label__en": "Lab recipe", "plural__en": "Lab recipes", "named": true, "page": false,
+      "fields": {
+        "inputs": { "type": "json", "label__en": "Ingredients", "json_shape": "recipe_inputs", "required": true },
+        "output_pet_id": { "type": "ref", "target": "PET", "label__en": "Result pet" },
+        "output_egg_id": { "type": "ref", "target": "EGG", "label__en": "Result egg" },
+        "outcome_table": { "type": "json", "label__en": "Possible results", "json_shape": "outcome_table" },
+        "success_prob": { "type": "prob", "label__en": "Success chance", "requires_mechanics": ["fusion_odds"], "display_format": "prob" },
+        "cost": { "type": "decimal", "label__en": "Cost", "currency_field": "currency_id", "display_format": "abbr" },
+        "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "station_text__en": { "type": "text", "label__en": "Where" }
+      }
+    },
+    "MNT": {
+      "tab": "mounts", "post_type": "rbx_mount", "path": "mounts", "label__en": "Mount", "plural__en": "Mounts", "named": true, "page": false,
+      "fields": {
+        "speed_bonus": { "type": "decimal", "label__en": "Speed bonus", "requires_mechanics": ["mounts"], "display_format": "decimal(2)" },
+        "speed_mult": { "type": "mult", "label__en": "Speed multiplier", "requires_mechanics": ["mounts"], "display_format": "mult" },
+        "obtain_method_text__en": { "type": "text", "label__en": "How to get" },
+        "cost": { "type": "decimal", "label__en": "Cost", "currency_field": "currency_id", "display_format": "abbr" },
+        "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "pet_id": { "type": "ref", "target": "PET", "label__en": "Pet" }
+      },
+      "exactly_one_of": [["speed_bonus", "speed_mult"]]
+    },
+    "GPS": {
+      "tab": "game_passes", "label__en": "Game pass", "plural__en": "Game passes", "named": true, "page": false,
+      "fields": {
+        "roblox_gamepass_id": { "type": "int", "label__en": "Roblox game pass ID" },
+        "price_robux": { "type": "robux", "label__en": "Price (Robux)", "display_format": "int" },
+        "effect_text__en": { "type": "text", "label__en": "Effect" },
+        "effect_mult": { "type": "mult", "label__en": "Effect multiplier", "requires_mechanics": ["game_pass_effects"], "display_format": "mult" },
+        "effect_target_field": { "type": "string", "label__en": "Affects" }
+      }
+    },
+    "COD": {
+      "tab": "codes", "label__en": "Code", "plural__en": "Codes", "named": false, "page": false,
+      "fields": {
+        "code": { "type": "string", "label__en": "Code", "required": true },
+        "reward_text__en": { "type": "text", "label__en": "Reward" },
+        "reward_items": { "type": "json", "label__en": "Reward items", "json_shape": "reward_items" },
+        "code_status": { "type": "enum", "enum": ["active", "expired", "unverified"], "label__en": "Code status", "required": true },
+        "first_seen": { "type": "date", "label__en": "First seen" },
+        "last_tested_at": { "type": "datetime", "label__en": "Last tested" },
+        "tested_by": { "type": "string", "label__en": "Tested by" },
+        "expires_at": { "type": "datetime", "label__en": "Expires", "future_ok": true }
+      }
+    },
+    "UPD": {
+      "tab": "updates", "post_type": "rbx_update", "path": "updates", "label__en": "Update", "plural__en": "Updates", "named": false, "slugged": true, "page": true,
+      "fields": {
+        "title__en": { "type": "text", "label__en": "Title", "required": true },
+        "release_date": { "type": "date", "label__en": "Release date", "required_for_index": true },
+        "roblox_updated_at": { "type": "datetime", "label__en": "Roblox update time" },
+        "official_source_url": { "type": "url", "label__en": "Official notes" },
+        "summary__en": { "type": "text", "label__en": "Summary", "required_for_index": true, "editorial": true },
+        "affected_record_ids": { "type": "ref_list", "target": "*", "label__en": "Affected items" }
+      },
+      "slug_pattern": "^\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(-[a-z0-9]+)*$",
+      "require_screenshot_for_index": false
+    }
+  },
+  "tools": [
+    {
+      "key": "calculator",
+      "path": "calculator",
+      "label__en": "Steal an Egg Calculator",
+      "slices": ["core", "pets"],
+      "inputs": [
+        { "key": "pet", "type": "ref", "target": "PET", "label__en": "Pet", "group_by": "rarity_id" },
+        { "key": "mutation", "type": "ref", "target": "MUT", "label__en": "Mutation", "optional": true, "none_label__en": "No mutation" },
+        { "key": "size", "type": "ref", "target": "SIZ", "label__en": "Size", "optional": true, "none_label__en": "Normal size" },
+        { "key": "count", "type": "number", "label__en": "How many", "min": 1, "max": 1000000, "default": 1, "integer": true }
+      ]
+    }
+  ],
+  "sibling_game": null
+}

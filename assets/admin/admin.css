@@ -1,0 +1,19 @@
+.rbx-admin .rbx-inline { display: inline-block; margin: 0 .5em .5em 0; }
+.rbx-admin .rbx-box { background: #fff; border: 1px solid #c3c4c7; padding: 12px 16px; margin: 12px 0; max-width: 1100px; }
+.rbx-admin .rbx-counts { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; padding: 0; list-style: none; }
+.rbx-admin .rbx-count { background: #f0f0f1; border-radius: 3px; padding: 4px 10px; }
+.rbx-admin .rbx-count--errors { background: #fcf0f1; color: #8a2424; }
+.rbx-admin .rbx-count--warnings { background: #fcf9e8; }
+.rbx-admin .rbx-issue--error td:first-child { color: #b32d2e; font-weight: 600; }
+.rbx-admin .rbx-op { border-left: 4px solid #c3c4c7; padding: 4px 12px; margin: 8px 0; background: #fff; }
+.rbx-admin .rbx-op--large { border-left-color: #dba617; }
+.rbx-admin .rbx-diff { margin: 4px 0 8px; }
+.rbx-admin .rbx-bad { color: #b32d2e; }
+.rbx-admin .rbx-status { background: #f0f0f1; border-radius: 3px; padding: 1px 6px; font-size: 12px; }
+.rbx-admin progress { width: 100%; max-width: 480px; }
+.rbx-admin .rbx-live:empty { display: none; }
+.rbx-state { border-radius: 3px; padding: 1px 6px; font-size: 12px; background: #f0f0f1; }
+.rbx-state--index { background: #edfaef; color: #1a6b2c; }
+.rbx-state--noindex { background: #fcf9e8; }
+.rbx-state--not_generated { background: #fcf0f1; }
+.rbx-todo { background: #fcf9e8; border-left: 4px solid #dba617; padding: 6px 10px; }
