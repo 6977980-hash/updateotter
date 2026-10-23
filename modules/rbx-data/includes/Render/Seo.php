@@ -338,7 +338,9 @@ final class Seo {
 
 	/**
 	 * Title or description of a site Page from `content/seo.json` (CONT-06/08), keyed by page
-	 * path, `home` for the front page. `{month}` becomes the current month, e.g. October 2026.
+	 * path, `home` for the front page. `{month}` becomes the current month, e.g. October 2026. On a
+	 * codes page it is the month of the newest codes check instead, and is dropped when that check
+	 * is older than the game's freshness window (UO-05), so the title never claims a check nobody did.
 	 */
 	public static function page_seo( string $field ): ?string {
 		static $map = null;
@@ -355,7 +357,37 @@ final class Seo {
 			return null;
 		}
 		$v = $map[ $key ][ $field ] ?? null;
-		return is_string( $v ) && '' !== $v ? str_replace( '{month}', Lang::month_year(), $v ) : null;
+		if ( ! is_string( $v ) || '' === $v ) {
+			return null;
+		}
+		if ( ! str_contains( $v, '{month}' ) ) {
+			return $v;
+		}
+		$month = Lang::month_year();
+		if ( preg_match( '#^(?:id/)?([a-z0-9-]+)/codes$#', (string) $key, $m ) ) {
+			$game  = Loader::by_folder( $m[1] );
+			$last  = $game ? self::codes_checked( $game ) : '';
+			$fresh = '' !== $last && strtotime( $last . ' 12:00 UTC' ) >= time() - $game->freshness_days() * DAY_IN_SECONDS;
+			$month = $fresh ? Lang::month_year( (int) strtotime( $last . ' 12:00 UTC' ) ) : '';
+		}
+		if ( '' === $month ) {
+			return trim( (string) preg_replace( '/\s*\(\{month\}\)|\s*\{month\}/', '', $v ) );
+		}
+		return str_replace( '{month}', $month, $v );
+	}
+
+	/** Newest codes check (Y-m-d): the Codes screen log, a code row's dates, or the redeem-box row. */
+	public static function codes_checked( Game $game ): string {
+		$dates = array( CheckLog::last_checked( $game ) );
+		$ds    = Repository::dataset( $game );
+		if ( $game->entity( 'COD' ) ) {
+			foreach ( $ds->all( 'COD', null ) as $c ) {
+				$dates[] = substr( (string) ( $c['data']['last_tested_at'] ?? '' ), 0, 10 );
+				$dates[] = (string) ( $c['data']['last_verified'] ?? '' );
+			}
+		}
+		$dates[] = (string) ( $ds->meta_all()['redeem_ui_exists']['last_verified'] ?? '' );
+		return (string) max( $dates );
 	}
 
 	public static function rm_description( string $desc ): string {

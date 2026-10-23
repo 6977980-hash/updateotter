@@ -381,17 +381,19 @@ final class Sections {
 		$out .= Ui::h2( sprintf( __( 'Does %s have a code redeem button?', 'rbx-data' ), $game->name() ), 'redeem-button' );
 		$out .= '<p>' . ( 'yes' === $redeem
 			? esc_html__( 'Yes. The game has a place to type codes.', 'rbx-data' )
-			: ( 'no' === $redeem ? esc_html__( 'No. The game has no place to type codes right now, so any site that says it does is wrong.', 'rbx-data' ) : esc_html__( 'We have not confirmed this yet.', 'rbx-data' ) ) ) . '</p>';
+			: ( 'no' === $redeem ? esc_html__( 'Community reports and the game page show no code box right now.', 'rbx-data' ) : esc_html__( 'We have not confirmed this yet.', 'rbx-data' ) ) ) . '</p>';
 		$channels = (array) ( $ds->meta( 'official_channels' ) ?? array() );
-		$out     .= Ui::h2( __( 'How we check for codes', 'rbx-data' ), 'how-we-check' ) . '<p>' . esc_html__( 'We check the channels below at least once a week and after every game update. We mark a code as working only after we redeem it in the game or the developer posts it. Codes that other players report, but we have not tested, are listed separately as reported codes.', 'rbx-data' ) . '</p>';
+		$out     .= Ui::h2( __( 'How we check for codes', 'rbx-data' ), 'how-we-check' ) . '<p>' . esc_html__( 'We look at the channels below and the community wiki for new codes. We mark a code as working only after we redeem it in the game or the developer posts it. Codes that other players report, but we have not tested, are listed separately as reported codes.', 'rbx-data' ) . '</p>';
 		if ( $channels ) {
 			$out .= '<ul>';
 			foreach ( $channels as $u ) {
-				$out .= '<li><a href="' . esc_url( (string) $u ) . '" rel="noopener nofollow">' . esc_html( (string) wp_parse_url( (string) $u, PHP_URL_HOST ) ) . '</a></li>';
+				$path = (string) wp_parse_url( (string) $u, PHP_URL_PATH );
+				$name = str_contains( $path, '/games/' ) ? __( 'Game page on Roblox', 'rbx-data' ) : ( str_contains( $path, '/communities/' ) || str_contains( $path, '/groups/' ) ? __( 'Developer group on Roblox', 'rbx-data' ) : (string) wp_parse_url( (string) $u, PHP_URL_HOST ) );
+				$out .= '<li><a href="' . esc_url( (string) $u ) . '" rel="noopener nofollow">' . esc_html( $name ) . '</a></li>';
 			}
 			$out .= '</ul>';
 		}
-		$out .= '<aside class="rbx-scam" role="note"><h2 id="fake-code-scams">' . esc_html__( 'Stay safe: fake code scams', 'rbx-data' ) . '</h2><p>' . esc_html__( "No code, website, or video can give free Robux. Never enter your password or run scripts from 'code' sites.", 'rbx-data' ) . '</p><ul><li>' . esc_html__( 'Codes are only typed inside the game.', 'rbx-data' ) . '</li><li>' . esc_html__( 'Never share your password with anyone.', 'rbx-data' ) . '</li><li>' . esc_html__( 'Do not download anything to get codes or pets.', 'rbx-data' ) . '</li></ul></aside>';
+		$out .= '<aside class="rbx-scam" role="note"><h2 id="fake-code-scams">' . esc_html__( 'Stay safe: fake code scams', 'rbx-data' ) . '</h2><p>' . esc_html__( 'No code, website, or video can give free Robux. Never enter your password or run scripts from “code” sites.', 'rbx-data' ) . '</p><ul><li>' . esc_html__( 'Codes are only typed inside the game.', 'rbx-data' ) . '</li><li>' . esc_html__( 'Never share your password with anyone.', 'rbx-data' ) . '</li><li>' . esc_html__( 'Do not download anything to get codes or pets.', 'rbx-data' ) . '</li></ul></aside>';
 		return $out;
 	}
 
