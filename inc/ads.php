@@ -1,8 +1,13 @@
 <?php
 /**
- * Manual ad slots (UX-38..40, TECH-43, POL-30). Nothing renders until the owner saves an AdSense
- * client ID and slot IDs AND ticks "approved" (L9: no empty boxes before approval).
- * Settings live under Appearance → UpdateOtter.
+ * Manual ad slots (UX-38..40, TECH-43, POL-30), ads.txt (POL-28) and the AdSense site tag.
+ *
+ * Config lives in git: content/ads.json (Ali's rule: no wp-admin work). The Appearance → UpdateOtter
+ * screen is only a fallback for keys the file leaves empty.
+ * - publisher_id set: home page gets <meta name="google-adsense-account"> (site check during the
+ *   application) and /ads.txt serves the Google line.
+ * - approved true + slot IDs: the ad script loads and the slots render. Nothing renders before
+ *   approval (L9: no empty boxes).
  *
  * @package UpdateOtter
  */
@@ -13,10 +18,46 @@ defined( 'ABSPATH' ) || exit;
 
 const UPDATEOTTER_AD_SLOTS = array( 'below-tool', 'mid-content', 'end', 'sidebar' );
 
+/**
+ * Effective ad config: content/ads.json first, then the old options.
+ *
+ * @return array{client: string, approved: bool, slots: array<string, string>}
+ */
+function updateotter_ads_config(): array {
+	static $cfg = null;
+	if ( null !== $cfg ) {
+		return $cfg;
+	}
+	$file = get_template_directory() . '/content/ads.json';
+	$json = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+	$json = is_array( $json ) ? $json : array();
+
+	$pub    = trim( (string) ( $json['publisher_id'] ?? '' ) );
+	$client = '' !== $pub ? 'ca-' . preg_replace( '/^ca-/', '', $pub ) : (string) get_option( 'updateotter_adsense_client', '' );
+	if ( 1 !== preg_match( '/^ca-pub-\d{10,20}$/', $client ) ) {
+		$client = '';
+	}
+
+	$slots = (array) get_option( 'updateotter_ad_slot_ids', array() );
+	foreach ( (array) ( $json['slots'] ?? array() ) as $k => $v ) {
+		if ( in_array( $k, UPDATEOTTER_AD_SLOTS, true ) && '' !== (string) $v ) {
+			$slots[ $k ] = (string) $v;
+		}
+	}
+
+	$cfg = array(
+		'client'   => $client,
+		'approved' => is_bool( $json['approved'] ?? null ) ? $json['approved'] : (bool) get_option( 'updateotter_ads_approved', 0 ),
+		'slots'    => array_filter( array_map( 'strval', $slots ), static fn( $v ) => 1 === preg_match( '/^\d{6,12}$/', $v ) ),
+	);
+	return $cfg;
+}
+
 function updateotter_ads_on(): bool {
+	$cfg = updateotter_ads_config();
 	return ! updateotter_locked()
-		&& (bool) get_option( 'updateotter_ads_approved', 0 )
-		&& 1 === preg_match( '/^ca-pub-\d{10,20}$/', (string) get_option( 'updateotter_adsense_client', '' ) )
+		&& $cfg['approved']
+		&& '' !== $cfg['client']
 		&& ! is_404()
 		&& ! is_search()
 		&& ! updateotter_is_site_page();
@@ -30,9 +71,8 @@ function updateotter_ad_slot( string $slot ): void {
 	if ( ! in_array( $slot, UPDATEOTTER_AD_SLOTS, true ) || ! updateotter_ads_on() || $count >= 3 ) {
 		return;
 	}
-	$ids = (array) get_option( 'updateotter_ad_slot_ids', array() );
-	$id  = (string) ( $ids[ $slot ] ?? '' );
-	if ( ! preg_match( '/^\d{6,12}$/', $id ) ) {
+	$id = updateotter_ads_config()['slots'][ $slot ] ?? '';
+	if ( '' === $id ) {
 		return;
 	}
 	++$count;
@@ -40,7 +80,7 @@ function updateotter_ad_slot( string $slot ): void {
 		'<div class="ad-slot ad-slot--%1$s"><span class="ad-slot__label">%2$s</span><ins class="adsbygoogle" style="display:block" data-ad-client="%3$s" data-ad-slot="%4$s" data-ad-format="auto" data-full-width-responsive="true" data-tag-for-age-treatment="1"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>',
 		esc_attr( $slot ),
 		esc_html__( 'Advertisement', 'updateotter' ),
-		esc_attr( (string) get_option( 'updateotter_adsense_client' ) ),
+		esc_attr( updateotter_ads_config()['client'] ),
 		esc_attr( $id )
 	);
 }
@@ -50,10 +90,55 @@ add_action(
 	'wp_head',
 	static function (): void {
 		if ( updateotter_ads_on() ) {
-			printf( '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%s" crossorigin="anonymous"></script>' . "\n", esc_attr( (string) get_option( 'updateotter_adsense_client' ) ) );
+			printf( '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%s" crossorigin="anonymous"></script>' . "\n", esc_attr( updateotter_ads_config()['client'] ) );
 		}
 	},
 	30
+);
+
+/* [uo_ad slot="below-tool"] places a slot inside page content (calculator, hub). */
+add_shortcode(
+	'uo_ad',
+	static function ( $atts ): string {
+		$slot = (string) ( shortcode_atts( array( 'slot' => '' ), (array) $atts )['slot'] );
+		ob_start();
+		updateotter_ad_slot( $slot );
+		return (string) ob_get_clean();
+	}
+);
+
+/* AdSense site ownership tag, home page only (same place as the Search Console tag). */
+add_action(
+	'wp_head',
+	static function (): void {
+		$client = updateotter_ads_config()['client'];
+		if ( '' !== $client && is_front_page() && ! updateotter_locked() ) {
+			echo '<meta name="google-adsense-account" content="' . esc_attr( $client ) . '">' . "\n";
+		}
+	},
+	1
+);
+
+/* /ads.txt (POL-28): text/plain, 200, from content/ads.json. 404 until a publisher ID is set. */
+add_action(
+	'parse_request',
+	static function (): void {
+		$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( rtrim( (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ), '/' ) . '/ads.txt' !== $path ) {
+			return;
+		}
+		$client = updateotter_ads_config()['client'];
+		if ( '' === $client ) {
+			return;
+		}
+		status_header( 200 );
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'Cache-Control: public, max-age=86400' );
+		header( 'X-Content-Type-Options: nosniff' );
+		echo 'google.com, ' . esc_html( substr( $client, 3 ) ) . ", DIRECT, f08c47fec0942fa0\n";
+		exit;
+	},
+	0
 );
 
 /* Settings page: GA4 ID, AdSense client, slot IDs, approved flag. */

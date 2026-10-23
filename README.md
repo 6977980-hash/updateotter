@@ -22,3 +22,5 @@ Theme layout:
 - `patterns/` holds the editor patterns (FAQ, how we calculated, comparison table, scam warning, update summary).
 
 Pre-launch lock: while the `rbx_prelaunch_lock` option is on (on by default), logged-out visitors see a "Coming soon" page, every response sends `X-Robots-Tag: noindex, nofollow`, and robots.txt disallows everything. Turn it off at launch (Phase 1c) on RBX Data → Setup or with `wp rbx prelaunch off`.
+
+Ads (Phase 1d): `content/ads.json` holds the AdSense publisher ID, the "approved" switch and the manual slot IDs. With only the publisher ID set, the home page gets the `google-adsense-account` tag and `/ads.txt` is served; slots and the ad script render only when `approved` is `true`. Every unit carries `data-tag-for-age-treatment="1"`; Auto ads stay off in the AdSense account. Place a slot inside page content with `[uo_ad slot="below-tool"]`. Bump the `purge` id in `content/launch.json` after changing the file.

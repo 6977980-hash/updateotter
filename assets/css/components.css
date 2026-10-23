@@ -531,6 +531,9 @@ summary.rbx-chip {
 	background: var(--surface);
 	position: relative;
 }
+.ad-slot:has(ins[data-ad-status="unfilled"]) {
+	display: none;
+}
 .ad-slot__label {
 	display: block;
 	font-size: var(--fs-xs);
