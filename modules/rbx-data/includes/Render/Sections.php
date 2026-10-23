@@ -27,7 +27,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sections {
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -55,7 +55,7 @@ final class Sections {
 	 */
 	public static function render( array $a ): string {
 		$section = (string) ( $a['section'] ?? '' );
-		if ( 'home_games' === $section || 'home_latest' === $section || 'corrections' === $section || 'report_form' === $section ) {
+		if ( 'home_games' === $section || 'home_latest' === $section || 'home_guides' === $section || 'corrections' === $section || 'report_form' === $section ) {
 			$game = null;
 		} else {
 			$game = Loader::game( (string) ( $a['game'] ?? '' ) );
@@ -106,6 +106,8 @@ final class Sections {
 					return self::home_games();
 				case 'home_latest':
 					return self::home_latest();
+				case 'home_guides':
+					return self::home_guides();
 			}
 		} catch ( \Throwable $e ) {
 			\RBX\Data\Log\ErrorLog::add( 'render', $section . ': ' . $e->getMessage() );
@@ -625,11 +627,36 @@ final class Sections {
 					$links .= '<li><a href="' . esc_url( $u ) . '">' . esc_html( (string) $game->section( $s )['label__en'] ) . '</a></li>';
 				}
 			}
+			$gu = Breadcrumbs::page_url( $game->folder() . '/guides' );
+			if ( '' !== $gu ) {
+				$links .= '<li><a href="' . esc_url( $gu ) . '">' . esc_html__( 'Guides', 'rbx-data' ) . '</a></li>';
+			}
 			$lc   = Changelog::last_changed( array_keys( self::ds( $game )->records() ) );
 			$mono = mb_strtoupper( mb_substr( $game->short_name(), 0, 1 ) );
 			$out .= '<li class="rbx-game-card" style="--game-accent:' . esc_attr( $game->accent() ) . '"><span class="rbx-game-card__mono" aria-hidden="true">' . esc_html( $mono ) . '</span><h3><a href="' . esc_url( $hub ) . '">' . esc_html( $game->name() ) . '</a></h3>' . ( $lc ? '<p class="rbx-meta">' . esc_html__( 'Updated', 'rbx-data' ) . ' ' . Ui::date( substr( (string) $lc, 0, 10 ) ) . '</p>' : '' ) . ( '' !== $links ? '<ul class="rbx-game-card__links">' . $links . '</ul>' : '' ) . '</li>';
 		}
 		return '' === $out ? '' : '<ul class="rbx-game-cards">' . $out . '</ul>';
+	}
+
+	/** Newest published guides across games: the children of each game's guides page. */
+	private static function home_guides(): string {
+		$all = array();
+		foreach ( Loader::games() as $game ) {
+			$idx = get_page_by_path( \RBX\Data\Content\Lang::path( $game->folder() . '/guides' ) );
+			if ( ! $idx || 'publish' !== $idx->post_status ) {
+				continue;
+			}
+			foreach ( get_pages( array( 'parent' => $idx->ID, 'post_status' => 'publish', 'sort_column' => 'post_date', 'sort_order' => 'DESC' ) ) as $p ) {
+				$all[] = array( $game, $p );
+			}
+		}
+		usort( $all, static fn( $a, $b ) => strcmp( (string) $b[1]->post_date_gmt, (string) $a[1]->post_date_gmt ) );
+		$li = '';
+		foreach ( array_slice( $all, 0, 6 ) as [ $game, $p ] ) {
+			$li .= '<li><a href="' . esc_url( (string) get_permalink( $p ) ) . '">' . esc_html( html_entity_decode( wp_strip_all_tags( get_the_title( $p ) ), ENT_QUOTES, 'UTF-8' ) ) . '</a> <span class="rbx-meta">' . esc_html( $game->short_name() ) . '</span></li>';
+		}
+		// The heading comes with the list so an empty list leaves no empty section.
+		return '' === $li ? '' : '<h2 class="wp-block-heading" id="guides">' . esc_html__( 'Guides', 'rbx-data' ) . '</h2><ul class="rbx-latest">' . $li . '</ul>';
 	}
 
 	/** Latest updates across games (CONT-19 item 4). */

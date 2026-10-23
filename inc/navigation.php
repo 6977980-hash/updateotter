@@ -46,6 +46,10 @@ function updateotter_game_sections( \RBX\Data\Config\Game $g ): array {
 			$out[] = array( (string) $s['label__en'], updateotter_game_url( $g, $slug ) );
 		}
 	}
+	// Guides are plain Pages, not config sections: listed once the game's guides page is published.
+	if ( class_exists( '\RBX\Data\Render\Breadcrumbs' ) && '' !== \RBX\Data\Render\Breadcrumbs::page_url( $g->folder() . '/guides' ) ) {
+		$out[] = array( __( 'Guides', 'updateotter' ), updateotter_game_url( $g, 'guides' ) );
+	}
 	return $out;
 }
 
