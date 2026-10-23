@@ -115,6 +115,7 @@ final class Item {
 		}
 		$game  = $ds->game();
 		$parts = array();
+		$lead  = self::lead( $pid );
 		$rar   = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
 		if ( $rar ) {
 			$parts[] = esc_html( $game->label( (string) $rec['entity'], 'rarity_id' ) ) . ': ' . esc_html( (string) $rar['name'] );
@@ -140,7 +141,13 @@ final class Item {
 				$parts[] = esc_html( $game->label( 'MUT', 'income_mult' ) ) . ': ' . Ui::raw( $ds, array( 'type' => 'mult' ), $st['value'] );
 			}
 		}
-		return $parts ? '<p class="rbx-summary">' . implode( ' <span aria-hidden="true">·</span> ', $parts ) . '</p>' : '';
+		return ( '' !== $lead ? '<p class="rbx-lead">' . esc_html( $lead ) . '</p>' : '' ) . ( $parts ? '<p class="rbx-summary">' . implode( ' <span aria-hidden="true">·</span> ', $parts ) . '</p>' : '' );
+	}
+
+	/** One plain sentence with the main number under the H1 (UO-23), the first sentence of the meta description. */
+	private static function lead( int $pid ): string {
+		$d = Seo::item_description( $pid );
+		return preg_match( '/^(.+?\.)(?:\s|$)/u', $d, $m ) && ! str_starts_with( $m[1], 'Stats, sources' ) ? $m[1] : '';
 	}
 
 	/** Data card: icon, chips, stats with states, trust strip, calculator link, report (UX-07). */
@@ -386,7 +393,36 @@ final class Item {
 				$picked[ $id ] = true;
 			}
 		}
-		$links = array();
+		// Pages that can rank come first (UO-25): indexable picks, then other indexable items of the
+		// same kind nearest in list order, then the remaining picks.
+		$indexable = static fn( array $r ): bool => ! empty( $r['post_id'] ) && PageState::INDEX === get_post_meta( (int) $r['post_id'], '_rbx_page_state', true );
+		$first     = array();
+		$rest      = array();
+		foreach ( array_keys( $picked ) as $id ) {
+			$r = $ds->get( (string) $id );
+			if ( $r && $indexable( $r ) ) {
+				$first[ $id ] = true;
+			} else {
+				$rest[ $id ] = true;
+			}
+		}
+		if ( count( $first ) < 6 ) {
+			$ids  = array_map( 'strval', array_keys( $ds->all( (string) $rec['entity'], array( 'live', 'limited' ) ) ) );
+			$pos  = array_flip( $ids );
+			$here = (int) ( $pos[ (string) $rec['id'] ] ?? 0 );
+			usort( $ids, static fn( $a, $b ) => abs( $pos[ $a ] - $here ) <=> abs( $pos[ $b ] - $here ) );
+			foreach ( $ids as $id ) {
+				if ( count( $first ) >= 6 ) {
+					break;
+				}
+				$r = $ds->get( $id );
+				if ( $id !== (string) $rec['id'] && $r && $indexable( $r ) ) {
+					$first[ $id ] = true;
+				}
+			}
+		}
+		$picked = $first + $rest;
+		$links  = array();
 		foreach ( array_slice( array_keys( $picked ), 0, 6 ) as $id ) {
 			$r = $ds->get( (string) $id );
 			if ( $r && ! empty( $r['post_id'] ) && 'publish' === get_post_status( (int) $r['post_id'] ) ) {

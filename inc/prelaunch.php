@@ -56,7 +56,7 @@ add_filter(
 			return "User-agent: *\nDisallow: /\n";
 		}
 		// TECH-09 exact content once live; replaces the WordPress and Rank Math defaults.
-		return "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\nDisallow: /*?s=\nDisallow: /search/\nDisallow: /*?*replytocom=\n\nSitemap: " . home_url( class_exists( '\RBX\Data\Render\Seo' ) && \RBX\Data\Render\Seo::core_sitemaps_on() ? '/wp-sitemap.xml' : '/sitemap_index.xml' ) . "\n";
+		return "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\nDisallow: /*?s=\nDisallow: /report/?\nDisallow: /search/\nDisallow: /*?*replytocom=\n\nSitemap: " . home_url( class_exists( '\RBX\Data\Render\Seo' ) && \RBX\Data\Render\Seo::core_sitemaps_on() ? '/wp-sitemap.xml' : '/sitemap_index.xml' ) . "\n";
 	},
 	999
 );

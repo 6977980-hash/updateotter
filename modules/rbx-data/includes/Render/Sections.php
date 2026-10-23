@@ -12,6 +12,7 @@ declare( strict_types=1 );
 namespace RBX\Data\Render;
 
 use RBX\Data\Codes\CheckLog;
+use RBX\Data\Content\Lang;
 use RBX\Data\Config\Game;
 use RBX\Data\Config\Loader;
 use RBX\Data\Data\Dataset;
@@ -69,7 +70,8 @@ final class Sections {
 				case 'count':
 					return self::count( $game, (string) ( $a['entity'] ?? '' ) );
 				case 'list':
-					return self::licensed( $game, self::list( $game, (string) ( $a['entity'] ?? '' ) ) );
+					$list = self::list( $game, (string) ( $a['entity'] ?? '' ) );
+					return '' === $list ? '' : self::full_guides( $game, (string) ( $a['entity'] ?? '' ) ) . self::licensed( $game, $list );
 				case 'mutations':
 					return self::licensed( $game, self::mutations( $game ) );
 				case 'sizes':
@@ -251,7 +253,63 @@ final class Sections {
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $label ) . '</caption><thead><tr>' . $head . '</tr></thead><tbody>' . $body . '</tbody></table></div>';
 		$empty = '<p class="rbx-empty" hidden data-rbx-empty>' . esc_html__( 'No results. Try fewer filters.', 'rbx-data' ) . ' <a href="' . esc_url( home_url( '/report/' ) ) . '">' . esc_html__( 'Report a missing item', 'rbx-data' ) . '</a></p>';
 		self::enqueue_list_js();
-		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . '</div>';
+		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . '</div>' . self::sources_line( $game, $recs );
+	}
+
+	/**
+	 * Links to the items of a list that have a full page in search (UO-25), above the table, so
+	 * the pages that can rank get links from the list page that is about them.
+	 */
+	public static function full_guides( Game $game, string $entity ): string {
+		$links = array();
+		foreach ( self::ds( $game )->all( $entity, array( 'live', 'limited' ) ) as $r ) {
+			$pid = (int) ( $r['post_id'] ?? 0 );
+			if ( $pid && 'publish' === get_post_status( $pid ) && PageState::INDEX === get_post_meta( $pid, '_rbx_page_state', true ) ) {
+				$links[ (string) $r['name'] ] = '<a href="' . esc_url( (string) get_permalink( $pid ) ) . '">' . esc_html( (string) $r['name'] ) . '</a>';
+			}
+		}
+		if ( ! $links ) {
+			return '';
+		}
+		ksort( $links, SORT_NATURAL | SORT_FLAG_CASE );
+		/* translators: %s: plural entity label, e.g. pets */
+		$label = sprintf( __( 'Full guides to %s', 'rbx-data' ), strtolower( Lang::t( $game->entity_label( $entity, true ) ) ) );
+		return '<nav class="rbx-full-guides" aria-label="' . esc_attr( $label ) . '"><p><strong>' . esc_html( $label ) . ':</strong> ' . implode( ' <span aria-hidden="true">·</span> ', $links ) . '</p></nav>';
+	}
+
+	/**
+	 * One "Sources" line under a list table (UO-24): the wiki pages its rows come from, linked.
+	 *
+	 * @param array<string, array<string, mixed>> $recs Records in the table.
+	 */
+	private static function sources_line( Game $game, array $recs ): string {
+		$urls = array();
+		foreach ( $recs as $r ) {
+			$u = (string) ( $r['data']['source_url'] ?? '' );
+			if ( str_starts_with( $u, 'https://' ) ) {
+				$urls[ $u ] = ( $urls[ $u ] ?? 0 ) + 1;
+			}
+		}
+		if ( ! $urls ) {
+			return '';
+		}
+		if ( count( $urls ) > 5 && '' !== $game->wiki_url() ) {
+			// One wiki page per row: link the wiki itself; each item page links its own source.
+			return '<p class="rbx-sources">' . esc_html__( 'Sources:', 'rbx-data' ) . ' ' . sprintf(
+				/* translators: %s: linked wiki name */
+				esc_html__( 'each item\'s page on the %s', 'rbx-data' ),
+				'<a href="' . esc_url( $game->wiki_url() ) . '" rel="noopener">' . esc_html( $game->wiki_name() ) . '</a>'
+			) . '</p>';
+		}
+		arsort( $urls );
+		$links = array();
+		foreach ( array_slice( array_keys( $urls ), 0, 5 ) as $u ) {
+			$page    = str_replace( '_', ' ', rawurldecode( basename( (string) wp_parse_url( $u, PHP_URL_PATH ) ) ) );
+			$host    = (string) wp_parse_url( $u, PHP_URL_HOST );
+			$links[] = '<a href="' . esc_url( $u ) . '" rel="noopener">' . esc_html( ( str_ends_with( $host, 'fandom.com' ) && '' !== $game->wiki_name() ? $game->wiki_name() : $host ) . ': ' . $page ) . '</a>';
+		}
+		$more = '';
+		return '<p class="rbx-sources">' . esc_html__( 'Sources:', 'rbx-data' ) . ' ' . implode( ', ', $links ) . $more . '</p>';
 	}
 
 	/** Record-level confidence chip. */
@@ -260,7 +318,7 @@ final class Sections {
 			'state'             => null === ( $r['data']['source_type'] ?? null ) ? 'unknown' : ( 'community' === $r['data']['source_type'] ? 'community' : 'verified' ),
 			'mechanic_ok'       => true,
 			'source_type'       => $r['data']['source_type'] ?? null,
-			'source_url'        => null,
+			'source_url'        => null, // One "Sources" line per table instead (UO-24), see sources_line().
 			'evidence_media_id' => null,
 		);
 		$st['label'] = Dataset::state_label( $st['state'] );
@@ -641,9 +699,11 @@ final class Sections {
 				continue;
 			}
 			$links = '';
-			foreach ( array( 'calculator', 'codes', 'pets' ) as $s ) {
-				$u = Breadcrumbs::page_url( $game->folder() . '/' . $s );
-				if ( '' !== $u && $game->section( $s ) ) {
+			// Every section page of the game, so GAG2 and Fish It list pages get a home link too (UO-25).
+			foreach ( array_slice( $game->menu_order(), 0, 5 ) as $s ) {
+				$sec = $game->section( $s );
+				$u   = $sec && 'updates' === ( $sec['type'] ?? '' ) ? Ui::updates_url( $game ) : Breadcrumbs::page_url( $game->folder() . '/' . $s );
+				if ( '' !== $u && $sec ) {
 					$links .= '<li><a href="' . esc_url( $u ) . '">' . esc_html( (string) $game->section( $s )['label__en'] ) . '</a></li>';
 				}
 			}

@@ -177,9 +177,29 @@ final class Insights {
 		if ( null === $best ) {
 			return '';
 		}
-		$intro = sprintf(
+		$bw     = $rec['data']['base_weight_kg'] ?? null;
+		$answer = is_numeric( $bw ) && (float) $bw > 0
+			? sprintf(
+				/* translators: 1: pet, 2: game, 3: income per second, 4: income per hour, 5: base weight */
+				esc_html__( 'A %1$s in %2$s earns %3$s Cash per second (%4$s per hour) at its base weight of %5$s kg with no mutation.', 'rbx-data' ),
+				esc_html( $name ),
+				esc_html( $ds->game()->name() ),
+				Ui::number( $ds, $base, 'abbr' ),
+				Ui::number( $ds, $base * 3600, 'abbr' ),
+				Ui::number( $ds, (float) $bw, 'abbr' )
+			)
+			: sprintf(
+				/* translators: 1: pet, 2: game, 3: income per second, 4: income per hour */
+				esc_html__( 'A %1$s in %2$s earns %3$s Cash per second (%4$s per hour) at its base weight with no mutation.', 'rbx-data' ),
+				esc_html( $name ),
+				esc_html( $ds->game()->name() ),
+				Ui::number( $ds, $base, 'abbr' ),
+				Ui::number( $ds, $base * 3600, 'abbr' )
+			);
+		// UO-23: the answer with its unit comes first, then how mutations change it.
+		$intro = $answer . ' ' . sprintf(
 			/* translators: 1: pet, 2: best mutation name, 3: income */
-			esc_html__( 'A plain %1$s earns its base income. A mutation multiplies it, so a %2$s %1$s at the same weight earns %3$s per second, the most of any mutation in our list.', 'rbx-data' ),
+			esc_html__( 'A mutation multiplies it, so a %2$s %1$s at the same weight earns %3$s per second, the most of any mutation in our list.', 'rbx-data' ),
 			esc_html( $name ),
 			esc_html( (string) $best[0]['name'] ),
 			Ui::number( $ds, $best[1], 'abbr' )
@@ -414,6 +434,15 @@ final class Insights {
 		if ( '' === $rows ) {
 			return '';
 		}
+		// UO-23: the answer with its unit comes first.
+		$intro = sprintf(
+			/* translators: 1: crop, 2: game, 3: value, 4: currency */
+			esc_html__( 'A %1$s in %2$s sells for %3$s %4$s at its base weight with no mutation.', 'rbx-data' ),
+			esc_html( $name ),
+			esc_html( $game->name() ),
+			Ui::number( $ds, $base, 'abbr' ),
+			esc_html( $cur )
+		) . ' ' . $intro;
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr>' . $head . '<th scope="col">' . esc_html__( 'Multiplier', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Sell value', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: crop */
 		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much is a %s worth?', 'rbx-data' ), $name ), 'value' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
