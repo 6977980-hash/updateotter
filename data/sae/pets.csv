@@ -62,7 +62,11 @@ SAE-PET-0015,axolotl,Axolotl,,SAE-RAR-0005,2800,SAE-CUR-0001,28,,FALSE,,,,"The A
 The catch is the hatch time: Legendary eggs take minutes, not seconds. Put an Axolotl egg in your pen before you leave to farm elsewhere, so the wait does not feel slow.
 
 Its base weight is light, so a heavy Axolotl gets a big weight boost. A Golden or Rainbow Axolotl is a top early pet that stays useful well into the Desert and Jungle.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Axolotl,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0016,leviathan,Leviathan,,SAE-RAR-0007,220000,SAE-CUR-0001,5000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Leviathan,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0016,leviathan,Leviathan,,SAE-RAR-0007,220000,SAE-CUR-0001,5000,,FALSE,,,,"The Leviathan is the surprise of the Lake: a Cosmic pet in the second biome. It earns far more than anything else you can reach at that stage, including the Axolotl.
+
+The price is time. Its egg takes close to half an hour to hatch, much longer than any other Lake egg, so start it before a long farming session.
+
+Its base weight is very heavy, so huge kg numbers are normal and weight bonuses are small. For a player stuck before the Desert, a Leviathan is the single biggest income jump available.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Leviathan,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0017,jerboa,Jerboa,,SAE-RAR-0001,6,SAE-CUR-0001,2,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Jerboa,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0018,fennec,Fennec,,SAE-RAR-0002,18,SAE-CUR-0001,8,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Fennec,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0019,camel,Camel,,SAE-RAR-0003,75,SAE-CUR-0001,700,,FALSE,,,,"The Camel is the Desert's Rare, and for many players it is the first pet from the third biome. The Desert asks for a big jump in Speed compared with the Lake, so a Camel is a sign that your run is going well.
@@ -73,15 +77,27 @@ Income-wise the Camel only beats the Lake's Turtle by a little, so the real reas
 SAE-PET-0020,tob-tobi-tob-tob,Tob Tobi Tob Tob,,SAE-RAR-0004,325,SAE-CUR-0001,700,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Tob_Tobi_Tob_Tob,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0021,snake,Snake,,SAE-RAR-0005,3600,SAE-CUR-0001,45,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Snake,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0022,sand-spider,Sand Spider,,SAE-RAR-0006,16000,SAE-CUR-0001,120,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Sand_Spider,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0023,scorpion,Scorpion,,SAE-RAR-0006,18500,SAE-CUR-0001,75,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Scorpion,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0024,royal-sphinx,Royal Sphinx,,SAE-RAR-0007,280000,SAE-CUR-0001,4000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Royal_Sphinx,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0023,scorpion,Scorpion,,SAE-RAR-0006,18500,SAE-CUR-0001,75,,FALSE,,,,"The Scorpion is the Desert's guardian and also one of its best pets. It is a Mythic, a rarity above the Legendaries most players own when they first reach the Desert.
+
+Stealing a Scorpion egg means going right up to the guardian, so bring Speed to spare. The egg hatches in about the same time as a Forest or Lake Legendary, which is short for a Mythic.
+
+Its base income is several times the Desert's Legendary, the Snake, and its light base weight means a heavy Scorpion gets a strong weight bonus. The wiki infobox for this egg lists no reward, so the reward line is missing on this page.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Scorpion,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0024,royal-sphinx,Royal Sphinx,,SAE-RAR-0007,280000,SAE-CUR-0001,4000,,FALSE,,,,"The Royal Sphinx is the Desert's Cosmic and the best pet in the third biome. It earns a bit more than the Lake's Leviathan and much more than the Desert's Mythics.
+
+Its egg takes about half an hour to hatch, and its Speed reward is the highest of any Desert egg. The base weight is heavy, so a big kg number is normal.
+
+If you have to choose between farming Scorpions or waiting on a Royal Sphinx, the Sphinx pays more over time, while Scorpions give a faster return.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Royal_Sphinx,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0025,chimpanzee,Chimpanzee,,SAE-RAR-0003,90,SAE-CUR-0001,65,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Chimpanzee,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0026,toucan,Toucan,,SAE-RAR-0003,110,SAE-CUR-0001,5,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Toucan,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0027,crocodile,Crocodile,,SAE-RAR-0004,420,SAE-CUR-0001,400,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Crocodile,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0028,gorilla,Gorilla,,SAE-RAR-0005,4800,SAE-CUR-0001,190,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Gorilla,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0029,orangutini-ananassini,Orangutini Ananassini,,SAE-RAR-0005,5500,SAE-CUR-0001,140,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Orangutini_Ananassini,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0030,spider,Spider,,SAE-RAR-0006,22000,SAE-CUR-0001,120,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Spider,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0031,tiger,Tiger,,SAE-RAR-0006,28000,SAE-CUR-0001,260,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Tiger,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0031,tiger,Tiger,,SAE-RAR-0006,28000,SAE-CUR-0001,260,,FALSE,,,,"The Tiger is the Jungle's guardian and its Mythic. The Jungle is the fourth biome, and the Tiger is the pet most players remember from it.
+
+It earns more than the Desert's Scorpion, and its egg takes only a few minutes to hatch, so it is a quick upgrade once you can reach the Jungle and survive the run back.
+
+Its base weight is moderate. The Speed reward on its egg is bigger than anything in the Desert except the Royal Sphinx, which makes Tiger eggs a good way to save up for Snow.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Tiger,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0032,king-snake,King Snake,,SAE-RAR-0008,3500000,SAE-CUR-0001,10000,,TRUE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/King_Snake,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0033,penguin,Penguin,,SAE-RAR-0003,140,SAE-CUR-0001,16,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Penguin,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0034,walrus,Walrus,,SAE-RAR-0004,600,SAE-CUR-0001,200,,FALSE,,,,"The Walrus is the Snow biome's Epic. Snow needs a big jump in Speed over the Desert, so the Walrus is usually a mid-game pet.
@@ -97,15 +113,31 @@ Reaching Snow needs a lot of Speed, so the Polar Bear marks the start of the mid
 SAE-PET-0036,sabertooth-tiger,Sabertooth Tiger,,SAE-RAR-0006,35000,SAE-CUR-0001,350,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Sabertooth_Tiger,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0037,mammoth,Mammoth,,SAE-RAR-0006,42000,SAE-CUR-0001,2000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Mammoth,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0038,king-mammoth,King Mammoth,,SAE-RAR-0007,400000,SAE-CUR-0001,25000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/King_Mammoth,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0039,yeti,Yeti,,SAE-RAR-0008,5000000,SAE-CUR-0001,1500,,TRUE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Yeti,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0040,ice-dragon,Ice Dragon,,SAE-RAR-0009,65000000,SAE-CUR-0001,8500,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Ice_Dragon,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0039,yeti,Yeti,,SAE-RAR-0008,5000000,SAE-CUR-0001,1500,,TRUE,,,,"The Yeti is the Snow biome's guardian and a Secret pet. Secret pets are a rarity above Cosmic, and the Yeti earns many times what the Snow's King Mammoth does.
+
+Its egg is a commitment: it takes well over an hour and a half to hatch. Put it in your pen before you log off or go farm elsewhere.
+
+The base weight is heavy. A Yeti is a long-term pet for a mid-game base, and only the Snow's Eternal, the Ice Dragon, beats it in the same biome.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Yeti,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0040,ice-dragon,Ice Dragon,,SAE-RAR-0009,65000000,SAE-CUR-0001,8500,,FALSE,,,,"The Ice Dragon is the Snow biome's Eternal pet, a rarity above Secret. It earns more than ten times what the Yeti from the same biome does.
+
+That power comes with the longest wait of any Snow egg: about four hours to hatch. It makes sense to start one before a long break.
+
+Players who can reach Snow but not much further often aim for the Ice Dragon as their top pet. Its base weight is heavy, so weight bonuses are small.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Ice_Dragon,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0041,lava-gecko,Lava Gecko,,SAE-RAR-0003,180,SAE-CUR-0001,14,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Lava_Gecko,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0042,lava-frog,Lava Frog,,SAE-RAR-0004,850,SAE-CUR-0001,4,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Lava_Frog,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0043,flaming-bull,Flaming Bull,,SAE-RAR-0005,9500,SAE-CUR-0001,450,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Flaming_Bull,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0044,lava-iguana,Lava Iguana,,SAE-RAR-0005,11000,SAE-CUR-0001,400,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Lava_Iguana,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0045,chillin-chilli,Chillin Chilli,,SAE-RAR-0006,55000,SAE-CUR-0001,30,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Chillin_Chilli,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0046,cerberus,Cerberus,,SAE-RAR-0008,8000000,SAE-CUR-0001,9000,,TRUE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Cerberus,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0047,phoenix,Phoenix,,SAE-RAR-0009,85000000,SAE-CUR-0001,2500,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Phoenix,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0046,cerberus,Cerberus,,SAE-RAR-0008,8000000,SAE-CUR-0001,9000,,TRUE,,,,"Cerberus is the Volcano's guardian and a Secret pet. It earns more than the Snow's Yeti, which makes it the strongest Secret most players see before the Abyss Ocean.
+
+Its egg takes about two hours to hatch. Its base weight is very heavy, so expect very large kg numbers on its card.
+
+The Volcano's Eternal pets, the Phoenix and Lava Dragon, earn more, but their eggs take far longer. A Cerberus is a strong pet to aim for while you build up Speed for the Abyss Ocean.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Cerberus,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0047,phoenix,Phoenix,,SAE-RAR-0009,85000000,SAE-CUR-0001,2500,,FALSE,,,,"The Phoenix is one of the Volcano's Eternal pets. It earns more than the Snow's Ice Dragon and a little less than the Volcano's Lava Dragon.
+
+Its base weight is light for an Eternal, much lighter than the Lava Dragon's. That makes a heavy Phoenix especially valuable, because weight bonuses are measured against the pet's own base.
+
+Its egg takes about four and a half hours to hatch. For a player who can reach the Volcano, it is one of the best long-term pets in the biome.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Phoenix,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0048,lava-dragon,Lava Dragon,,SAE-RAR-0009,100000000,SAE-CUR-0001,14000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Lava_Dragon,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0049,parrotfish,Parrotfish,,SAE-RAR-0003,220,SAE-CUR-0001,5,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Parrotfish,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0050,swordfish,Swordfish,,SAE-RAR-0004,1100,SAE-CUR-0001,250,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Swordfish,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
@@ -117,14 +149,22 @@ The Abyss Ocean is also where Dr. Scramble's cave is hidden, home of the shop th
 SAE-PET-0052,orca,Orca,,SAE-RAR-0006,80000,SAE-CUR-0001,1800,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Orca,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0053,whale-shark,Whale Shark,,SAE-RAR-0007,700000,SAE-CUR-0001,2000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Whale_Shark,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0054,beluga-whale,Beluga Whale,,SAE-RAR-0007,850000,SAE-CUR-0001,5000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Beluga_Whale,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0055,kraken,Kraken,,SAE-RAR-0008,15000000,SAE-CUR-0001,18000,,TRUE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Kraken,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0055,kraken,Kraken,,SAE-RAR-0008,15000000,SAE-CUR-0001,18000,,TRUE,,,,"The Kraken is the Abyss Ocean's Secret pet. It earns about twice what Cerberus does, so it is a clear upgrade once you can reach the seventh biome.
+
+Its egg takes more than two hours to hatch and has a big Speed reward, which helps toward the Prehistoric biome.
+
+Its base weight is very heavy, so a big kg number is normal. The Abyss Ocean's Eternal, El Maja, earns far more, but its egg takes even longer.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Kraken,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0056,el-maja,El Maja,,SAE-RAR-0009,130000000,SAE-CUR-0001,90000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/El_Maja,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0057,dodo,Dodo,,SAE-RAR-0003,280,SAE-CUR-0001,20,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Dodo,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0058,pterodactyl,Pterodactyl,,SAE-RAR-0005,22000,SAE-CUR-0001,180,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Pterodactyl,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0059,ankylosaurus,Ankylosaurus,,SAE-RAR-0006,120000,SAE-CUR-0001,2500,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Ankylosaurus,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0060,triceratops,Triceratops,,SAE-RAR-0007,1200000,SAE-CUR-0001,3500,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Triceratops,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0061,bronto,Bronto,,SAE-RAR-0007,1500000,SAE-CUR-0001,35000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Bronto,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0062,t-rex,T-Rex,,SAE-RAR-0008,25000000,SAE-CUR-0001,7500,,TRUE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/T-Rex,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
+SAE-PET-0062,t-rex,T-Rex,,SAE-RAR-0008,25000000,SAE-CUR-0001,7500,,TRUE,,,,"The T-Rex is the Prehistoric biome's guardian and its Secret pet. It earns more than the Kraken, although the Prehistoric biome's other Secret, Tralaledon, earns a bit more.
+
+Its egg takes about two and a half hours to hatch, and the Speed reward listed for it is far larger than any Abyss Ocean egg's.
+
+Reaching the Prehistoric biome needs a huge amount of Speed, so a T-Rex is a late-game goal. The Mosasaurus from the same biome is an Eternal and earns several times more.",claude,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/T-Rex,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0063,tralaledon,Tralaledon,,SAE-RAR-0008,32000000,SAE-CUR-0001,1000,,TRUE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Tralaledon,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0064,mosasaurus,Mosasaurus,,SAE-RAR-0009,180000000,SAE-CUR-0001,30000,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Mosasaurus,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
 SAE-PET-0065,centapede,Centapede,,SAE-RAR-0004,1500,SAE-CUR-0001,6,,FALSE,,,,,,,live,community,https://stealanegg.fandom.com/wiki/Centapede,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
