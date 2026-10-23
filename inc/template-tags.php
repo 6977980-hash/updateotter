@@ -83,3 +83,14 @@ function updateotter_page_head(): void {
 	}
 	echo '</header>';
 }
+
+/** Result label on the search page, the same words as the game's own menus ("Crop", not "Plant"; UO-20). */
+function updateotter_search_label( WP_Post $p ): string {
+	if ( class_exists( '\RBX\Data\Data\Repository' ) && in_array( $p->post_type, \RBX\Data\Plugin::post_types(), true ) ) {
+		$found = \RBX\Data\Data\Repository::for_post( $p->ID );
+		if ( $found ) {
+			return $found[0]->entity_label( (string) $found[1]['entity'] );
+		}
+	}
+	return 'page' === $p->post_type ? __( 'Page', 'updateotter' ) : (string) get_post_type_object( $p->post_type )->labels->singular_name;
+}

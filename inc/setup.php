@@ -98,3 +98,33 @@ add_action(
 	},
 	0
 );
+
+/**
+ * Site name and tagline from git, not from the database (UO-20, no hPanel/admin step): titles of
+ * search, 404 and feed pages, the feed channel and /wp-json/ all say UpdateOtter.
+ */
+add_filter( 'pre_option_blogname', static fn(): string => 'UpdateOtter' );
+add_filter( 'pre_option_blogdescription', static fn(): string => 'Fan-made calculators, item databases, codes and guides for Roblox games' );
+add_filter( 'document_title_separator', static fn(): string => '|' );
+
+/** English search shows English pages only; /id/ pages stay out of it (UO-20). */
+add_action(
+	'pre_get_posts',
+	static function ( \WP_Query $q ): void {
+		if ( is_admin() || ! $q->is_main_query() || ! $q->is_search() || ( class_exists( '\RBX\Data\Content\Lang' ) && \RBX\Data\Content\Lang::is_id() ) ) {
+			return;
+		}
+		$root = get_page_by_path( 'id', OBJECT, 'page' );
+		if ( $root instanceof \WP_Post ) {
+			$ids = get_pages(
+				array(
+					'child_of'    => $root->ID,
+					'post_status' => 'publish,draft',
+					'fields'      => 'ids',
+				)
+			);
+			$not = array_merge( array( (int) $root->ID ), array_map( static fn( $p ) => (int) ( is_object( $p ) ? $p->ID : $p ), (array) $ids ) );
+			$q->set( 'post__not_in', $not );
+		}
+	}
+);

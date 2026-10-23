@@ -23,6 +23,18 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Item {
 
+	/** H1 that names the game too (UO-19): "Chicken (Steal an Egg)", "Golden mutation in Steal an Egg". */
+	public static function heading( Game $game, array $rec ): string {
+		$name = (string) $rec['name'];
+		if ( 'MUT' === $rec['entity'] ) {
+			/* translators: 1: mutation, 2: game */
+			return sprintf( __( '%1$s mutation in %2$s', 'rbx-data' ), (string) preg_replace( '/\s+mutation$/i', '', $name ), $game->name() );
+		}
+		/* translators: 1: item, 2: game */
+		return sprintf( __( '%1$s (%2$s)', 'rbx-data' ), $name, $game->name() );
+	}
+
+
 	/**
 	 * @return array{game: Game, ds: Dataset, rec: array<string, mixed>, post_id: int}|null
 	 */
@@ -60,7 +72,7 @@ final class Item {
 		\RBX\Data\Cache\Purge::tag_record( (string) $rec['id'] );
 
 		$out  = '<article class="rbx-item rbx-item--' . esc_attr( strtolower( (string) $rec['entity'] ) ) . '">';
-		$out .= '<header class="rbx-item__head"><h1>' . esc_html( (string) $rec['name'] ) . '</h1>';
+		$out .= '<header class="rbx-item__head"><h1>' . esc_html( self::heading( $game, $rec ) ) . '</h1>';
 		$out .= Ui::byline( $pid, (string) ( $rec['data']['notes_reviewed_by'] ?? '' ) ) . '</header>';
 		$out .= self::removed_banner( $ds, $rec );
 		$out .= self::summary( $ds, $rec, $pid );

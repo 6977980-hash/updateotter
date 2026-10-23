@@ -40,7 +40,7 @@ $updateotter_q = get_search_query();
 		<h2><?php echo esc_html( $updateotter_name ); ?></h2>
 		<ul>
 			<?php foreach ( $updateotter_posts as $updateotter_p ) : ?>
-			<li><a href="<?php echo esc_url( (string) get_permalink( $updateotter_p ) ); ?>"><?php echo esc_html( get_the_title( $updateotter_p ) ); ?></a> <span class="rbx-chip"><?php echo esc_html( (string) get_post_type_object( $updateotter_p->post_type )->labels->singular_name ); ?></span></li>
+			<li><a href="<?php echo esc_url( (string) get_permalink( $updateotter_p ) ); ?>"><?php echo esc_html( get_the_title( $updateotter_p ) ); ?></a> <span class="rbx-chip"><?php echo esc_html( updateotter_search_label( $updateotter_p ) ); ?></span></li>
 			<?php endforeach; ?>
 		</ul>
 			<?php

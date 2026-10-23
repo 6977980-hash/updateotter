@@ -39,7 +39,9 @@ final class CheckLog {
 				'note'             => sanitize_textarea_field( (string) ( $row['note'] ?? '' ) ),
 			)
 		);
-		return (int) $wpdb->insert_id;
+		$id = (int) $wpdb->insert_id;
+		\RBX\Data\Index\IndexNow::codes_checked( $game );
+		return $id;
 	}
 
 	/** @return array<int, array<string, mixed>> */

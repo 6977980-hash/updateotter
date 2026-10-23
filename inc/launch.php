@@ -10,6 +10,11 @@
  *
  * - `purge`: purges the whole page cache once. Change its id in a PR whose deploy changes
  *   output on cached pages (head tags, robots.txt, sitemaps).
+ * - `llms`: deletes the orphan static /llms.txt a Hostinger plugin once wrote into the site root
+ *   (it lists "Hello world!"), so the theme's generated /llms.txt is served (audit UO-21). Only a
+ *   file with that plugin's signature is deleted.
+ * - `indexnow`: sends the home, hub, tool, list, codes and guide URLs to IndexNow once and keeps
+ *   the answer code in the step state (audit UO-22).
  *
  * A step runs once per id, on the first request after the deploy. Turning the lock back on in
  * RBX Data → Setup is not undone by a later request. Status: GET /wp-json/rbx/v1/launch.
@@ -34,7 +39,7 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live', 'purge' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'purge', 'llms', 'indexnow' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
@@ -129,6 +134,39 @@ add_action(
 			$state['purge'] = array(
 				'id' => $todo['purge'],
 				'at' => gmdate( 'Y-m-d H:i:s' ),
+			);
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		if ( isset( $todo['llms'] ) ) {
+			$file = ABSPATH . 'llms.txt';
+			$old  = is_readable( $file ) ? (string) file_get_contents( $file ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$gone = '' === $old;
+			if ( ! $gone && ( str_contains( $old, 'Hello world' ) || str_contains( $old, 'Hostinger Tools' ) ) ) {
+				wp_delete_file( $file );
+				$gone = ! file_exists( $file );
+			}
+			$state['llms'] = array(
+				'id'      => $todo['llms'],
+				'at'      => gmdate( 'Y-m-d H:i:s' ),
+				'removed' => '' !== $old && $gone,
+				'static'  => file_exists( $file ),
+			);
+			if ( class_exists( '\RBX\Data\Index\Llms' ) ) {
+				\RBX\Data\Index\Llms::flush();
+			}
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		if ( isset( $todo['indexnow'] ) && class_exists( '\RBX\Data\Index\IndexNow' ) && \RBX\Data\Index\IndexNow::enabled() ) {
+			$urls              = \RBX\Data\Index\IndexNow::site_urls();
+			$sent              = \RBX\Data\Index\IndexNow::submit( $urls );
+			$log               = (array) get_option( 'rbx_indexnow_log', array() );
+			$state['indexnow'] = array(
+				'id'   => $todo['indexnow'],
+				'at'   => gmdate( 'Y-m-d H:i:s' ),
+				'urls' => count( $urls ),
+				'sent' => $sent,
+				'code' => (int) ( end( $log )['code'] ?? 0 ),
+				'key'  => home_url( '/' . \RBX\Data\Index\IndexNow::key() . '.txt' ),
 			);
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}

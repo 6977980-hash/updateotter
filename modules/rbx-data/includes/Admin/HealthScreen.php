@@ -128,7 +128,7 @@ final class HealthScreen {
 			'Rank Math'                             => defined( 'RANK_MATH_VERSION' ) ? RANK_MATH_VERSION : __( 'not active', 'rbx-data' ),
 			'LiteSpeed Cache'                       => defined( 'LSCWP_V' ) ? LSCWP_V : __( 'not active', 'rbx-data' ),
 			__( 'Object cache', 'rbx-data' )       => wp_using_ext_object_cache() ? __( 'yes', 'rbx-data' ) : __( 'no', 'rbx-data' ),
-			'IndexNow'                              => \RBX\Data\Index\IndexNow::enabled() ? __( 'on', 'rbx-data' ) : __( 'off (needs production, no pre-launch lock, and a Rank Math key)', 'rbx-data' ),
+			'IndexNow'                              => \RBX\Data\Index\IndexNow::enabled() ? __( 'on', 'rbx-data' ) : __( 'off (local/development install or pre-launch lock on)', 'rbx-data' ),
 		);
 		foreach ( array( 'rbx_data_nightly_gate', 'rbx_data_prune', 'rbx_notifier_poll' ) as $hook ) {
 			$next                      = wp_next_scheduled( $hook );
