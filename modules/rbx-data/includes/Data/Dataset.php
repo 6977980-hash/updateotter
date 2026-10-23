@@ -178,13 +178,24 @@ final class Dataset {
 		return null;
 	}
 
-	/** @param array<int, string> $keys Mechanic keys. */
+	/**
+	 * A `partially_confirmed` mechanic counts when the wiki formula is allowed, or when it has an
+	 * in-game reading with a screenshot (UO-07: one reading fits the rule but cannot pin it down,
+	 * so the page shows a "partly tested" badge while the calculator keeps working).
+	 *
+	 * @param array<int, string> $keys Mechanic keys.
+	 */
 	public function mechanics_confirmed( array $keys ): bool {
-		$ok = $this->game->wiki_formula_ok() ? array( 'confirmed', 'partially_confirmed' ) : array( 'confirmed' );
 		foreach ( $keys as $k ) {
-			if ( ! in_array( $this->mechanic_status( (string) $k ), $ok, true ) ) {
-				return false;
+			$status = $this->mechanic_status( (string) $k );
+			if ( 'confirmed' === $status ) {
+				continue;
 			}
+			$m = $this->mechanic( (string) $k );
+			if ( 'partially_confirmed' === $status && ( $this->game->wiki_formula_ok() || ( $m && 'in_game' === ( $m['data']['source_type'] ?? '' ) && ! empty( $m['data']['evidence_media_id'] ) ) ) ) {
+				continue;
+			}
+			return false;
 		}
 		return true;
 	}

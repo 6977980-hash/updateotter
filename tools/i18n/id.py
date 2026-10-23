@@ -132,6 +132,8 @@ RBX_DATA = {
     'By %s': 'Oleh %s',
     'Checked by %s': 'Dicek oleh %s',
     'Notes drafted with AI help': 'Catatan disusun dengan bantuan AI',
+    'Partly tested in game': 'Baru sebagian dites di game',
+    'The weight rule comes from the community wiki and matched one in-game reading. The table stops at ten times the base weight because heavier pets have not been checked yet.': 'Aturan berat berasal dari wiki komunitas dan cocok dengan satu pembacaan di game. Tabel berhenti di sepuluh kali berat dasar karena pet yang lebih berat belum dicek.',
     'Game data adapted from the %1$s on Fandom, licensed %2$s. Our changes to that data use the same licence.': 'Data game diadaptasi dari %1$s di Fandom, berlisensi %2$s. Perubahan kami pada data itu memakai lisensi yang sama.',
     'Checked in game': 'Dicek di game',
     'Wiki data as of': 'Data wiki per',
