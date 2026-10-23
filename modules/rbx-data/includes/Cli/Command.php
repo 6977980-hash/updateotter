@@ -161,8 +161,9 @@ final class Command {
 		foreach ( $ds->formulas() as $key => $f ) {
 			$live = 'live' === ( $f['record']['data']['status'] ?? '' );
 			$n    = count( array_filter( $res, static fn( $r ) => $r['formula'] === $key ) );
-			if ( $live && $n < 3 ) {
-				WP_CLI::warning( "Live formula $key has only $n live tests (DATA-34 needs 3)." );
+			$min  = $ds->game()->min_formula_tests();
+			if ( $live && $n < $min ) {
+				WP_CLI::warning( "Live formula $key has only $n live tests (DATA-34 needs $min)." );
 				++$fail;
 			}
 		}

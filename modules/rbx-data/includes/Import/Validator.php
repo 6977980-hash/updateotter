@@ -519,8 +519,9 @@ final class Validator {
 				$this->issues->error( 'formula', __( 'Formula is live but one of its mechanics is not confirmed (DATA-12).', 'rbx-data' ), $this->tab( $id ), $this->row( $id ), $id, 'status' );
 			}
 			$live = array_filter( $ds->tests_for( $id ), static fn( $t ) => 'live' === ( $t['data']['status'] ?? '' ) && ! empty( $t['data']['evidence_media_id'] ) );
-			if ( count( $live ) < 3 ) {
-				$this->issues->error( 'formula_tests', __( 'Live formulas need at least 3 live tests with screenshot evidence (DATA-34).', 'rbx-data' ), $this->tab( $id ), $this->row( $id ), $id, 'status' );
+			if ( count( $live ) < $ds->game()->min_formula_tests() ) {
+				/* translators: %d: minimum number of live tests */
+				$this->issues->error( 'formula_tests', sprintf( __( 'Live formulas need at least %d live tests with screenshot evidence (DATA-34).', 'rbx-data' ), $ds->game()->min_formula_tests() ), $this->tab( $id ), $this->row( $id ), $id, 'status' );
 			}
 		}
 		foreach ( self::run_tests( $ds ) as $res ) {
