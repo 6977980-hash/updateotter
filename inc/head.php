@@ -70,3 +70,27 @@ add_action(
 	},
 	20
 );
+
+/**
+ * Search engine ownership tags from content/site-verification.json (P1-46; no DNS or hPanel
+ * change): {"google": "<content value>", "bing": "<content value>"}. Home page only.
+ */
+add_action(
+	'wp_head',
+	static function (): void {
+		if ( ! is_front_page() ) {
+			return;
+		}
+		$file = get_template_directory() . '/content/site-verification.json';
+		$tags = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( ! is_array( $tags ) ) {
+			return;
+		}
+		foreach ( array( 'google' => 'google-site-verification', 'bing' => 'msvalidate.01' ) as $key => $name ) {
+			if ( ! empty( $tags[ $key ] ) && is_string( $tags[ $key ] ) ) {
+				echo '<meta name="' . esc_attr( $name ) . '" content="' . esc_attr( $tags[ $key ] ) . '">' . "\n";
+			}
+		}
+	},
+	1
+);
