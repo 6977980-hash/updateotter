@@ -1,0 +1,11 @@
+{
+  "_doc": "AdSense config (Phase 1d). publisher_id: the pub-XXXXXXXXXXXXXXXX ID from the AdSense account; setting it adds the google-adsense-account tag on the home page and serves /ads.txt. approved: set true ONLY after Google approves the site; slots: the numeric ad unit IDs for each manual unit. Auto ads stay OFF in the AdSense account (POL-22). Every ad unit carries data-tag-for-age-treatment=1 (child-directed, POL-30). Bump content/launch.json purge after changing this file.",
+  "publisher_id": "",
+  "approved": false,
+  "slots": {
+    "below-tool": "",
+    "mid-content": "",
+    "end": "",
+    "sidebar": ""
+  }
+}
