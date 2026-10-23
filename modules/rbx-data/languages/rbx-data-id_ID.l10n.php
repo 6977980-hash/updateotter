@@ -51,6 +51,7 @@ return array( 'domain' => 'rbx-data', 'language' => 'id_ID', 'plural-forms' => '
 	'Game page on Roblox' => 'Halaman game di Roblox',
 	'Game update' => 'Update game',
 	'Game update (optional)' => 'Update game (opsional)',
+	'Games' => 'Game',
 	'Guides' => 'Panduan',
 	'Home' => 'Beranda',
 	'How to get' => 'Cara mendapatkan',

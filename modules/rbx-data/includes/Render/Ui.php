@@ -416,10 +416,18 @@ final class Ui {
 	/**
 	 * Placeholder icon (UX-48): rarity bar and first letter, no fake image.
 	 */
-	public static function placeholder( string $name, string $color = '', int $size = 96 ): string {
+	public static function placeholder( string $name, string $color = '', int $size = 96, string $rarity = '' ): string {
 		$letter = mb_strtoupper( mb_substr( $name, 0, 1 ) );
-		$bar    = preg_match( '/^#[0-9A-Fa-f]{6}$/', $color ) ? $color : 'currentColor';
-		return '<svg class="rbx-ph" width="' . $size . '" height="' . $size . '" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><rect width="96" height="96" rx="12" class="rbx-ph__bg"/><rect y="88" width="96" height="8" fill="' . esc_attr( $bar ) . '"/><text x="48" y="62" text-anchor="middle" font-size="44" font-weight="700" class="rbx-ph__t">' . esc_html( $letter ) . '</text></svg>';
+		$hex    = preg_match( '/^#[0-9A-Fa-f]{6}$/', $color ) ? $color : '';
+		$bar    = '' !== $hex ? $hex : 'currentColor';
+		// UO-53: the rarity initial sits in a corner badge, so rarity is not shown by colour alone.
+		$badge = '';
+		if ( '' !== $rarity && '' !== $hex ) {
+			$rgb   = array_map( 'hexdec', str_split( substr( $hex, 1 ), 2 ) );
+			$ink   = ( 0.299 * $rgb[0] + 0.587 * $rgb[1] + 0.114 * $rgb[2] ) > 150 ? '#111111' : '#ffffff';
+			$badge = '<rect x="58" y="4" width="34" height="34" rx="8" fill="' . esc_attr( $hex ) . '" stroke="#111111" stroke-opacity=".35" stroke-width="2"/><text x="75" y="29" text-anchor="middle" font-size="22" font-weight="800" fill="' . $ink . '">' . esc_html( mb_strtoupper( mb_substr( $rarity, 0, 1 ) ) ) . '</text>';
+		}
+		return '<svg class="rbx-ph" width="' . $size . '" height="' . $size . '" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><rect width="96" height="96" rx="12" class="rbx-ph__bg"/><rect y="88" width="96" height="8" fill="' . esc_attr( $bar ) . '"/><text x="48" y="62" text-anchor="middle" font-size="44" font-weight="700" class="rbx-ph__t">' . esc_html( $letter ) . '</text>' . $badge . '</svg>';
 	}
 
 	/** Item icon: approved media image or the placeholder. */
@@ -439,7 +447,7 @@ final class Ui {
 				return $img;
 			}
 		}
-		return self::placeholder( (string) $rec['name'], $color, $size );
+		return self::placeholder( (string) $rec['name'], $color, $size, (string) ( $rar['name'] ?? '' ) );
 	}
 
 	/**

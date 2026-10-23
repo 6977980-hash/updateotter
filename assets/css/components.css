@@ -715,6 +715,25 @@ summary.rbx-chip {
 	flex: 1 0 100%;
 	min-width: 0;
 }
+/* UO-52: links in row headers are 44 px tall, and on phones the whole card opens the item. */
+.rbx-table th[scope="row"] a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+}
+.rbx-table--list tr {
+	position: relative;
+}
+.rbx-table--list .rbx-cell-name a::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+}
+.rbx-table--list td a,
+.rbx-table--list td button {
+	position: relative;
+	z-index: 1;
+}
 .rbx-table--list th {
 	border: 0;
 }
@@ -750,7 +769,8 @@ summary.rbx-chip {
 		text-align: start;
 	}
 	.rbx-table--list td::before,
-	.rbx-table--list td::after {
+	.rbx-table--list td::after,
+	.rbx-table--list .rbx-cell-name a::after {
 		content: none;
 	}
 	.rbx-table--list tr[hidden] {

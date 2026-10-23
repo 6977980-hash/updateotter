@@ -5,6 +5,7 @@
 
 RBX_DATA = {
     'Home': 'Beranda',
+    'Games': 'Game',
     'Search': 'Cari',
     'Page not found': 'Halaman tidak ditemukan',
     'Breadcrumb': 'Navigasi jejak',

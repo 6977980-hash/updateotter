@@ -65,6 +65,11 @@ final class Sections {
 			}
 			\RBX\Data\Cache\Purge::tag_game( $game );
 		}
+		return self::table_roles( self::dispatch( $section, $game, $a ) );
+	}
+
+	/** The HTML of one section; '' when it is unknown or fails. */
+	private static function dispatch( string $section, ?Game $game, array $a ): string {
 		try {
 			switch ( $section ) {
 				case 'count':
@@ -115,6 +120,36 @@ final class Sections {
 			\RBX\Data\Log\ErrorLog::add( 'render', $section . ': ' . $e->getMessage() );
 		}
 		return '';
+	}
+
+	/**
+	 * UO-51: list tables are restyled as cards below 600 px (display:block/flex), which makes
+	 * Safari/VoiceOver drop the table semantics. Explicit ARIA roles keep them.
+	 */
+	private static function table_roles( string $html ): string {
+		if ( false === strpos( $html, 'rbx-table--list' ) ) {
+			return $html;
+		}
+		return (string) preg_replace_callback(
+			'#<table class="rbx-table rbx-table--list">.*?</table>#s',
+			static function ( $m ) {
+				return strtr(
+					$m[0],
+					array(
+						'<table class="rbx-table rbx-table--list">' => '<table class="rbx-table rbx-table--list" role="table">',
+						'<thead>'                                  => '<thead role="rowgroup">',
+						'<tbody>'                                  => '<tbody role="rowgroup">',
+						'<tr>'                                     => '<tr role="row">',
+						'<tr '                                     => '<tr role="row" ',
+						'<th scope="col"'                          => '<th role="columnheader" scope="col"',
+						'<th scope="row"'                          => '<th role="rowheader" scope="row"',
+						'<td>'                                     => '<td role="cell">',
+						'<td '                                     => '<td role="cell" ',
+					)
+				);
+			},
+			$html
+		);
 	}
 
 	/** Data table plus its CC BY-SA credit (UO-04); nothing when the table is empty. */
@@ -533,7 +568,7 @@ final class Sections {
 				continue;
 			}
 			self::show( array_keys( $tiers[ $t ] ) );
-			$out .= '<section class="rbx-tier rbx-tier--' . esc_attr( strtolower( $t ) ) . '" aria-labelledby="tier-' . esc_attr( strtolower( $t ) ) . '"><h2 id="tier-' . esc_attr( strtolower( $t ) ) . '"><span class="rbx-tier__badge">' . esc_html( $t ) . '</span> ' . esc_html( sprintf( /* translators: %s: tier letter */ __( '%s tier', 'rbx-data' ), $t ) ) . '</h2><ul class="rbx-tier__list">';
+			$out .= '<section class="rbx-tier rbx-tier--' . esc_attr( strtolower( $t ) ) . '" aria-labelledby="tier-' . esc_attr( strtolower( $t ) ) . '"><h2 id="tier-' . esc_attr( strtolower( $t ) ) . '"><span class="rbx-tier__badge" aria-hidden="true">' . esc_html( $t ) . '</span> ' . esc_html( sprintf( /* translators: %s: tier letter */ __( '%s tier', 'rbx-data' ), $t ) ) . '</h2><ul class="rbx-tier__list">';
 			foreach ( $tiers[ $t ] as $r ) {
 				$why  = (string) ( $r['data']['tier_rationale__en'] ?? '' );
 				$out .= '<li>' . Ui::icon( $ds, $r, 48 ) . '<span class="rbx-tier__name">' . Ui::link( $r ) . '</span>' . ( '' !== $why ? '<span class="rbx-tier__why">' . esc_html( wp_strip_all_tags( $why ) ) . '</span>' : '' ) . '</li>';
@@ -766,7 +801,8 @@ final class Sections {
 		}
 		$search = '<form class="rbx-home-search" role="search" action="' . esc_url( home_url( '/' ) ) . '" method="get"><label for="rbx-home-q">' . esc_html__( 'Search pets, crops and pages', 'rbx-data' ) . '</label><span class="rbx-home-search__row"><input type="search" id="rbx-home-q" name="s" autocomplete="off"><button type="submit" class="button">' . esc_html__( 'Search', 'rbx-data' ) . '</button></span></form>';
 		$pop    = $popular ? '<p class="rbx-popular"><strong>' . esc_html__( 'Popular now:', 'rbx-data' ) . '</strong> ' . implode( ' ', $popular ) . '</p>' : '';
-		return $search . $pop . '<ul class="rbx-game-cards">' . $out . '</ul>';
+		// UO-49: an H2 between the page H1 and the H3 card titles.
+		return $search . $pop . '<h2 class="wp-block-heading" id="games">' . esc_html__( 'Games', 'rbx-data' ) . '</h2><ul class="rbx-game-cards">' . $out . '</ul>';
 	}
 
 	/** Newest published guides across games: the children of each game's guides page. */
