@@ -8,7 +8,7 @@ The site's own code ships inside the theme as modules (no separate plugins to in
 
 | Folder | What it does |
 |---|---|
-| `modules/rbx-data` | Game data: Sheet import, validation, changelog, page gate, exports, data blocks, Setup screen |
+| `modules/rbx-data` | Game data: import (bundled CSVs in `data/`, see `data/README.md`), validation, changelog, page gate, exports, data blocks, Setup screen |
 | `modules/rbx-tools` | Calculators |
 | `modules/rbx-notifier` | Roblox update alerts and the per-update checklist |
 

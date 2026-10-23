@@ -77,6 +77,8 @@ export function createUI( root, cfg ) {
 				values[ key ] = c.value;
 			} else if ( d.type === 'bool' ) {
 				values[ key ] = c.checked;
+			} else if ( d.optional && c.value.trim() === '' ) {
+				values[ key ] = null;
 			} else {
 				const s = suffixes.get( key );
 				const r = parseNumber( c.value, cfg.locale, cfg.ladder, s ? s.value : '', {

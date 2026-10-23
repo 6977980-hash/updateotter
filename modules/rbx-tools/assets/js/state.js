@@ -34,6 +34,8 @@ export function readState( hash, toolSchema, data, knownSlugs = null ) {
 			}
 		} else if ( d.type === 'bool' ) {
 			values[ d.key ] = raw === '1';
+		} else if ( raw === '' && d.optional ) {
+			values[ d.key ] = null;
 		} else {
 			let n = /^-?\d+(\.\d+)?$/.test( raw ) ? Number( raw ) : NaN;
 			if ( ! Number.isFinite( n ) ) {

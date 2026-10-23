@@ -1,0 +1,2 @@
+id,slug,name,symbol_text,is_premium,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+SAE-CUR-0001,cash,Cash,$,FALSE,live,community,https://stealanegg.fandom.com/wiki/Pets,,Money shown as $ in game,2026-10-23,claude,,,,

@@ -128,6 +128,29 @@ final class Source {
 	}
 
 	/**
+	 * Bundled CSVs in a folder of the theme repo (`data/{game}/{tab}.csv`).
+	 *
+	 * @return array{tabs: array<string, array<int, array<int, string>>>, warnings: array<int, string>}
+	 * @throws \RuntimeException When the folder has no CSV files.
+	 */
+	public static function from_dir( string $dir ): array {
+		$tabs = array();
+		foreach ( (array) glob( untrailingslashit( $dir ) . '/*.csv' ) as $path ) {
+			if ( ! preg_match( '/^(_?[a-z][a-z0-9_]*)\.csv$/', basename( (string) $path ), $m ) ) {
+				continue;
+			}
+			if ( filesize( (string) $path ) > self::MAX_BYTES ) {
+				throw new \RuntimeException( sprintf( /* translators: %s: file name */ __( '%s is larger than 10 MB.', 'rbx-data' ), basename( (string) $path ) ) );
+			}
+			$tabs[ $m[1] ] = self::csv( (string) file_get_contents( (string) $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		}
+		if ( ! $tabs ) {
+			throw new \RuntimeException( __( 'The bundled data folder has no CSV files.', 'rbx-data' ) );
+		}
+		return self::filter( $tabs );
+	}
+
+	/**
 	 * Drops tabs that must never be imported (ED-10) with a warning.
 	 *
 	 * @param array<string, array<int, array<int, string>>> $tabs Raw tabs.

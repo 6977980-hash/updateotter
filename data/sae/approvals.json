@@ -1,0 +1,11 @@
+{
+  "_note": "Approvals for the automatic import after a deploy (what a person would tick on the Import screen). Every warning class needs a reason; every large change needs its record ID in large; missing records need a decision in missing (ID: removed_from_game, draft or ignore).",
+  "warnings": {
+    "community_required": "Seed data from the Fandom wiki. Pages stay noindex until Ali verifies the values in game.",
+    "rarity_order": "Wiki values kept as reported; flagged for Ali's in-game check list.",
+    "meta_provenance": "calc_defaults is our own editorial choice, not a game fact."
+  },
+  "large": [],
+  "corrections": [],
+  "missing": {}
+}

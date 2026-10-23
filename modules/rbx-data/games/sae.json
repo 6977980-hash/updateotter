@@ -3,8 +3,8 @@
   "name": "Steal an Egg",
   "short_name": "Steal an Egg",
   "folder": "steal-an-egg",
-  "roblox_universe_id": null,
-  "roblox_place_id": null,
+  "roblox_universe_id": "10563114921",
+  "roblox_place_id": "107778070777162",
   "schema_version": "1.0",
   "locales": ["en"],
   "freshness_days": 30,
@@ -84,6 +84,7 @@
         "rarity_id": { "type": "ref", "target": "RAR", "label__en": "Rarity", "required_for_index": true, "list": true, "facet": true },
         "base_income_per_s": { "type": "decimal", "label__en": "Base income per second", "currency_field": "currency_id", "requires_mechanics": ["income_formula"], "required_for_index": true, "display_format": "abbr", "compare": true, "list": true },
         "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
+        "base_weight_kg": { "type": "decimal", "label__en": "Base weight (kg)", "requires_mechanics": ["weight_scaling"], "display_format": "abbr" },
         "base_speed": { "type": "decimal", "label__en": "Base speed", "requires_mechanics": ["speed_requirement"], "display_format": "decimal(2)", "compare": true },
         "is_secret": { "type": "bool", "label__en": "Secret pet", "facet": true },
         "is_mountable": { "type": "bool", "label__en": "Can be ridden", "requires_mechanics": ["mounts"] },
@@ -232,7 +233,7 @@
       "inputs": [
         { "key": "pet", "type": "ref", "target": "PET", "label__en": "Pet", "group_by": "rarity_id" },
         { "key": "mutation", "type": "ref", "target": "MUT", "label__en": "Mutation", "optional": true, "none_label__en": "No mutation" },
-        { "key": "size", "type": "ref", "target": "SIZ", "label__en": "Size", "optional": true, "none_label__en": "Normal size" },
+        { "key": "weight", "type": "number", "label__en": "Weight in kg (optional)", "optional": true, "min": 0.01, "max": 1000000000 },
         { "key": "count", "type": "number", "label__en": "How many", "min": 1, "max": 1000000, "default": 1, "integer": true }
       ]
     }

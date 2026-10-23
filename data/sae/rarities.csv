@@ -1,0 +1,11 @@
+id,slug,name,sort_order,ui_color_hex,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+SAE-RAR-0001,common,Common,1,#979797,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0002,uncommon,Uncommon,2,#00FF00,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0003,rare,Rare,3,#1990FF,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0004,epic,Epic,4,#C402FF,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0005,legendary,Legendary,5,#FF8522,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0006,mythic,Mythic,6,#FF2B64,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0007,cosmic,Cosmic,7,#4100AA,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0008,secret,Secret,8,#2E2E2E,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0009,eternal,Eternal,9,#FF1EF0,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
+SAE-RAR-0010,divine,Divine,10,#FBFF00,live,community,https://stealanegg.fandom.com/wiki/Pets,,Rarity list and colours from the wiki,2026-10-23,claude,,,,
