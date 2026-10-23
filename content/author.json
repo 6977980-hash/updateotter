@@ -1,0 +1,5 @@
+{
+  "_doc": "Public byline for pages whose WordPress account has no author page (user meta rbx_author_page). Keeps login names like 'admin' off the site (CONT-42, POL-16).",
+  "name": "Ali Ahmad",
+  "url": "/authors/ali-ahmad/"
+}
