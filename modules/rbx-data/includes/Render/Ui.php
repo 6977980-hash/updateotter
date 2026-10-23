@@ -43,8 +43,8 @@ final class Ui {
 			return '';
 		}
 		$ladder = $ds->meta( 'suffix_ladder' );
-		$text   = Number::format( $value, $format, 'en', is_array( $ladder ) ? $ladder : null );
-		$exact  = Number::exact( $value, 'en' );
+		$text   = Number::format( $value, $format, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null );
+		$exact  = Number::exact( $value, \RBX\Data\Content\Lang::num() );
 		if ( 'abbr' === $format && $text !== $exact ) {
 			return '<span class="rbx-num" data-exact="' . esc_attr( $exact ) . '" title="' . esc_attr( $exact ) . '">' . esc_html( $text ) . '</span><span class="screen-reader-text"> (' . esc_html( $exact ) . ')</span>';
 		}
@@ -72,7 +72,7 @@ final class Ui {
 
 	/** Human label for an enum value: "biome_spawn" → "Biome spawn". */
 	public static function enum_label( string $v ): string {
-		return ucfirst( str_replace( '_', ' ', $v ) );
+		return \RBX\Data\Content\Lang::t( ucfirst( str_replace( '_', ' ', $v ) ) );
 	}
 
 	/**

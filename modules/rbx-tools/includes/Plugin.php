@@ -27,6 +27,7 @@ final class Plugin {
 	}
 
 	public static function register(): void {
+		load_textdomain( 'rbx-tools', RBX_TOOLS_DIR . '/languages/rbx-tools-' . determine_locale() . '.mo' );
 		wp_register_script_module( 'rbx-calculator', RBX_TOOLS_URL . 'assets/js/calculator.js', array(), RBX_TOOLS_VERSION );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/calculator' );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/mini-calculator' );

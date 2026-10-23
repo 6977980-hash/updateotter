@@ -17,7 +17,7 @@ declare( strict_types=1 );
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'RBX_TOOLS_VERSION', '1.0.0' );
+define( 'RBX_TOOLS_VERSION', '1.0.1' );
 define( 'RBX_TOOLS_FILE', __FILE__ );
 define( 'RBX_TOOLS_DIR', __DIR__ );
 // The UpdateOtter theme bundles this module and sets the URL itself.

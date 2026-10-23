@@ -17,7 +17,7 @@ get_header();
 		<?php foreach ( updateotter_games() as $updateotter_game ) : ?>
 		<li><a href="<?php echo esc_url( updateotter_game_url( $updateotter_game ) ); ?>"><?php echo esc_html( $updateotter_game->name() ); ?></a></li>
 		<?php endforeach; ?>
-		<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'updateotter' ); ?></a></li>
+		<li><a href="<?php echo esc_url( updateotter_url() ); ?>"><?php esc_html_e( 'Home', 'updateotter' ); ?></a></li>
 	</ul>
 </main>
 <?php

@@ -20,7 +20,7 @@ $updateotter_game = updateotter_game();
 <?php require UPDATEOTTER_DIR . '/assets/svg/icons.svg'; ?>
 <header class="site-header">
 	<div class="container site-header__bar">
-		<a class="site-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'UpdateOtter home', 'updateotter' ); ?>"><?php updateotter_logo(); ?></a>
+		<a class="site-logo" href="<?php echo esc_url( updateotter_url() ); ?>" aria-label="<?php esc_attr_e( 'UpdateOtter home', 'updateotter' ); ?>"><?php updateotter_logo(); ?></a>
 		<?php if ( count( updateotter_games() ) > 0 ) : ?>
 		<button type="button" class="icon-btn" aria-expanded="false" aria-controls="game-switcher" data-disclosure>
 			<?php echo updateotter_icon( 'gamepad' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

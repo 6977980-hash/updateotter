@@ -19,6 +19,8 @@ jobs:
         run: sh tools/build-css.sh && git diff --exit-code assets/css/site.css
       - name: Only min-width media queries
         run: "! grep -rn 'max-width:' assets/css/tokens.css assets/css/base.css assets/css/layout.css assets/css/components.css | grep '@media'"
+      - name: Indonesian translation files are up to date
+        run: python3 tools/i18n/build.py && git diff --exit-code languages modules/rbx-data/languages modules/rbx-tools/languages
       - name: Calculator PHP/JS parity
         run: RBX_DATA_DIR=modules/rbx-data node --test modules/rbx-tools/tests/parity.test.mjs
       - name: No eval or innerHTML in calculator JS
