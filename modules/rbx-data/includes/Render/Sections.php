@@ -336,6 +336,15 @@ final class Sections {
 		return Ui::chip( $st );
 	}
 
+	/** Copy button for a code, named after it for screen readers (UO-46). */
+	private static function copy_button( string $code ): string {
+		/* translators: %s: game code */
+		$label = sprintf( __( 'Copy code %s', 'rbx-data' ), $code );
+		/* translators: %s: game code */
+		$done = sprintf( __( 'Copied %s', 'rbx-data' ), $code );
+		return '<button type="button" class="rbx-copy" data-copy="' . esc_attr( $code ) . '" data-copied="' . esc_attr( $done ) . '" aria-label="' . esc_attr( $label ) . '" hidden>' . esc_html__( 'Copy', 'rbx-data' ) . '</button>';
+	}
+
 	public static function enqueue_list_js(): void {
 		wp_enqueue_script_module( 'rbx-data-list', RBX_DATA_URL . 'assets/front/list.js', array(), Ui::asset_ver( 'assets/front/list.js' ) );
 	}
@@ -430,7 +439,7 @@ final class Sections {
 					? esc_html__( 'Last tested', 'rbx-data' ) . ' ' . Ui::date( $t )
 					/* translators: %s: date */
 					: '<span class="rbx-chip rbx-chip--warning">' . sprintf( esc_html__( 'Not re-checked since %s', 'rbx-data' ), Ui::date( '' !== $t ? $t : (string) ( $d['first_seen'] ?? '' ) ) ) . '</span>';
-				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> <button type="button" class="rbx-copy" data-copy="' . esc_attr( (string) $d['code'] ) . '" hidden>' . esc_html__( 'Copy', 'rbx-data' ) . '</button></th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'First seen', 'rbx-data' ) . '">' . Ui::date( (string) ( $d['first_seen'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Tested', 'rbx-data' ) . '">' . $state . ( ! empty( $d['tested_by'] ) ? ' ' . esc_html__( 'by', 'rbx-data' ) . ' ' . esc_html( (string) $d['tested_by'] ) : '' ) . '</td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
+				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> ' . self::copy_button( (string) $d['code'] ) . '</th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'First seen', 'rbx-data' ) . '">' . Ui::date( (string) ( $d['first_seen'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Tested', 'rbx-data' ) . '">' . $state . ( ! empty( $d['tested_by'] ) ? ' ' . esc_html__( 'by', 'rbx-data' ) . ' ' . esc_html( (string) $d['tested_by'] ) : '' ) . '</td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
 			}
 			$out .= Ui::h2( __( 'Active codes', 'rbx-data' ), 'active-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'First seen', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Tested', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
 			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), Ui::asset_ver( 'assets/front/copy.js' ) );
@@ -439,7 +448,7 @@ final class Sections {
 			$rows = '';
 			foreach ( $reported as $c ) {
 				$d     = $c['data'];
-				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> <button type="button" class="rbx-copy" data-copy="' . esc_attr( (string) $d['code'] ) . '" hidden>' . esc_html__( 'Copy', 'rbx-data' ) . '</button></th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Status', 'rbx-data' ) . '"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested by us', 'rbx-data' ) . '</span></td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
+				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> ' . self::copy_button( (string) $d['code'] ) . '</th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Status', 'rbx-data' ) . '"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested by us', 'rbx-data' ) . '</span></td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
 			}
 			$out .= Ui::h2( __( 'Reported codes', 'rbx-data' ), 'reported-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Status', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
 			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), Ui::asset_ver( 'assets/front/copy.js' ) );

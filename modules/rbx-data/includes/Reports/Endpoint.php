@@ -23,6 +23,8 @@ final class Endpoint {
 
 	public const MAX_TEXT = 500;
 	public const PER_HOUR = 5;
+	/** Reports a day for the whole site (UO-45). */
+	public const PER_DAY = 200;
 
 	public static function boot(): void {
 		add_action( 'rest_api_init', array( self::class, 'routes' ) );
@@ -102,9 +104,17 @@ final class Endpoint {
 		if ( '' !== trim( (string) ( $p['website'] ?? '' ) ) ) {
 			return new \WP_Error( 'spam', $msgs['spam'], array( 'status' => 400 ) );
 		}
-		$t0 = (int) ( $p['t'] ?? 0 );
-		if ( $t0 <= 0 || time() - (int) floor( $t0 / 1000 ) < 3 ) {
-			return new \WP_Error( 'spam', $msgs['spam'], array( 'status' => 400 ) );
+		// UO-45: the dialog sends the time it was open (`e`, ms from performance.now()), so the
+		// visitor's clock does not matter. The no-JS /report/ page keeps the server render stamp `t`.
+		if ( isset( $p['e'] ) && '' !== (string) $p['e'] ) {
+			if ( (int) $p['e'] < 3000 ) {
+				return new \WP_Error( 'spam', $msgs['spam'], array( 'status' => 400 ) );
+			}
+		} else {
+			$t0 = (int) ( $p['t'] ?? 0 );
+			if ( $t0 <= 0 || time() - (int) floor( $t0 / 1000 ) < 3 ) {
+				return new \WP_Error( 'spam', $msgs['spam'], array( 'status' => 400 ) );
+			}
 		}
 		$text = trim( sanitize_textarea_field( (string) ( $p['text'] ?? '' ) ) );
 		if ( '' === $text ) {
@@ -150,27 +160,45 @@ final class Endpoint {
 		return true;
 	}
 
-	/** Email, phone number, or Roblox profile URL (CONT-46). */
+	/**
+	 * Email, phone number, or Roblox profile URL (CONT-46). Game numbers are not phone numbers
+	 * (UO-44): "Shark makes 150000000 per hour" and "1.500.000.000 per detik" pass. A phone number
+	 * starts with + (8+ digits) or with a 0 that is not a decimal (9 to 13 digits).
+	 */
 	public static function has_pii( string $text ): bool {
 		if ( preg_match( '/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', $text ) ) {
 			return true;
 		}
-		if ( preg_match( '/(?:\+?\d[\s().-]*){8,}/', $text ) ) {
-			return true;
+		if ( preg_match_all( '/(?<![\w.,])(\+|0(?![.,]\d))[\d\s().-]*\d/', $text, $m ) ) {
+			foreach ( $m[0] as $i => $hit ) {
+				$digits = strlen( (string) preg_replace( '/\D/', '', $hit ) );
+				if ( '+' === $m[1][ $i ] ? $digits >= 8 : ( $digits >= 9 && $digits <= 13 ) ) {
+					return true;
+				}
+			}
 		}
 		return (bool) preg_match( '#roblox\.com/(?:users|profile)|roblox\.com/[a-z-]*/?users/\d+#i', $text );
 	}
 
-	/** 5 per hour keyed by sha256(IP + daily salt) in a 1 h transient; the IP itself is never stored. */
+	/**
+	 * 5 per hour per visitor, keyed by sha256(IP + daily salt) in a 1 h transient; the IP itself is
+	 * never stored. Behind the Hostinger CDN REMOTE_ADDR can be a shared CDN address, so the first
+	 * X-Forwarded-For hop is part of the key (UO-45). That header can be faked, so a daily cap for
+	 * the whole site bounds what a faker can send.
+	 */
 	private static function rate_ok(): bool {
 		$ip   = (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$fwd  = trim( explode( ',', (string) ( $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '' ) )[0] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		$salt = (string) get_option( 'rbx_report_salt', 'rbx' ) . gmdate( 'Y-m-d' );
-		$key  = 'rbx_rl_' . substr( hash( 'sha256', $ip . $salt ), 0, 32 );
+		$key  = 'rbx_rl_' . substr( hash( 'sha256', $ip . '|' . $fwd . $salt ), 0, 32 );
+		$day  = 'rbx_rl_day_' . gmdate( 'Ymd' );
 		$n    = (int) get_transient( $key );
-		if ( $n >= self::PER_HOUR ) {
+		$all  = (int) get_transient( $day );
+		if ( $n >= self::PER_HOUR || $all >= self::PER_DAY ) {
 			return false;
 		}
 		set_transient( $key, $n + 1, HOUR_IN_SECONDS );
+		set_transient( $day, $all + 1, DAY_IN_SECONDS );
 		return true;
 	}
 }

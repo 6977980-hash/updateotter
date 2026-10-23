@@ -23,5 +23,7 @@ jobs:
         run: python3 tools/i18n/build.py && git diff --exit-code languages modules/rbx-data/languages modules/rbx-tools/languages
       - name: Calculator PHP/JS parity
         run: RBX_DATA_DIR=modules/rbx-data node --test modules/rbx-tools/tests/parity.test.mjs
+      - name: Report form personal-data check
+        run: php modules/rbx-data/tests/report-pii.test.php
       - name: No eval or innerHTML in calculator JS
         run: "! grep -rnE 'eval\\(|new Function|innerHTML' modules/rbx-tools/assets/js"

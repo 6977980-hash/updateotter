@@ -11,6 +11,7 @@ if ( tpl && typeof HTMLDialogElement === 'function' ) {
 	const live = form.querySelector( '.rbx-live' );
 	const submit = form.querySelector( 'button[type="submit"]' );
 	let opener = null;
+	let openedAt = 0;
 
 	document.addEventListener( 'click', ( ev ) => {
 		const btn = ev.target.closest( '[data-rbx-report]' );
@@ -39,6 +40,7 @@ if ( tpl && typeof HTMLDialogElement === 'function' ) {
 		set( 'dataset_version', btn.dataset.version );
 		set( 'page_url', window.location.href.split( '#' )[ 0 ] );
 		set( 't', String( Date.now() ) );
+		openedAt = performance.now();
 		dlg.showModal();
 	} );
 
@@ -47,11 +49,14 @@ if ( tpl && typeof HTMLDialogElement === 'function' ) {
 	form.addEventListener( 'submit', async ( ev ) => {
 		ev.preventDefault();
 		submit.disabled = true;
+		// Time the dialog was open, from the page's own timer: the device clock can be wrong (UO-45).
+		const body = new FormData( form );
+		body.set( 'e', String( Math.round( performance.now() - openedAt ) ) );
 		try {
-			const res = await fetch( form.dataset.endpoint, { method: 'POST', body: new FormData( form ) } );
-			const body = await res.json().catch( () => ( {} ) );
+			const res = await fetch( form.dataset.endpoint, { method: 'POST', body } );
+			const answer = await res.json().catch( () => ( {} ) );
 			if ( ! res.ok ) {
-				throw new Error( body.message || i18n.error );
+				throw new Error( answer.message || i18n.error );
 			}
 			live.textContent = i18n.thanks;
 			setTimeout( () => dlg.open && dlg.close(), 2500 );
