@@ -1,7 +1,7 @@
 {
   "_note": "Approvals for the automatic import after a deploy (what a person would tick on the Import screen). Every warning class needs a reason; every large change needs its record ID in large; missing records need a decision in missing (ID: removed_from_game, draft or ignore).",
   "warnings": {
-    "community_required": "Seed data from the Fandom wiki. Pages stay noindex until Ali verifies the values in game.",
+    "community_required": "Seed data from the Fandom wiki (CC BY-SA). Values show 'Source: community wiki'; owner decision 2026-10-23: pages index on wiki data once Ali has reviewed our own note (notes_reviewed_by=ali), no in-game screenshot required.",
     "rarity_order": "Wiki values kept as reported; flagged for Ali's in-game check list.",
     "meta_provenance": "calc_defaults is our own editorial choice, not a game fact.",
     "large_change": "Light Dove and Flame Sprite base income fixed from 225 to 225000: our seed dropped the 'k' from the wiki's $225k/s (the egg's cash reward on the wiki is 100x that value, like every other biome egg)."
