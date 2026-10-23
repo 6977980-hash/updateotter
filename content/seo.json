@@ -1,0 +1,86 @@
+{
+  "home": {
+    "title": "UpdateOtter: Roblox Game Calculators, Wikis & Updates",
+    "description": "Unofficial, fan-made calculators and wikis for Roblox games. Every value shows where it comes from and when we last checked it."
+  },
+  "steal-an-egg": {
+    "title": "Steal an Egg Wiki: Pets, Eggs, Mutations & Biomes | UpdateOtter",
+    "description": "Fan-made Steal an Egg wiki: every pet, egg, mutation and biome, with the source and last-checked date shown on each value."
+  },
+  "steal-an-egg/calculator": {
+    "title": "Steal an Egg Calculator: Pet Value & Income | UpdateOtter",
+    "description": "Work out a Steal an Egg pet's income per second from its base income, mutation and weight. Free, no sign-up, works on phones."
+  },
+  "steal-an-egg/eggs": {
+    "title": "Steal an Egg Eggs: Full List with Hatch Times | UpdateOtter",
+    "description": "Every egg in Steal an Egg with its cost, hatch time, zone and the pets it can hatch. Each value shows its source."
+  },
+  "steal-an-egg/pets": {
+    "title": "Steal an Egg Pets List: Every Pet by Rarity | UpdateOtter",
+    "description": "All Steal an Egg pets sorted by rarity, with base income, the eggs they hatch from and the date each value was checked."
+  },
+  "steal-an-egg/mutations": {
+    "title": "Steal an Egg Mutations & Size Multipliers | UpdateOtter",
+    "description": "Every Steal an Egg mutation with its income multiplier, how weight changes income, and how the two stack, with a worked example."
+  },
+  "steal-an-egg/codes": {
+    "title": "Steal an Egg Codes ({month}): None Yet, Here's Why | UpdateOtter",
+    "description": "Are there Steal an Egg codes? Not yet. Here is what we check, where codes would appear, and how to avoid fake code sites."
+  },
+  "steal-an-egg/tier-list": {
+    "title": "Steal an Egg Tier List: Best Pets Ranked | UpdateOtter",
+    "description": "Steal an Egg pets you can still get, ranked S to B by base income, with the ranking date and how we rank."
+  },
+  "steal-an-egg/updates": {
+    "title": "Steal an Egg Updates: Weekly Patch Notes & Changes | UpdateOtter",
+    "description": "Steal an Egg updates we have tracked, newest first, and what changed in our data after each one."
+  },
+  "about": {
+    "title": "About UpdateOtter: Who Runs This Fan Site | UpdateOtter",
+    "description": "UpdateOtter is an unofficial, fan-made Roblox helper site run by Ali Ahmad. Why it exists, how we gather data and how to reach us."
+  },
+  "methodology": {
+    "title": "How We Verify Data: Editorial Policy & Methodology | UpdateOtter",
+    "description": "How UpdateOtter collects and checks game values, what each source label means, how calculators work and how we fix mistakes."
+  },
+  "authors": {
+    "title": "Authors | UpdateOtter",
+    "description": "The people who write and check UpdateOtter."
+  },
+  "authors/ali-ahmad": {
+    "title": "Ali Ahmad, Founder and Editor | UpdateOtter",
+    "description": "Ali Ahmad runs UpdateOtter from Pakistan and has played Roblox for about two years, including Steal an Egg since launch."
+  },
+  "contact": {
+    "title": "Contact UpdateOtter | UpdateOtter",
+    "description": "Email contact@updateotter.com about a wrong value, a takedown request or anything else."
+  },
+  "corrections": {
+    "title": "Corrections Log | UpdateOtter",
+    "description": "How we fix confirmed mistakes on UpdateOtter and show what changed. We never change a number silently."
+  },
+  "report": {
+    "title": "Report a Wrong Value | UpdateOtter",
+    "description": "Tell us about a wrong number or out-of-date page on UpdateOtter."
+  },
+  "privacy-policy": {
+    "title": "Privacy Policy | UpdateOtter",
+    "description": "What data UpdateOtter collects, why, how long we keep it and your choices."
+  },
+  "cookie-policy": {
+    "title": "Cookie Policy | UpdateOtter",
+    "description": "The cookies and browser storage UpdateOtter uses and how to control them."
+  },
+  "terms": {
+    "title": "Terms of Use | UpdateOtter",
+    "description": "The terms for using UpdateOtter, an unofficial fan-made site."
+  },
+  "disclaimer": {
+    "title": "Disclaimer: Unofficial Fan Site | UpdateOtter",
+    "description": "UpdateOtter is not affiliated with Roblox or any game developer. Game names and assets belong to their owners."
+  },
+  "dmca": {
+    "title": "Copyright and DMCA | UpdateOtter",
+    "description": "How to send a copyright notice to UpdateOtter and what we do when we get one."
+  }
+}
