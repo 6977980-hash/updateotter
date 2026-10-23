@@ -1,5 +1,5 @@
 // PHP/JS twin parity (ENG-31, ENG-34, ENG-35). Vectors are written by rbx-data/tests/make-vectors.php.
-// Run: node --test tests/  (RBX_DATA_DIR overrides the rbx-data checkout path)
+// Run: node --test tests/parity.test.mjs  (RBX_DATA_DIR overrides the rbx-data checkout path)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

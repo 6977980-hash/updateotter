@@ -21,6 +21,6 @@ jobs:
       - name: PHP syntax
         run: find . -name '*.php' -not -path './.git/*' -not -path './rbx-data-src/*' -print0 | xargs -0 -n1 php -l
       - name: PHP/JS parity
-        run: RBX_DATA_DIR=rbx-data-src node --test tests/
+        run: RBX_DATA_DIR=rbx-data-src node --test tests/parity.test.mjs
       - name: No eval or innerHTML in front-end JS
         run: "! grep -rnE 'eval\\(|new Function|innerHTML' assets/js"
