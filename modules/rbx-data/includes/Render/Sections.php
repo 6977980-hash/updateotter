@@ -281,10 +281,16 @@ final class Sections {
 		$txt = (string) ( $m['data']['definition__en'] ?? $m['data']['description__en'] ?? '' );
 		$out = '' !== $txt ? wpautop( Ui::text( $txt ) ) : '';
 		if ( 'confirmed' !== ( $m['data']['status'] ?? '' ) ) {
-			$out .= '<p class="rbx-note"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested in game yet', 'rbx-data' ) . '</span> ' . esc_html__( 'This is not confirmed yet. We will update it once we test it in the game.', 'rbx-data' ) . '</p>';
+			$out .= '<p class="rbx-note">' . self::mechanic_chip( $m ) . ' ' . esc_html__( 'This is not confirmed yet. We will update it once we test it in the game.', 'rbx-data' ) . '</p>';
 		}
 		self::show( array( (string) $m['id'] ) );
 		return $out;
+	}
+
+	/** Badge for a mechanic that is not fully confirmed (UO-07). */
+	private static function mechanic_chip( array $m ): string {
+		$partly = 'partially_confirmed' === ( $m['data']['status'] ?? '' );
+		return '<span class="rbx-chip rbx-chip--warning">' . esc_html( $partly ? __( 'Partly tested in game', 'rbx-data' ) : __( 'Not tested in game yet', 'rbx-data' ) ) . '</span>';
 	}
 
 	/** Mutation table with an id anchor per row (CONT-24, REV C-39). */
@@ -510,7 +516,7 @@ final class Sections {
 				continue;
 			}
 			$term = (string) ( $m['data']['term__en'] ?? Ui::enum_label( (string) $m['data']['mechanic_key'] ) );
-			$dl  .= '<div id="term-' . esc_attr( sanitize_title( $term ) ) . '"><dt>' . esc_html( $term ) . '</dt><dd>' . Ui::text( (string) $m['data']['definition__en'] ) . ( 'confirmed' !== ( $m['data']['status'] ?? '' ) ? ' <span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested in game yet', 'rbx-data' ) . '</span>' : '' ) . '</dd></div>';
+			$dl  .= '<div id="term-' . esc_attr( sanitize_title( $term ) ) . '"><dt>' . esc_html( $term ) . '</dt><dd>' . Ui::text( (string) $m['data']['definition__en'] ) . ( 'confirmed' !== ( $m['data']['status'] ?? '' ) ? ' ' . self::mechanic_chip( $m ) : '' ) . '</dd></div>';
 		}
 		return '' === $dl ? '' : '<dl class="rbx-glossary">' . $dl . '</dl>';
 	}

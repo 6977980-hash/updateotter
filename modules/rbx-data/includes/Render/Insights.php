@@ -22,8 +22,11 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Insights {
 
-	/** Weight steps for the weight table, as multiples of the base weight. */
-	private const WEIGHT_STEPS = array( 1, 2, 10, 50, 125, 500 );
+	/**
+	 * Weight steps for the weight table, as multiples of the base weight. Capped at 10x until
+	 * heavier pets are read in game: the weight rule rests on one reading (UO-07).
+	 */
+	private const WEIGHT_STEPS = array( 1, 2, 5, 10 );
 
 	/** Most pets shown in a mutation's effect table. */
 	private const MUT_TABLE_MAX = 20;
@@ -215,8 +218,9 @@ final class Insights {
 		/* translators: %s: pet */
 		$cap   = sprintf( __( 'Income of one %s with no mutation at different weights', 'rbx-data' ), $name );
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Weight', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Compared with base', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		$note  = 'confirmed' !== $ds->mechanic_status( 'weight_scaling' ) ? '<p class="rbx-note"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Partly tested in game', 'rbx-data' ) . '</span> ' . esc_html__( 'The weight rule comes from the community wiki and matched one in-game reading. The table stops at ten times the base weight because heavier pets have not been checked yet.', 'rbx-data' ) . '</p>' : '';
 		/* translators: %s: pet */
-		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $intro . '</p>' . $table . '</section>';
+		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $intro . '</p>' . $table . $note . '</section>';
 	}
 
 	/* ---------------------------------------------------------------- mutations */
