@@ -470,7 +470,7 @@ final class Sections {
 		$items = '';
 		foreach ( $game->menu_order() as $slug ) {
 			$s   = $game->section( $slug );
-			$url = Breadcrumbs::page_url( $game->folder() . '/' . $slug );
+			$url = 'updates' === ( $s['type'] ?? '' ) ? Ui::updates_url( $game ) : Breadcrumbs::page_url( $game->folder() . '/' . $slug );
 			if ( null === $s || '' === $url ) {
 				continue;
 			}
@@ -496,7 +496,8 @@ final class Sections {
 		}
 		$pub = Ui::last_publish( $game );
 		if ( '' !== $pub ) {
-			$rows .= '<tr><th scope="row">' . esc_html__( 'Latest publish on Roblox', 'rbx-data' ) . '</th><td>' . $pub . ' <a href="' . esc_url( home_url( '/' . $game->folder() . '/updates/' ) ) . '">' . esc_html__( 'Updates', 'rbx-data' ) . '</a></td></tr>';
+			$upd   = Ui::updates_url( $game );
+			$rows .= '<tr><th scope="row">' . esc_html__( 'Latest publish on Roblox', 'rbx-data' ) . '</th><td>' . $pub . ( '' !== $upd ? ' <a href="' . esc_url( $upd ) . '">' . esc_html__( 'Updates', 'rbx-data' ) . '</a>' : '' ) . '</td></tr>';
 		}
 		$cad = (string) ( $ds->meta( 'update_cadence_text' ) ?? '' );
 		if ( '' !== $cad ) {

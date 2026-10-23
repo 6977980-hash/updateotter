@@ -26,7 +26,13 @@ const UPDATEOTTER_ROOT_FILES = array(
 	'og-steal-an-egg.jpg'   => 'image/jpeg',
 	'og-grow-a-garden.jpg'  => 'image/jpeg',
 	'og-grow-a-garden-2.jpg' => 'image/jpeg',
+	'og-fish-it.jpg'        => 'image/jpeg',
 );
+
+/** True when a root file ships with the theme (used by the Open Graph tags, UO-13). */
+function updateotter_root_file_exists( string $name ): bool {
+	return isset( UPDATEOTTER_ROOT_FILES[ $name ] ) && is_readable( UPDATEOTTER_DIR . '/root-files/' . $name );
+}
 
 function updateotter_serve_root_file(): void {
 	$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput

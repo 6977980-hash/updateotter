@@ -219,6 +219,15 @@ final class Ui {
 	 * Newest Roblox publish time the update tracker saw for the game (UO-09), as "23 Oct 2026, 17:26
 	 * UTC", or '' before the first poll. Only the time is a fact; we don't guess what changed.
 	 */
+	/**
+	 * URL of the game's updates list, or '' while that page is missing or has no published update,
+	 * so no link lands on an empty page or on another game's updates (UO-15).
+	 */
+	public static function updates_url( Game $game ): string {
+		$url = Breadcrumbs::page_url( $game->folder() . '/updates' );
+		return '' !== $url && Seo::has_updates( $game, 1 ) ? $url : '';
+	}
+
 	public static function last_publish( Game $game ): string {
 		$u = $game->universe_id();
 		if ( null === $u || '' === $u || ! class_exists( '\RBX\Notifier\State' ) ) {
@@ -287,7 +296,8 @@ final class Ui {
 		foreach ( $rows as $r ) {
 			$out .= '<li>' . self::change_line( $ds, $r ) . '</li>';
 		}
-		return $out . '</ul><p><a href="' . esc_url( home_url( '/' . $ds->game()->folder() . '/updates/' ) ) . '">' . esc_html__( 'All updates and changes', 'rbx-data' ) . '</a></p></section>';
+		$all = self::updates_url( $ds->game() );
+		return $out . '</ul>' . ( '' !== $all ? '<p><a href="' . esc_url( $all ) . '">' . esc_html__( 'All updates and changes', 'rbx-data' ) . '</a></p>' : '' ) . '</section>';
 	}
 
 	/** @param array<string, mixed> $r Changelog row. */

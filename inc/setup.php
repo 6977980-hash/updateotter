@@ -71,3 +71,30 @@ add_action(
 		register_block_pattern_category( 'updateotter', array( 'label' => __( 'UpdateOtter', 'updateotter' ) ) );
 	}
 );
+
+// No shortlink HTTP header either (UO-26); the head tag is removed above.
+remove_action( 'template_redirect', 'wp_shortlink_header', 11 );
+
+// A mistyped or missing URL is a 404, never a 301 to the nearest slug of another game (UO-15).
+add_filter( 'do_redirect_guess_404_permalink', '__return_false' );
+
+/**
+ * Archives are not pages of this site (UO-14): category, tag, date and author archives, post type
+ * archives and the blog index (where /?post_type=rbx_pet lands) are real 404s, not soft ones.
+ * Feeds and search stay as they are.
+ */
+add_action(
+	'template_redirect',
+	static function (): void {
+		if ( is_feed() || is_search() || is_admin() || is_404() ) {
+			return;
+		}
+		if ( is_category() || is_tag() || is_tax() || is_date() || is_author() || is_post_type_archive() || ( is_home() && ! is_front_page() ) ) {
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+			nocache_headers();
+		}
+	},
+	0
+);

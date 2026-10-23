@@ -69,11 +69,12 @@ final class Seo {
 			'post'    => null,
 			'section' => '',
 		);
-		if ( is_front_page() ) {
+		$post = get_queried_object();
+		// The Indonesian root /id/ is the home page of that language (UO-16).
+		if ( is_front_page() || ( is_page() && $post instanceof \WP_Post && Lang::is_root( $post ) ) ) {
 			$ctx['kind'] = 'home';
 			return $ctx;
 		}
-		$post = get_queried_object();
 		if ( ! is_singular() || ! $post instanceof \WP_Post ) {
 			return $ctx;
 		}
@@ -478,14 +479,39 @@ final class Seo {
 	 * @return array<string, mixed>|null
 	 */
 	private static function page_node( array $c, string $url ): ?array {
-		if ( 'other' === $c['kind'] || 'home' === $c['kind'] ) {
-			return null;
+		if ( 'other' === $c['kind'] && ! $c['post'] ) {
+			return null; // 404, search: no page node.
 		}
 		$node = array(
-			'@type' => 'WebPage',
-			'@id'   => $url . '#webpage',
-			'url'   => $url,
+			'@type'      => 'WebPage',
+			'@id'        => $url . '#webpage',
+			'url'        => $url,
+			'inLanguage' => Lang::is_id() ? Lang::ID : 'en',
+			'isPartOf'   => array( '@id' => home_url( '/#website' ) ),
 		);
+		if ( $c['post'] ) {
+			$node['name'] = html_entity_decode( wp_strip_all_tags( get_the_title( $c['post'] ) ), ENT_QUOTES, 'UTF-8' );
+		}
+		if ( 'home' === $c['kind'] ) {
+			$node['name']  = self::BRAND;
+			$node['about'] = array( '@id' => home_url( '/#organization' ) );
+			$desc          = self::description();
+			if ( null !== $desc && '' !== $desc ) {
+				$node['description'] = $desc;
+			}
+			return $node;
+		}
+		if ( 'other' === $c['kind'] ) {
+			// Site pages (about, contact, methodology, policies): typed where schema.org has a type (UO-17).
+			$slug = (string) $c['post']->post_name;
+			if ( 'about' === $slug ) {
+				$node['@type'] = 'AboutPage';
+				$node['about'] = array( '@id' => home_url( '/#organization' ) );
+			} elseif ( 'contact' === $slug ) {
+				$node['@type'] = 'ContactPage';
+			}
+			return $node;
+		}
 		if ( $c['post'] ) {
 			$lc = (string) get_post_meta( $c['post']->ID, '_rbx_last_changed', true );
 			if ( '' !== $lc ) {
@@ -533,7 +559,8 @@ final class Seo {
 				}
 				break;
 			case 'author':
-				$node['@type'] = 'ProfilePage';
+				$node['@type']      = 'ProfilePage';
+				$node['mainEntity'] = self::person( (string) ( $node['name'] ?? '' ), $url );
 				break;
 		}
 		return $node;
@@ -606,11 +633,7 @@ final class Seo {
 			}
 			$au = Ui::author( $post->ID );
 			if ( $au ) {
-				$node['author'] = array(
-					'@type' => 'Person',
-					'name'  => $au['name'],
-					'url'   => $au['url'],
-				);
+				$node['author'] = self::person_ref( $au );
 			}
 			$thumb = (int) get_post_thumbnail_id( $post );
 			if ( $thumb ) {
@@ -641,11 +664,7 @@ final class Seo {
 			);
 			$au   = Ui::author( $post->ID );
 			if ( $au ) {
-				$node['author'] = array(
-					'@type' => 'Person',
-					'name'  => $au['name'],
-					'url'   => $au['url'],
-				);
+				$node['author'] = self::person_ref( $au );
 			}
 			if ( $game ) {
 				$node['about'] = self::video_game( $game );
@@ -653,6 +672,78 @@ final class Seo {
 			$out['Article'] = $node;
 		}
 		return $out;
+	}
+
+	/**
+	 * The author as a full Person node, the mainEntity of their profile page (UO-17).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function person( string $name, string $url ): array {
+		$node = array(
+			'@type'    => 'Person',
+			'@id'      => $url . '#person',
+			'name'     => $name,
+			'url'      => $url,
+			'worksFor' => array( '@id' => home_url( '/#organization' ) ),
+		);
+		$same = self::author_json()['same_as'] ?? array();
+		if ( is_array( $same ) && $same ) {
+			$node['sameAs'] = array_values( array_map( 'strval', $same ) );
+		}
+		return $node;
+	}
+
+	/**
+	 * Author of an Article/BlogPosting, with the same @id as the Person on the profile page.
+	 *
+	 * @param array{name: string, url: string} $au Author from Ui::author().
+	 * @return array<string, string>
+	 */
+	private static function person_ref( array $au ): array {
+		return array(
+			'@type' => 'Person',
+			'@id'   => $au['url'] . '#person',
+			'name'  => $au['name'],
+			'url'   => $au['url'],
+		);
+	}
+
+	/** @return array<string, mixed> content/author.json */
+	private static function author_json(): array {
+		static $a = null;
+		if ( null === $a ) {
+			$file = get_template_directory() . '/content/author.json';
+			$a    = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : array(); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$a    = is_array( $a ) ? $a : array();
+		}
+		return $a;
+	}
+
+	/**
+	 * Organization node (UO-17). sameAs comes from content/author.json `org_same_as` once the brand
+	 * accounts exist (UO-73).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function organization(): array {
+		$a    = self::author_json();
+		$node = array(
+			'@type'       => 'Organization',
+			'@id'         => home_url( '/#organization' ),
+			'name'        => self::BRAND,
+			'url'         => home_url( '/' ),
+			'logo'        => home_url( '/logo-organization.png' ),
+			'description' => 'Fan-made calculators, item databases, codes and guides for popular Roblox games. Not affiliated with Roblox or the game developers.',
+			'email'       => (string) ( $a['org_email'] ?? 'contact@updateotter.com' ),
+		);
+		if ( ! empty( $a['url'] ) ) {
+			$node['founder'] = array( '@id' => home_url( (string) $a['url'] ) . '#person' );
+		}
+		if ( ! empty( $a['org_same_as'] ) && is_array( $a['org_same_as'] ) ) {
+			$node['sameAs'] = array_values( array_map( 'strval', $a['org_same_as'] ) );
+		}
+		return $node;
 	}
 
 	/** @return array<string, string> */
@@ -844,6 +935,71 @@ final class Seo {
 
 	/* ---------------------------------------------------------------- fallback head without Rank Math */
 
+	/**
+	 * Open Graph and Twitter card tags (UO-13). Image per game from the root files, else the
+	 * site default; an update post with a featured image uses that image's 1200×630 crop.
+	 *
+	 * @param array<string, mixed> $c Context.
+	 */
+	private static function social_tags( array $c, ?string $desc ): void {
+		if ( is_404() || is_search() || ( 'other' === $c['kind'] && ! $c['post'] ) ) {
+			return;
+		}
+		$url   = 'home' === $c['kind'] && ! Lang::is_id() ? home_url( '/' ) : (string) ( wp_get_canonical_url() ?: get_permalink() );
+		$title = html_entity_decode( wp_get_document_title(), ENT_QUOTES, 'UTF-8' );
+		$game  = $c['game'];
+		$img   = home_url( '/og-default.jpg' );
+		$alt   = self::BRAND . ': Roblox game tools, updates and guides';
+		if ( $game && function_exists( 'updateotter_root_file_exists' ) && updateotter_root_file_exists( 'og-' . $game->folder() . '.jpg' ) ) {
+			$img = home_url( '/og-' . $game->folder() . '.jpg' );
+			$alt = self::BRAND . ': ' . $game->name();
+		}
+		$w = 1200;
+		$h = 630;
+		if ( 'update' === $c['kind'] && $c['post'] && has_post_thumbnail( $c['post'] ) ) {
+			$src = wp_get_attachment_image_src( (int) get_post_thumbnail_id( $c['post'] ), 'rbx-og' );
+			if ( $src ) {
+				[ $img, $w, $h ] = array( (string) $src[0], (int) $src[1], (int) $src[2] );
+			}
+		}
+		$type = in_array( $c['kind'], array( 'guide', 'update' ), true ) ? 'article' : 'website';
+		$tags = array(
+			'og:type'        => $type,
+			'og:site_name'   => self::BRAND,
+			'og:title'       => $title,
+			'og:description' => (string) $desc,
+			'og:url'         => $url,
+			'og:locale'      => Lang::is_id() ? 'id_ID' : 'en_US',
+			'og:image'       => $img,
+			'og:image:width' => (string) $w,
+			'og:image:height' => (string) $h,
+			'og:image:alt'   => $alt,
+		);
+		foreach ( $tags as $k => $v ) {
+			if ( '' !== $v ) {
+				echo '<meta property="' . esc_attr( $k ) . '" content="' . esc_attr( $v ) . "\">\n";
+			}
+		}
+		if ( null !== Lang::pair() ) {
+			echo '<meta property="og:locale:alternate" content="' . ( Lang::is_id() ? 'en_US' : 'id_ID' ) . "\">\n";
+		}
+		if ( 'article' === $type && $c['post'] ) {
+			echo '<meta property="article:modified_time" content="' . esc_attr( (string) get_post_modified_time( 'c', true, $c['post'] ) ) . "\">\n";
+		}
+		$tw = array(
+			'twitter:card'        => 'summary_large_image',
+			'twitter:title'       => $title,
+			'twitter:description' => (string) $desc,
+			'twitter:image'       => $img,
+			'twitter:image:alt'   => $alt,
+		);
+		foreach ( $tw as $k => $v ) {
+			if ( '' !== $v ) {
+				echo '<meta name="' . esc_attr( $k ) . '" content="' . esc_attr( $v ) . "\">\n";
+			}
+		}
+	}
+
 	public static function core_head(): void {
 		if ( self::rank_math() || is_admin() ) {
 			return;
@@ -853,23 +1009,22 @@ final class Seo {
 			echo '<meta name="description" content="' . esc_attr( $desc ) . "\">\n";
 		}
 		$c   = self::context();
+		self::social_tags( $c, $desc );
 		$url = is_singular() ? (string) get_permalink() : home_url( '/' );
 		$graph = array();
-		if ( 'home' === $c['kind'] ) {
+		if ( 'home' === $c['kind'] && ! Lang::is_id() ) {
 			$graph[] = array(
 				'@type'         => 'WebSite',
 				'@id'           => home_url( '/#website' ),
 				'name'          => self::BRAND,
 				'alternateName' => (string) wp_parse_url( home_url(), PHP_URL_HOST ),
 				'url'           => home_url( '/' ),
+				'inLanguage'    => 'en',
 			);
-			$graph[] = array(
-				'@type' => 'Organization',
-				'@id'   => home_url( '/#organization' ),
-				'name'  => self::BRAND,
-				'url'   => home_url( '/' ),
-				'logo'  => home_url( '/logo-organization.png' ),
-			);
+		}
+		// The publisher every page points at by @id; printed in full where it is the subject.
+		if ( in_array( $c['kind'], array( 'home', 'author' ), true ) || ( 'other' === $c['kind'] && $c['post'] && 'about' === $c['post']->post_name ) ) {
+			$graph[] = self::organization();
 		}
 		$page = self::page_node( $c, $url );
 		if ( $page ) {

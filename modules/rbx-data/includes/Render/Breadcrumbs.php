@@ -36,7 +36,8 @@ final class Breadcrumbs {
 			if ( is_search() ) {
 				return array( $home, array( __( 'Search', 'rbx-data' ), '' ) );
 			}
-			return array( $home, array( __( 'Page not found', 'rbx-data' ), '' ) );
+			// Only a real 404 says "Page not found" (UO-14).
+			return is_404() ? array( $home, array( __( 'Page not found', 'rbx-data' ), '' ) ) : array();
 		}
 		$trail = array( $home );
 		if ( in_array( $post->post_type, Plugin::post_types(), true ) ) {
