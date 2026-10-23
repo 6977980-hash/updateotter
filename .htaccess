@@ -1,0 +1,12 @@
+# UO-61: the theme folder is the git repo. Browsers only need the CSS, JS, SVG and images under
+# assets/ and modules/*/assets/; the data, docs, configs and tools stay private.
+<FilesMatch "\.(csv|tsv|md|py|pyc|sh|yml|yaml|json|txt|xlsx|mjs|phar|log|ini|dist|lock|neon|bak|sql)$">
+	Require all denied
+</FilesMatch>
+
+<FilesMatch "^\.">
+	Require all denied
+</FilesMatch>
+
+RedirectMatch 403 /wp-content/themes/[^/]+/(data|content|tools|languages|patterns|\.github|\.git)(/|$)
+RedirectMatch 403 /wp-content/themes/[^/]+/modules/[^/]+/(games|tests|languages|includes|data)(/|$)

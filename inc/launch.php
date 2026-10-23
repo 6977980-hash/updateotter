@@ -211,10 +211,18 @@ add_action(
 				'methods'             => 'GET',
 				'permission_callback' => '__return_true',
 				'callback'            => static function (): WP_REST_Response {
+					$state = updateotter_launch_state();
+					// UO-60: without login only each step's id and time; the details are for admins.
+					if ( ! current_user_can( 'manage_options' ) ) {
+						$state = array_map(
+							static fn( $s ) => is_array( $s ) ? array_intersect_key( $s, array_flip( array( 'id', 'at' ) ) ) : $s,
+							$state
+						);
+					}
 					return new WP_REST_Response(
 						array(
 							'plan'          => updateotter_launch_plan(),
-							'state'         => updateotter_launch_state(),
+							'state'         => $state,
 							'locked'        => updateotter_locked(),
 							'blog_public'   => (bool) get_option( 'blog_public' ),
 							'page_on_front' => (int) get_option( 'page_on_front' ),
