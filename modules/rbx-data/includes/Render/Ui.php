@@ -24,6 +24,12 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Ui {
 
+	/** Front-end asset version: RBX_DATA_VERSION plus the file's change time, so a deploy busts the cache. */
+	public static function asset_ver( string $rel ): string {
+		$f = RBX_DATA_DIR . '/' . $rel;
+		return RBX_DATA_VERSION . ( is_readable( $f ) ? '.' . filemtime( $f ) : '' );
+	}
+
 	/** Public date: `<time datetime="Y-m-d">22 Oct 2026</time>`. */
 	public static function date( ?string $ymd ): string {
 		if ( null === $ymd || '' === $ymd ) {
@@ -44,7 +50,7 @@ final class Ui {
 		}
 		$ladder = $ds->meta( 'suffix_ladder' );
 		$text   = Number::format( $value, $format, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null );
-		$exact  = Number::exact( $value, \RBX\Data\Content\Lang::num() );
+		$exact  = Number::exact( $value, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null );
 		if ( 'abbr' === $format && $text !== $exact ) {
 			return '<span class="rbx-num" data-exact="' . esc_attr( $exact ) . '" title="' . esc_attr( $exact ) . '">' . esc_html( $text ) . '</span><span class="screen-reader-text"> (' . esc_html( $exact ) . ')</span>';
 		}
@@ -204,7 +210,7 @@ final class Ui {
 			$m   = $ds->get( $media_id );
 			$src = $m ? Media::url( (string) $m['data']['file_name'] ) : '';
 			if ( '' !== $src ) {
-				wp_enqueue_script_module( 'rbx-data-lightbox', RBX_DATA_URL . 'assets/front/lightbox.js', array(), RBX_DATA_VERSION );
+				wp_enqueue_script_module( 'rbx-data-lightbox', RBX_DATA_URL . 'assets/front/lightbox.js', array(), self::asset_ver( 'assets/front/lightbox.js' ) );
 				return '<a class="rbx-chip rbx-chip--source" href="' . esc_url( $src ) . '" data-rbx-lightbox data-credit="' . esc_attr( (string) $m['data']['image_credit'] ) . '" data-alt="' . esc_attr( (string) $m['data']['alt__en'] ) . '">' . esc_html( $label ) . '</a>';
 			}
 		}
@@ -422,6 +428,12 @@ final class Ui {
 		$rar   = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
 		$color = (string) ( $rar['data']['ui_color_hex'] ?? '' );
 		foreach ( $media as $m ) {
+			// UO-37: only a picture of this item alone is its icon. A test screenshot that also shows
+			// a mutation or a value (the Golden Chicken 26 kg shot) stays in the item's evidence.
+			$depicts = array_values( array_filter( (array) ( $m['data']['depicts_record_ids'] ?? array() ) ) );
+			if ( array( (string) $rec['id'] ) !== $depicts || array() !== array_filter( (array) ( $m['data']['shows_fields'] ?? array() ) ) ) {
+				continue;
+			}
 			$img = Media::img( (string) $m['data']['file_name'], '', $size, 'rbx-icon-img' );
 			if ( '' !== $img ) {
 				return $img;

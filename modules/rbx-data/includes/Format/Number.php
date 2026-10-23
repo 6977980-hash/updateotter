@@ -63,7 +63,7 @@ final class Number {
 	}
 
 	/** Full value for `data-exact` and screen readers. */
-	public static function exact( mixed $value, string $locale = 'en' ): string {
+	public static function exact( mixed $value, string $locale = 'en', ?array $ladder = null ): string {
 		if ( ! is_int( $value ) && ! is_float( $value ) ) {
 			return '';
 		}
@@ -72,7 +72,7 @@ final class Number {
 			return '';
 		}
 		if ( abs( $v ) > self::MAX_SAFE ) {
-			return self::abbr( $v, $locale, self::DEFAULT_LADDER );
+			return self::abbr( $v, $locale, self::ladder( $ladder ) );
 		}
 		return self::fixed( $v, 4, true, $locale );
 	}

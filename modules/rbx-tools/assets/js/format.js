@@ -184,12 +184,13 @@ export function formatValue( value, format, locale = 'en', ladder = null ) {
 	}
 }
 
-export function formatExact( value, locale = 'en' ) {
+// ladder: the game's suffix ladder, so a huge value reads the same as the short form (UO-35).
+export function formatExact( value, locale = 'en', ladder = null ) {
 	if ( typeof value !== 'number' || ! Number.isFinite( value ) ) {
 		return '';
 	}
 	if ( Math.abs( value ) > MAX_SAFE ) {
-		return abbr( value, locale, DEFAULT_LADDER );
+		return abbr( value, locale, ladderOf( ladder ) );
 	}
 	return fixed( value, 4, true, locale );
 }

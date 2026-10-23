@@ -95,6 +95,23 @@ final class Api {
 				'missing' => '',
 			);
 		}
+		// UO-33: the game allows each mutation once, so the same pick in two slots is not a result.
+		$seen = array();
+		foreach ( (array) $f['inputs'] as $key => $decl ) {
+			$v = $inputs[ $key ] ?? '';
+			if ( 'ref' === ( $decl['type'] ?? '' ) && is_string( $v ) && '' !== $v ) {
+				$t = (string) ( $decl['target'] ?? '' ) . '|' . $v;
+				if ( isset( $seen[ $t ] ) ) {
+					return array(
+						'ok'      => false,
+						'value'   => null,
+						'reason'  => 'duplicate',
+						'missing' => (string) $key,
+					);
+				}
+				$seen[ $t ] = true;
+			}
+		}
 		try {
 			// Item pages evaluate the formula many times per request; build the calc data once per dataset.
 			static $data = array();

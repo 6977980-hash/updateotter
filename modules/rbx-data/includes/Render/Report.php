@@ -91,7 +91,7 @@ final class Report {
 		echo '<template id="rbx-report-tpl"><dialog class="rbx-dialog" aria-labelledby="rbx-dlg-title"><form method="dialog" class="rbx-dialog__close-form"><button class="rbx-dialog__close" value="cancel" aria-label="' . esc_attr__( 'Close', 'rbx-data' ) . '">×</button></form><h2 id="rbx-dlg-title">' . esc_html__( 'Report a wrong value', 'rbx-data' ) . '</h2><form class="rbx-report-form" data-endpoint="' . esc_url( rest_url( 'rbx/v1/report' ) ) . '">'
 			. self::fields( array( 'game' => $game ? $game->key() : '' ), true ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in fields().
 			. '<p class="rbx-live" role="status"></p><p><button type="submit" class="button">' . esc_html__( 'Send report', 'rbx-data' ) . '</button></p></form></dialog></template>';
-		wp_enqueue_script_module( 'rbx-data-report', RBX_DATA_URL . 'assets/front/report.js', array(), RBX_DATA_VERSION );
+		wp_enqueue_script_module( 'rbx-data-report', RBX_DATA_URL . 'assets/front/report.js', array(), Ui::asset_ver( 'assets/front/report.js' ) );
 		printf(
 			'<script type="application/json" id="rbx-report-i18n">%s</script>',
 			wp_json_encode(

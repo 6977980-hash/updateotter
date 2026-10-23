@@ -130,7 +130,7 @@
           "requires_mechanics": [
             "weight_scaling"
           ],
-          "display_format": "decimal(2)",
+          "display_format": "decimal(3)",
           "list": true
         },
         "huge_chance_prob": {
@@ -374,15 +374,13 @@
           "label__en": "Weight in kg (optional)",
           "optional": true,
           "min": 0.01,
-          "max": 1000000
+          "max": 10000
         },
         {
           "key": "variant",
           "type": "ref",
           "target": "VAR",
-          "label__en": "Variant",
-          "optional": true,
-          "none_label__en": "Normal"
+          "label__en": "Variant"
         },
         {
           "key": "mutation",
@@ -415,7 +413,7 @@
           "type": "number",
           "label__en": "How many fruits",
           "min": 1,
-          "max": 1000000,
+          "max": 10000,
           "default": 1,
           "integer": true
         }

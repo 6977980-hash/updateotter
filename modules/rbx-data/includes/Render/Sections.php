@@ -175,7 +175,7 @@ final class Sections {
 		$head = '<th scope="col" data-sort-key="name">' . esc_html__( 'Name', 'rbx-data' ) . '</th>';
 		foreach ( $fields as $f => $fd ) {
 			$numeric = $ds->is_numeric_field( $entity, $f );
-			$head   .= '<th scope="col"' . ( $numeric ? ' data-sort-key="' . esc_attr( $f ) . '"' : '' ) . '>' . esc_html( (string) ( $fd['label__en'] ?? $f ) ) . '</th>';
+			$head   .= '<th scope="col"' . ( $numeric ? ' data-sort-key="' . esc_attr( $f ) . '"' : '' ) . '>' . esc_html( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '</th>';
 		}
 		if ( 'PET' === $entity ) {
 			$head .= '<th scope="col">' . esc_html__( 'Source egg', 'rbx-data' ) . '</th>';
@@ -183,7 +183,13 @@ final class Sections {
 		if ( 'EGG' === $entity ) {
 			$head .= '<th scope="col">' . esc_html__( 'Pets', 'rbx-data' ) . '</th>';
 		}
-		$head .= '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th>';
+		// UO-30: when every row has the same confidence, one legend above the table replaces the
+		// column (two chips per row made each phone card about 240 px tall).
+		$conf     = array_map( static fn( $r ) => self::confidence( $r ), $recs );
+		$one_conf = 1 === count( array_unique( $conf ) );
+		if ( ! $one_conf ) {
+			$head .= '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th>';
+		}
 
 		$body       = '';
 		$facet_vals = array();
@@ -203,8 +209,9 @@ final class Sections {
 			$row = '<tr id="' . esc_attr( (string) $r['slug'] ) . '"' . $attrs . '><th scope="row" class="rbx-cell-name">' . Ui::icon( $ds, $r, 48 ) . Ui::link( $r ) . '</th>';
 			foreach ( $fields as $f => $fd ) {
 				$st   = $ds->field_state( $r, $f );
-				$sort = is_numeric( $st['value'] ) && 'verified' === $st['state'] ? ' data-sort="' . esc_attr( (string) $st['value'] ) . '"' : '';
-				$row .= '<td data-label="' . esc_attr( (string) ( $fd['label__en'] ?? $f ) ) . '"' . $sort . '>' . Ui::value( $ds, $r, $f, false ) . '</td>';
+				// Every known number sorts; only conflicting reports are left out (UO-27: all data is wiki data).
+				$sort = is_numeric( $st['value'] ) && 'disputed' !== $st['state'] ? ' data-sort="' . esc_attr( (string) $st['value'] ) . '"' : '';
+				$row .= '<td data-label="' . esc_attr( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '"' . $sort . '>' . Ui::value( $ds, $r, $f, false ) . '</td>';
 			}
 			if ( 'PET' === $entity ) {
 				$eggs = array();
@@ -216,7 +223,7 @@ final class Sections {
 			if ( 'EGG' === $entity ) {
 				$row .= '<td data-label="' . esc_attr__( 'Pets', 'rbx-data' ) . '">' . esc_html( number_format_i18n( count( $ds->children( 'DRP', 'egg_id', (string) $id ) ) ) ) . '</td>';
 			}
-			$row  .= '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . self::confidence( $r ) . '</td></tr>';
+			$row  .= ( $one_conf ? '' : '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . $conf[ $id ] . '</td>' ) . '</tr>';
 			$body .= $row;
 		}
 
@@ -226,7 +233,7 @@ final class Sections {
 			if ( count( $vals ) < 2 ) {
 				continue;
 			}
-			$chips .= '<fieldset class="rbx-facet"><legend>' . esc_html( (string) ( $fd['label__en'] ?? $f ) ) . '</legend>';
+			$chips .= '<fieldset class="rbx-facet"><legend>' . esc_html( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '</legend>';
 			foreach ( $vals as $v ) {
 				$label = 'ref' === ( $fd['type'] ?? '' ) || 'ref_list' === ( $fd['type'] ?? '' ) ? (string) ( $ds->get( $v )['name'] ?? $v ) : ( 'bool' === ( $fd['type'] ?? '' ) ? ( 'yes' === $v ? __( 'Yes', 'rbx-data' ) : __( 'No', 'rbx-data' ) ) : Ui::enum_label( $v ) );
 				$chips .= '<button type="button" class="rbx-chip-btn" aria-pressed="false" data-facet="' . esc_attr( str_replace( '_', '-', $f ) ) . '" data-value="' . esc_attr( sanitize_title( $v ) ) . '">' . esc_html( $label ) . '</button>';
@@ -235,25 +242,29 @@ final class Sections {
 		}
 		$has_removed = (bool) array_filter( $recs, static fn( $r ) => 'removed_from_game' === $r['status'] );
 		$label       = $game->entity_label( $entity, true );
+		// Search and sort stay in view; the facet chips fold into "Filters" on phones (UO-30).
 		$controls    = '<div class="rbx-list__controls" hidden data-rbx-controls>'
 			. '<label class="rbx-search"><span>' . esc_html__( 'Search this list', 'rbx-data' ) . '</span><input type="search" data-rbx-q autocomplete="off"></label>'
-			. $chips
+			. ( '' !== $chips ? '<details class="rbx-filters" data-rbx-filters><summary>' . esc_html__( 'Filters', 'rbx-data' ) . ' <span data-rbx-filter-count></span></summary><div class="rbx-filters__body">' . $chips . '</div></details>' : '' )
 			. '<label class="rbx-sort"><span>' . esc_html__( 'Sort', 'rbx-data' ) . '</span><select data-rbx-sort><option value="">' . esc_html__( 'Default order', 'rbx-data' ) . '</option><option value="name-asc">' . esc_html__( 'Name A to Z', 'rbx-data' ) . '</option>';
 		foreach ( $fields as $f => $fd ) {
 			if ( $ds->is_numeric_field( $entity, $f ) ) {
 				/* translators: %s: field label */
-				$controls .= '<option value="' . esc_attr( $f ) . '-desc">' . esc_html( sprintf( __( '%s, highest first', 'rbx-data' ), (string) ( $fd['label__en'] ?? $f ) ) ) . '</option>';
+				$controls .= '<option value="' . esc_attr( $f ) . '-desc">' . esc_html( sprintf( __( '%s, highest first', 'rbx-data' ), Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) ) . '</option>';
 			}
 		}
 		$controls .= '</select></label>'
 			. ( $has_removed ? '<button type="button" class="rbx-chip-btn" aria-pressed="false" data-rbx-removed>' . esc_html__( 'Show removed', 'rbx-data' ) . '</button>' : '' )
 			. '<button type="button" class="rbx-link-btn" data-rbx-clear hidden>' . esc_html__( 'Clear filters', 'rbx-data' ) . '</button>'
-			. '<p class="rbx-live" role="status" data-rbx-status></p></div>';
+			/* translators: 1: rows shown, 2: rows in the list, 3: plural item label, e.g. pets */
+			. '<p class="rbx-live" role="status" data-rbx-status data-template="' . esc_attr( sprintf( __( 'Showing %1$s of %2$s %3$s', 'rbx-data' ), '{shown}', '{total}', strtolower( Lang::t( $label ) ) ) ) . '"></p></div>';
 
-		$table = '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $label ) . '</caption><thead><tr>' . $head . '</tr></thead><tbody>' . $body . '</tbody></table></div>';
+		$legend = $one_conf ? '<p class="rbx-legend">' . esc_html__( 'Confidence for every row:', 'rbx-data' ) . ' ' . reset( $conf ) . '</p>' : '';
+		$table  = $legend . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( Lang::t( $label ) ) . '</caption><thead><tr>' . $head . '</tr></thead><tbody>' . $body . '</tbody></table></div>';
 		$empty = '<p class="rbx-empty" hidden data-rbx-empty>' . esc_html__( 'No results. Try fewer filters.', 'rbx-data' ) . ' <a href="' . esc_url( home_url( '/report/' ) ) . '">' . esc_html__( 'Report a missing item', 'rbx-data' ) . '</a></p>';
 		self::enqueue_list_js();
-		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . '</div>' . self::sources_line( $game, $recs );
+		$top = '<a class="rbx-backtop" href="#top" hidden data-rbx-backtop>' . esc_html__( 'Back to top', 'rbx-data' ) . '</a>';
+		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . $top . '</div>' . self::sources_line( $game, $recs );
 	}
 
 	/**
@@ -326,7 +337,7 @@ final class Sections {
 	}
 
 	public static function enqueue_list_js(): void {
-		wp_enqueue_script_module( 'rbx-data-list', RBX_DATA_URL . 'assets/front/list.js', array(), RBX_DATA_VERSION );
+		wp_enqueue_script_module( 'rbx-data-list', RBX_DATA_URL . 'assets/front/list.js', array(), Ui::asset_ver( 'assets/front/list.js' ) );
 	}
 
 	/** Mechanic text by token (CONT-24 item 2, ED-11). */
@@ -422,7 +433,7 @@ final class Sections {
 				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> <button type="button" class="rbx-copy" data-copy="' . esc_attr( (string) $d['code'] ) . '" hidden>' . esc_html__( 'Copy', 'rbx-data' ) . '</button></th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'First seen', 'rbx-data' ) . '">' . Ui::date( (string) ( $d['first_seen'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Tested', 'rbx-data' ) . '">' . $state . ( ! empty( $d['tested_by'] ) ? ' ' . esc_html__( 'by', 'rbx-data' ) . ' ' . esc_html( (string) $d['tested_by'] ) : '' ) . '</td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
 			}
 			$out .= Ui::h2( __( 'Active codes', 'rbx-data' ), 'active-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'First seen', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Tested', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
-			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), RBX_DATA_VERSION );
+			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), Ui::asset_ver( 'assets/front/copy.js' ) );
 		}
 		if ( $reported ) {
 			$rows = '';
@@ -431,7 +442,7 @@ final class Sections {
 				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> <button type="button" class="rbx-copy" data-copy="' . esc_attr( (string) $d['code'] ) . '" hidden>' . esc_html__( 'Copy', 'rbx-data' ) . '</button></th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Status', 'rbx-data' ) . '"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested by us', 'rbx-data' ) . '</span></td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
 			}
 			$out .= Ui::h2( __( 'Reported codes', 'rbx-data' ), 'reported-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Status', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
-			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), RBX_DATA_VERSION );
+			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), Ui::asset_ver( 'assets/front/copy.js' ) );
 		}
 		if ( $expired ) {
 			$li = '';

@@ -95,7 +95,7 @@
         "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
         "base_weight_kg": { "type": "decimal", "label__en": "Base weight (kg)", "requires_mechanics": ["weight_scaling"], "display_format": "abbr" },
         "base_speed": { "type": "decimal", "label__en": "Base speed", "requires_mechanics": ["speed_requirement"], "display_format": "decimal(2)", "compare": true },
-        "is_secret": { "type": "bool", "label__en": "Secret pet", "facet": true },
+        "is_secret": { "type": "bool", "label__en": "Secret pet" },
         "is_mountable": { "type": "bool", "label__en": "Can be ridden", "requires_mechanics": ["mounts"] },
         "tier_list_rank": { "type": "enum", "enum": ["S", "A", "B", "C", "D"], "label__en": "Tier", "opinion": true },
         "tier_rationale__en": { "type": "text", "label__en": "Why this tier", "opinion": true },
@@ -242,8 +242,8 @@
       "inputs": [
         { "key": "pet", "type": "ref", "target": "PET", "label__en": "Pet", "group_by": "rarity_id" },
         { "key": "mutation", "type": "ref", "target": "MUT", "label__en": "Mutation", "optional": true, "none_label__en": "No mutation" },
-        { "key": "weight", "type": "number", "label__en": "Weight in kg (optional)", "optional": true, "min": 0.01, "max": 1000000000 },
-        { "key": "count", "type": "number", "label__en": "How many", "min": 1, "max": 1000000, "default": 1, "integer": true }
+        { "key": "weight", "type": "number", "label__en": "Weight in kg (optional)", "optional": true, "min": 0.01, "max": 10000000 },
+        { "key": "count", "type": "number", "label__en": "How many", "min": 1, "max": 10000, "default": 1, "integer": true }
       ]
     }
   ],

@@ -18,8 +18,27 @@ lists.forEach( ( list, n ) => {
 	const status = list.querySelector( '[data-rbx-status]' );
 	const empty = list.querySelector( '[data-rbx-empty]' );
 	const chips = Array.from( list.querySelectorAll( '[data-facet]' ) );
+	const filters = list.querySelector( '[data-rbx-filters]' );
+	const filterCount = list.querySelector( '[data-rbx-filter-count]' );
+	const backTop = list.querySelector( '[data-rbx-backtop]' );
 	const useHash = n === 0;
 	controls.hidden = false;
+	// Filter chips start folded on phones and open from 600 px (UO-30).
+	if ( filters && window.matchMedia( '(min-width: 600px)' ).matches ) {
+		filters.open = true;
+	}
+	if ( backTop ) {
+		backTop.addEventListener( 'click', ( e ) => {
+			e.preventDefault();
+			window.scrollTo( { top: 0 } );
+			( q || document.body ).focus( { preventScroll: true } );
+		} );
+		const onScroll = () => {
+			backTop.hidden = window.scrollY < window.innerHeight * 2;
+		};
+		window.addEventListener( 'scroll', onScroll, { passive: true } );
+		onScroll();
+	}
 
 	function state() {
 		const facets = {};
@@ -65,7 +84,12 @@ lists.forEach( ( list, n ) => {
 		empty.hidden = shown > 0;
 		const active = s.q || Object.keys( s.facets ).length || s.sort || s.removed;
 		clear.hidden = ! active;
-		status.textContent = active ? shown + ' / ' + rows.length : '';
+		const nf = new Intl.NumberFormat( document.documentElement.lang || 'en' );
+		status.textContent = active ? ( status.dataset.template || '{shown} / {total}' ).replace( '{shown}', nf.format( shown ) ).replace( '{total}', nf.format( rows.filter( ( r ) => s.removed || ! r.hasAttribute( 'data-removed' ) ).length ) ) : '';
+		if ( filterCount ) {
+			const nFacets = Object.values( s.facets ).reduce( ( a, v ) => a + v.length, 0 );
+			filterCount.textContent = nFacets ? '(' + nFacets + ')' : '';
+		}
 		if ( write && useHash ) {
 			const p = new URLSearchParams();
 			if ( s.q ) {

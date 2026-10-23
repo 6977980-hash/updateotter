@@ -28,9 +28,22 @@ final class Plugin {
 
 	public static function register(): void {
 		load_textdomain( 'rbx-tools', RBX_TOOLS_DIR . '/languages/rbx-tools-' . determine_locale() . '.mo' );
-		wp_register_script_module( 'rbx-calculator', RBX_TOOLS_URL . 'assets/js/calculator.js', array(), RBX_TOOLS_VERSION );
+		// Each module file is versioned by its own change time. The sub-modules are registered under
+		// their full URL, so WordPress's import map sends the relative imports in calculator.js
+		// ('./ui.js') to the versioned URL and a deploy never mixes old and new files (UO-56 part).
+		$deps = array();
+		foreach ( array( 'ui', 'state', 'data-loader', 'formula-engine', 'format', 'parse-input', 'validate' ) as $m ) {
+			$url = RBX_TOOLS_URL . 'assets/js/' . $m . '.js';
+			wp_register_script_module( $url, $url, array(), self::ver( 'assets/js/' . $m . '.js' ) );
+			$deps[] = $url;
+		}
+		wp_register_script_module( 'rbx-calculator', RBX_TOOLS_URL . 'assets/js/calculator.js', $deps, self::ver( 'assets/js/calculator.js' ) );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/calculator' );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/mini-calculator' );
+		$style = wp_styles()->query( 'rbx-calculator-style', 'registered' );
+		if ( $style ) {
+			$style->ver = self::ver( 'blocks/calculator/style.css' );
+		}
 		$tools = array();
 		foreach ( \RBX\Data\Api::games() as $g ) {
 			foreach ( $g->tools() as $t ) {
@@ -42,6 +55,12 @@ final class Plugin {
 			}
 		}
 		wp_add_inline_script( 'rbx-calculator-editor-script', 'window.rbxTools=' . wp_json_encode( array( 'tools' => $tools ) ) . ';', 'before' );
+	}
+
+	/** Asset version: RBX_TOOLS_VERSION plus the file's change time. */
+	public static function ver( string $rel ): string {
+		$f = RBX_TOOLS_DIR . '/' . $rel;
+		return RBX_TOOLS_VERSION . ( is_readable( $f ) ? '.' . filemtime( $f ) : '' );
 	}
 
 	/** @param array<string, string>|string $atts Attributes. */
