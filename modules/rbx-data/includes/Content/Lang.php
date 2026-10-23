@@ -204,8 +204,9 @@ final class Lang {
 	}
 
 	/** Current month and year for titles, e.g. "October 2026" or "Oktober 2026". */
-	public static function month_year(): string {
-		return self::is_id() ? self::MONTHS_FULL[ (int) gmdate( 'n' ) - 1 ] . ' ' . gmdate( 'Y' ) : gmdate( 'F Y' );
+	public static function month_year( ?int $ts = null ): string {
+		$ts ??= time();
+		return self::is_id() ? self::MONTHS_FULL[ (int) gmdate( 'n', $ts ) - 1 ] . ' ' . gmdate( 'Y', $ts ) : gmdate( 'F Y', $ts );
 	}
 
 	/** Indonesian month names for `j M Y` and `F Y` dates (no core language pack is installed). */
