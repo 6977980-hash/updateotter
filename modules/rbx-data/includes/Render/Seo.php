@@ -220,12 +220,14 @@ final class Seo {
 		$parts = array();
 		switch ( $rec['entity'] ) {
 			case 'PET':
+				// Community values are labelled on the page, so they can name the page too.
+				$st = $ds->field_state( $rec, 'base_income_per_s' );
+				if ( $st['calc_usable'] ) {
+					$parts[] = __( 'Income', 'rbx-data' );
+					$parts[] = __( 'Mutations', 'rbx-data' );
+				}
 				if ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) ) {
 					$parts[] = __( 'Egg', 'rbx-data' );
-				}
-				$st = $ds->field_state( $rec, 'base_income_per_s' );
-				if ( 'verified' === $st['state'] && $st['mechanic_ok'] ) {
-					$parts[] = __( 'Income', 'rbx-data' );
 				}
 				$lead = sprintf( /* translators: 1: item, 2: game */ __( '%1$s in %2$s', 'rbx-data' ), $name, $game->name() );
 				break;
@@ -246,7 +248,7 @@ final class Seo {
 				$lead = sprintf( /* translators: 1: item, 2: game */ __( '%1$s in %2$s', 'rbx-data' ), $name, $game->name() );
 				break;
 			case 'MUT':
-				if ( 'verified' === $ds->field_state( $rec, 'income_mult' )['state'] ) {
+				if ( in_array( $ds->field_state( $rec, 'income_mult' )['state'], array( 'verified', 'community' ), true ) ) {
 					$parts[] = __( 'Multiplier', 'rbx-data' );
 				}
 				if ( ! empty( $rec['data']['obtain_method_text__en'] ) ) {
@@ -257,8 +259,10 @@ final class Seo {
 			default:
 				$lead = sprintf( '%1$s in %2$s', $name, $game->name() );
 		}
-		$parts = array_slice( $parts, 0, 2 );
-		return $lead . ( $parts ? ': ' . implode( ' & ', $parts ) : '' ) . ' | ' . self::BRAND;
+		$parts = array_slice( $parts, 0, 3 );
+		$last  = array_pop( $parts );
+		$list  = $parts ? implode( ', ', $parts ) . ' & ' . $last : (string) $last;
+		return $lead . ( null !== $last ? ': ' . $list : '' ) . ' | ' . self::BRAND;
 	}
 
 	/** Generated description for shells (CONT-08): what the page gives, a fact, freshness. */
@@ -279,8 +283,18 @@ final class Seo {
 		}
 		$bits = array();
 		$rar  = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
-		/* translators: 1: item name, 2: entity label, 3: game */
-		$bits[] = sprintf( __( 'Stats, sources and change history for %1$s, a %2$s in %3$s.', 'rbx-data' ), $rec['name'], strtolower( ( $rar ? $rar['name'] . ' ' : '' ) . $game->entity_label( (string) $rec['entity'] ) ), $game->name() );
+		$inc  = 'PET' === $rec['entity'] ? $ds->field_state( $rec, 'base_income_per_s' ) : null;
+		$mul  = 'MUT' === $rec['entity'] ? $ds->field_state( $rec, 'income_mult' ) : null;
+		if ( $inc && $inc['calc_usable'] && is_numeric( $inc['value'] ) ) {
+			/* translators: 1: pet, 2: game, 3: rarity, 4: income per second */
+			$bits[] = sprintf( __( 'How much the %1$s earns in %2$s: a %3$s pet with %4$s Cash per second base income, with every mutation and at higher weights.', 'rbx-data' ), $rec['name'], $game->name(), $rar ? $rar['name'] : '', \RBX\Data\Format\Number::format( $inc['value'] + 0, 'abbr', 'en' ) );
+		} elseif ( $mul && is_numeric( $mul['value'] ) ) {
+			/* translators: 1: mutation, 2: game, 3: multiplier */
+			$bits[] = sprintf( __( 'The %1$s mutation in %2$s multiplies income by %3$s. How to get it, how it compares, and what it does to real pets.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), $game->name(), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ) );
+		} else {
+			/* translators: 1: item name, 2: entity label, 3: game */
+			$bits[] = sprintf( __( 'Stats, sources and change history for %1$s, a %2$s in %3$s.', 'rbx-data' ), $rec['name'], strtolower( ( $rar ? $rar['name'] . ' ' : '' ) . $game->entity_label( (string) $rec['entity'] ) ), $game->name() );
+		}
 		if ( 'PET' === $rec['entity'] ) {
 			$eggs = array();
 			foreach ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) as $d ) {
@@ -295,7 +309,7 @@ final class Seo {
 		$plv = (string) get_post_meta( $c['post']->ID, '_rbx_page_last_verified', true );
 		if ( '' !== $plv ) {
 			/* translators: %s: date */
-			$bits[] = sprintf( __( 'Checked in game on %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
+			$bits[] = sprintf( __( 'Last checked %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
 		}
 		return implode( ' ', $bits );
 	}
@@ -441,6 +455,7 @@ final class Seo {
 			case 'updates':
 			case 'update':
 			case 'page':
+			case 'guide':
 			case 'report':
 				if ( '' !== $hub && $game ) {
 					$node['isPartOf'] = array( '@id' => $hub . '#webpage' );
@@ -464,7 +479,7 @@ final class Seo {
 			$out['WebApplication'] = array(
 				'@type'               => 'WebApplication',
 				'@id'                 => $url . '#app',
-				'name'                => wp_strip_all_tags( get_the_title( $c['post'] ) ),
+				'name'                => html_entity_decode( wp_strip_all_tags( get_the_title( $c['post'] ) ), ENT_QUOTES, 'UTF-8' ),
 				'url'                 => $url,
 				'applicationCategory' => 'GameApplication',
 				'operatingSystem'     => 'Any (web browser)',
@@ -540,6 +555,31 @@ final class Seo {
 				}
 			}
 			$out['BlogPosting'] = $node;
+		}
+		// Guides: Article node from the page template flag (CONT-28, TECH-25, REV-G28).
+		if ( 'guide' === $c['kind'] && $c['post'] ) {
+			$post = $c['post'];
+			$node = array(
+				'@type'            => 'Article',
+				'@id'              => $url . '#article',
+				'headline'         => html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' ),
+				'datePublished'    => get_post_time( 'c', true, $post ) ?: get_post_time( 'c', false, $post ),
+				'dateModified'     => get_post_modified_time( 'c', true, $post ) ?: get_post_modified_time( 'c', false, $post ),
+				'mainEntityOfPage' => array( '@id' => $url . '#webpage' ),
+				'publisher'        => array( '@id' => home_url( '/#organization' ) ),
+			);
+			$au   = Ui::author( $post->ID );
+			if ( $au ) {
+				$node['author'] = array(
+					'@type' => 'Person',
+					'name'  => $au['name'],
+					'url'   => $au['url'],
+				);
+			}
+			if ( $game ) {
+				$node['about'] = self::video_game( $game );
+			}
+			$out['Article'] = $node;
 		}
 		return $out;
 	}

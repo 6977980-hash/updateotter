@@ -68,6 +68,7 @@ final class Item {
 		$out .= (string) apply_filters( 'rbx_data_item_after_card', '', $game, $rec, $ds );
 		$out .= self::screenshots( $ds, $rec );
 		$out .= self::where_to_get( $ds, $rec );
+		$out .= Insights::render( $ds, $rec );
 		$out .= self::notes( $ds, $rec, $editorial );
 		$out .= self::comparison( $ds, $rec );
 		$out .= self::aliases( $rec );
@@ -304,13 +305,15 @@ final class Item {
 			$me    = $id === $rec['id'];
 			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $r['name'] ) : Ui::link( $r ) ) . '</th><td class="rbx-num-cell">' . Ui::raw( $ds, $fdef, $ds->field_state( $r, $field )['value'] ) . '</td></tr>';
 		}
-		$by  = (array) ( $def['siblings_by'] ?? array() );
-		$cap = $by ? sprintf(
-			/* translators: 1: stat label, 2: grouping label */
-			__( '%1$s compared with items of the same %2$s', 'rbx-data' ),
+		$by    = (array) ( $def['siblings_by'] ?? array() );
+		$group = $by ? $ds->get( is_string( $rec['data'][ (string) $by[0] ] ?? null ) ? (string) $rec['data'][ (string) $by[0] ] : '' ) : null;
+		$cap   = sprintf(
+			/* translators: 1: stat label, 2: group name such as "Legendary" (may be empty), 3: plural entity label */
+			__( '%1$s compared with other %2$s%3$s', 'rbx-data' ),
 			(string) ( $fdef['label__en'] ?? $field ),
-			strtolower( $game->label( (string) $rec['entity'], (string) $by[0] ) )
-		) : (string) ( $fdef['label__en'] ?? $field );
+			$group ? $group['name'] . ' ' : '',
+			strtolower( $game->entity_label( (string) $rec['entity'], true ) )
+		);
 		return '<section class="rbx-compare">' . Ui::h2( __( 'Compared with similar items', 'rbx-data' ), 'compare' ) . '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Name', 'rbx-data' ) . '</th><th scope="col">' . esc_html( (string) ( $fdef['label__en'] ?? $field ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div></section>';
 	}
 

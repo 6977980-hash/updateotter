@@ -82,5 +82,13 @@
   "dmca": {
     "title": "Copyright and DMCA | UpdateOtter",
     "description": "How to send a copyright notice to UpdateOtter and what we do when we get one."
+  },
+  "steal-an-egg/guides": {
+    "title": "Steal an Egg Guides: Beginner Tips & How-Tos | UpdateOtter",
+    "description": "Step-by-step Steal an Egg guides: how to start, which eggs to steal, how to get Speed, and how mutations and weight change a pet's income."
+  },
+  "steal-an-egg/guides/beginners-guide": {
+    "title": "Steal an Egg Beginner's Guide: How to Play & Progress | UpdateOtter",
+    "description": "New to Steal an Egg? Which eggs to steal first, how to raise Speed, when to move biomes, how mutations and weight work, and mistakes to avoid."
   }
 }

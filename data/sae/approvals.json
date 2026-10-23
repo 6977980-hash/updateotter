@@ -3,14 +3,20 @@
   "warnings": {
     "community_required": "Seed data from the Fandom wiki. Pages stay noindex until Ali verifies the values in game.",
     "rarity_order": "Wiki values kept as reported; flagged for Ali's in-game check list.",
-    "meta_provenance": "calc_defaults is our own editorial choice, not a game fact."
+    "meta_provenance": "calc_defaults is our own editorial choice, not a game fact.",
+    "large_change": "Light Dove and Flame Sprite base income fixed from 225 to 225000: our seed dropped the 'k' from the wiki's $225k/s (the egg's cash reward on the wiki is 100x that value, like every other biome egg)."
   },
   "large": [
     "SAE-FRM-0001",
     "SAE-MEC-0001",
     "SAE-MEC-0002",
-    "SAE-MEC-0003"
+    "SAE-MEC-0003",
+    "SAE-PET-0089",
+    "SAE-PET-0090"
   ],
-  "corrections": [],
+  "corrections": [
+    "SAE-PET-0089:base_income_per_s",
+    "SAE-PET-0090:base_income_per_s"
+  ],
   "missing": {}
 }

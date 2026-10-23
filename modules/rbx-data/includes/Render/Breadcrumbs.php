@@ -65,7 +65,7 @@ final class Breadcrumbs {
 			}
 		}
 		$short = (string) get_post_meta( $id, '_rbx_crumb', true );
-		return '' !== $short ? $short : wp_strip_all_tags( get_the_title( $id ) );
+		return '' !== $short ? $short : html_entity_decode( wp_strip_all_tags( get_the_title( $id ) ), ENT_QUOTES, 'UTF-8' );
 	}
 
 	/** URL of a WP Page by path, or '' when it does not exist (crumb then renders as text). */
