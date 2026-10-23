@@ -1,0 +1,12 @@
+{
+  "_note": "Approvals for the automatic import after a deploy (what a person would tick on the Import screen). Every warning class needs a reason; every large change needs its record ID in large; missing records need a decision in missing (ID: removed_from_game, draft or ignore).",
+  "warnings": {
+    "community_required": "Seed data from the community Fandom wiki (owner decision 2026-10-23: Fish It! lean section on wiki data, no in-game checks asked of Ali). Values show 'Source: community wiki'.",
+    "meta_missing": "The wiki gives no reliable update schedule and the game has no confirmed code box, so the hub leaves those facts out.",
+    "outlier": "Event and quest items sit far from shop items of the same rarity; values match the wiki tables.",
+    "rarity_order": "Rarity does not track price or stats closely for quest, event and Robux items; values match the wiki tables."
+  },
+  "large": [],
+  "corrections": [],
+  "missing": {}
+}

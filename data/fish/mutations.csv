@@ -1,0 +1,11 @@
+id,slug,name,aliases,chance_prob,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+FISH-MUT-0001,stone,Stone,,0.014,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0002,gold,Gold,,0.012,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0003,ghost,Ghost,,0.01,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0004,radioactive,Radioactive,,0.009,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0005,lightning,Lightning,,0.008,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0006,midnight,Midnight,,0.007,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0007,fairy-dust,Fairy Dust,,0.006,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0008,gemstone,Gemstone,,0.005,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0009,corrupt,Corrupt,,0.005,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
+FISH-MUT-0010,galaxy,Galaxy,,0.005,live,community,https://fish-it.fandom.com/wiki/Mutations,,Chance from the wiki mutations page,2026-10-23,claude,,,,
