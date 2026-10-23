@@ -127,6 +127,10 @@
     "title": "Steal an Egg Guides: Beginner Tips & How-Tos | UpdateOtter",
     "description": "Step-by-step Steal an Egg guides: how to start, which eggs to steal, how to get Speed, and how mutations and weight change a pet's income."
   },
+  "steal-an-egg/guides/halloween-event": {
+    "title": "Steal an Egg Halloween Event Guide: Best Pets & Eggs | UpdateOtter",
+    "description": "What the Steal an Egg Halloween event adds: the Halloween Dimension eggs, the Divine Voidseer Pumpkin, Grave Cerberus vs Cerberus, and a simple plan to get the best pets."
+  },
   "steal-an-egg/guides/beginners-guide": {
     "title": "Steal an Egg Beginner's Guide: How to Play & Progress | UpdateOtter",
     "description": "New to Steal an Egg? Which eggs to steal first, how to raise Speed, when to move biomes, how mutations and weight work, and mistakes to avoid."
@@ -180,6 +184,8 @@
     "description": "Every Fish It! bait with its Luck bonus, price and extra effects such as mutation and shiny chance, and which bait to use."
   },
   "fish-it/mutations": {
+    "_noindex": "Kept out of search until the page has sell multipliers (audit UO-12).",
+    "noindex": true,
     "title": "Fish It! Mutations List & Chances | UpdateOtter",
     "description": "All Fish It! mutations with their chance per catch, how baits raise them, and how Shiny and Big tags differ."
   }

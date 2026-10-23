@@ -148,6 +148,9 @@ final class Poller {
 					}
 					$u['last_seen_updated'] = $g['updated'];
 					$changes[]              = $game->key() . ' ' . $g['updated'];
+					if ( class_exists( '\RBX\Data\Cache\Purge' ) ) {
+						\RBX\Data\Cache\Purge::game( $game ); // Hubs show the latest Roblox publish (UO-09).
+					}
 				}
 			} else {
 				$u['consecutive_failures'] = (int) $u['consecutive_failures'] + 1;

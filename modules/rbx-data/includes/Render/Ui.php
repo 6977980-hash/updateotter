@@ -215,6 +215,19 @@ final class Ui {
 		return '<span class="rbx-chip rbx-chip--source">' . esc_html( $label ) . '</span>';
 	}
 
+	/**
+	 * Newest Roblox publish time the update tracker saw for the game (UO-09), as "23 Oct 2026, 17:26
+	 * UTC", or '' before the first poll. Only the time is a fact; we don't guess what changed.
+	 */
+	public static function last_publish( Game $game ): string {
+		$u = $game->universe_id();
+		if ( null === $u || '' === $u || ! class_exists( '\RBX\Notifier\State' ) ) {
+			return '';
+		}
+		$t = strtotime( (string) ( \RBX\Notifier\State::universe( (string) $u )['last_seen_updated'] ?? '' ) );
+		return $t ? '<time datetime="' . esc_attr( gmdate( 'c', $t ) ) . '">' . esc_html( wp_date( 'j M Y, H:i', $t, new \DateTimeZone( 'UTC' ) ) ) . ' UTC</time>' : '';
+	}
+
 	/** CC BY-SA credit under a data table or card (UO-04): the wiki data's licence carries over. */
 	public static function license_line( Game $game ): string {
 		if ( '' === $game->wiki_url() ) {
