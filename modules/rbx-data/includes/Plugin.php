@@ -65,6 +65,7 @@ final class Plugin {
 		Render\Report::boot();
 		Reports\Endpoint::boot();
 		Rest\Routes::boot();
+		Import\Bundled::boot();
 		if ( is_admin() ) {
 			Admin\Menu::boot();
 			Admin\Editor::boot();

@@ -13,6 +13,7 @@ use RBX\Data\Config\Game;
 use RBX\Data\Config\Loader;
 use RBX\Data\Db\Runs;
 use RBX\Data\Export\Writer;
+use RBX\Data\Import\Bundled;
 use RBX\Data\Import\Runner;
 use RBX\Data\Import\Source;
 use RBX\Data\Lint\NumberLint;
@@ -87,6 +88,33 @@ final class Command {
 			WP_CLI::error( $ok->get_error_message() );
 		}
 		$this->apply( $run_id );
+	}
+
+	/**
+	 * Imports the bundled CSVs from the theme's data/{game}/ folder now (what a deploy does in the background).
+	 *
+	 * ## OPTIONS
+	 *
+	 * --game=<key>
+	 * : Game key.
+	 *
+	 * [--dry-run]
+	 * : Only make the dry run.
+	 *
+	 * @param array<int, string>    $args  Args.
+	 * @param array<string, string> $assoc Options.
+	 */
+	public function bundled( array $args, array $assoc ): void {
+		$game = $this->game( $assoc );
+		if ( ! Bundled::exists( $game ) ) {
+			WP_CLI::error( 'No CSV files in ' . Bundled::dir( $game ) );
+		}
+		$s = Bundled::run( $game, ! isset( $assoc['dry-run'] ) );
+		if ( ! empty( $s['run'] ) ) {
+			$this->report( (array) Runs::get( (int) $s['run'] ) );
+		}
+		WP_CLI::log( 'Status: ' . $s['status'] . ( empty( $s['message'] ) ? '' : ' (' . $s['message'] . ')' ) );
+		in_array( $s['status'], array( 'applied', 'ready' ), true ) ? WP_CLI::success( 'Run ' . (int) $s['run'] ) : WP_CLI::error( 'Not applied.' );
 	}
 
 	/**

@@ -177,6 +177,8 @@ final class Calculator {
 				}
 			} elseif ( 'bool' === $d['type'] ) {
 				$out[ $k ] = (bool) ( $meta[ $k ] ?? $d['default'] ?? false );
+			} elseif ( ! empty( $d['optional'] ) && ! isset( $meta[ $k ] ) && ! isset( $d['default'] ) ) {
+				$out[ $k ] = null; // Optional number: left empty.
 			} else {
 				$v         = $meta[ $k ] ?? $d['default'] ?? ( $d['min'] ?? 0 );
 				$out[ $k ] = is_numeric( $v ) ? $v + 0 : 0;
