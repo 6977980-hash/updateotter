@@ -51,8 +51,12 @@ add_filter(
 
 add_filter(
 	'robots_txt',
-	static function ( string $out ): string {
-		return updateotter_locked() ? "User-agent: *\nDisallow: /\n" : $out;
+	static function (): string {
+		if ( updateotter_locked() ) {
+			return "User-agent: *\nDisallow: /\n";
+		}
+		// TECH-09 exact content once live; replaces the WordPress and Rank Math defaults.
+		return "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\nDisallow: /*?s=\nDisallow: /search/\nDisallow: /*?*replytocom=\n\nSitemap: " . home_url( '/sitemap_index.xml' ) . "\n";
 	},
 	999
 );
