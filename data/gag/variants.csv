@@ -1,0 +1,8 @@
+id,slug,name,sort_order,value_mult,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+GAG-VAR-0001,normal,Normal,1,1,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,
+GAG-VAR-0002,silver,Silver,2,5,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,
+GAG-VAR-0003,gold,Gold,3,20,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,
+GAG-VAR-0004,rainbow,Rainbow,4,50,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,
+GAG-VAR-0005,diamond,Diamond,5,50,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,
+GAG-VAR-0006,jelly,Jelly,6,50,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,
+GAG-VAR-0007,ember,Ember,7,60,live,community,https://growagarden.fandom.com/wiki/Crop_Mutations#Price_Calculation,,Variant multipliers from the wiki price calculation section,2026-10-23,claude,,,,

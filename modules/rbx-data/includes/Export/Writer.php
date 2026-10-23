@@ -28,7 +28,7 @@ final class Writer {
 
 	/** Slice name => entity codes. Unknown entities are skipped per game. */
 	public const SLICES = array(
-		'core'    => array( 'CUR', 'RAR', 'BIO', 'MUT', 'SIZ', 'GPS', 'MNT' ),
+		'core'    => array( 'CUR', 'RAR', 'BIO', 'MUT', 'SIZ', 'VAR', 'GPS', 'MNT' ),
 		'pets'    => array( 'PET' ),
 		'eggs'    => array( 'EGG', 'DRP' ),
 		'recipes' => array( 'FUS', 'RIT', 'LAB' ),

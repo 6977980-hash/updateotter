@@ -96,7 +96,13 @@ final class Api {
 			);
 		}
 		try {
-			$v = Interpreter::evaluate( $f['ast'], \RBX\Data\Import\Validator::test_inputs( $ds, $f['inputs'], $inputs ), $ds->calc_data() );
+			// Item pages evaluate the formula many times per request; build the calc data once per dataset.
+			static $data = array();
+			$k = $game->key() . ':' . Repository::version( $game ) . ':' . spl_object_id( $ds );
+			if ( ! isset( $data[ $k ] ) ) {
+				$data = array( $k => $ds->calc_data() );
+			}
+			$v = Interpreter::evaluate( $f['ast'], \RBX\Data\Import\Validator::test_inputs( $ds, $f['inputs'], $inputs ), $data[ $k ] );
 			return array(
 				'ok'      => true,
 				'value'   => $v,

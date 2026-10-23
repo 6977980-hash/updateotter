@@ -1,0 +1,14 @@
+key,value,source_type,source_url,last_verified,verified_by
+game_code,GAG2,,,,
+schema_version,1.0,,,,
+roblox_universe_id,10200395747,official,https://games.roblox.com/v1/games?universeIds=10200395747,2026-10-23,claude
+roblox_place_id,97598239454123,official,https://www.roblox.com/games/97598239454123,2026-10-23,claude
+timezone_note,All times on this site are UTC.,,,,
+game_name,Grow a Garden 2,official,https://www.roblox.com/games/97598239454123,2026-10-23,claude
+developer_name,Strawberreh Squad,official,https://www.roblox.com/communities/432538536,2026-10-23,claude
+developer_roblox_url,https://www.roblox.com/communities/432538536,official,https://www.roblox.com/games/97598239454123,2026-10-23,claude
+official_channels,https://www.roblox.com/games/97598239454123|https://www.roblox.com/communities/432538536,official,https://www.roblox.com/games/97598239454123,2026-10-23,claude
+genre,Simulation,official,https://games.roblox.com/v1/games?universeIds=10200395747,2026-10-23,claude
+redeem_ui_exists,yes,community,https://growagarden2.fandom.com/wiki/Codes,2026-10-23,claude
+suffix_ladder,"[{""s"":""K"",""e"":3},{""s"":""M"",""e"":6},{""s"":""B"",""e"":9},{""s"":""T"",""e"":12},{""s"":""Qa"",""e"":15},{""s"":""Qi"",""e"":18}]",community,https://growagarden2.fandom.com/wiki/Sheckles,2026-10-23,claude
+calc_defaults,"{""calculator"": {""plant"": ""GAG2-PLT-0002"", ""count"": 1}}",,,2026-10-23,claude

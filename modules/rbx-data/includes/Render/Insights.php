@@ -33,7 +33,9 @@ final class Insights {
 			case 'PET':
 				return self::pet_glance( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
 			case 'MUT':
-				return self::mutation_effect( $ds, $rec );
+				return $ds->game()->entity( 'PLT' ) ? self::crop_mutation_effect( $ds, $rec ) : self::mutation_effect( $ds, $rec );
+			case 'PLT':
+				return self::plant_glance( $ds, $rec ) . self::plant_value( $ds, $rec ) . self::plant_weight( $ds, $rec );
 		}
 		return '';
 	}
@@ -286,6 +288,333 @@ final class Insights {
 			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'No mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $name ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		}
 		return $out . self::source_note() . '</section>';
+	}
+
+	/* ---------------------------------------------------------------- crops (Grow a Garden games) */
+
+	/** Weight steps for the crop weight table, as multiples of the base weight. */
+	private const CROP_WEIGHT_STEPS = array( 1, 1.5, 2, 3, 5, 10 );
+
+	/** Well-known crops used as examples on mutation pages when few crop pages are published. */
+	private const EXAMPLE_CROPS = array( 'carrot', 'strawberry', 'blueberry', 'tomato', 'corn', 'watermelon', 'pumpkin', 'apple', 'bamboo', 'coconut', 'dragon-fruit', 'mango', 'grape', 'mushroom', 'pepper', 'cacao', 'beanstalk', 'candy-blossom' );
+
+	private static function plant_glance( Dataset $ds, array $rec ): string {
+		$name  = (string) $rec['name'];
+		$base  = self::crop_value( $ds, (string) $rec['id'] );
+		$cur   = self::currency( $ds, $rec );
+		$facts = array();
+		$rar   = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
+		if ( null !== $base ) {
+			$bw = $rec['data']['base_weight_kg'] ?? null;
+			$facts[] = is_numeric( $bw )
+				/* translators: 1: crop, 2: value, 3: currency, 4: weight */
+				? sprintf( esc_html__( 'A plain %1$s at its base weight of %4$s kg sells for %2$s %3$s.', 'rbx-data' ), esc_html( $name ), Ui::number( $ds, $base, 'abbr' ), esc_html( $cur ), Ui::number( $ds, (float) $bw, 'decimal(2)' ) )
+				/* translators: 1: crop, 2: value, 3: currency */
+				: sprintf( esc_html__( 'A plain %1$s sells for %2$s %3$s at its base weight.', 'rbx-data' ), esc_html( $name ), Ui::number( $ds, $base, 'abbr' ), esc_html( $cur ) );
+			if ( $rar ) {
+				$same = self::ranked_crops( $ds, (string) $rar['id'] );
+				$pos  = array_search( (string) $rec['id'], array_keys( $same ), true );
+				if ( false !== $pos && count( $same ) > 1 ) {
+					$facts[] = sprintf(
+						/* translators: 1: crop, 2: count, 3: rarity, 4: ordinal */
+						esc_html__( 'The %1$s is one of %2$s %3$s crops in our list and has %4$s base value among them.', 'rbx-data' ),
+						esc_html( $name ),
+						esc_html( number_format_i18n( count( $same ) ) ),
+						esc_html( (string) $rar['name'] ),
+						esc_html( count( $same ) === (int) $pos + 1 ? __( 'the lowest', 'rbx-data' ) : self::nth( (int) $pos + 1, __( 'highest', 'rbx-data' ) ) )
+					);
+				}
+			}
+		}
+		if ( array_key_exists( 'is_multi_harvest', $rec['data'] ) && null !== $rec['data']['is_multi_harvest'] ) {
+			$facts[] = ! empty( $rec['data']['is_multi_harvest'] )
+				/* translators: %s: crop */
+				? sprintf( esc_html__( 'The %s is a multi-harvest crop: the plant stays in your garden and keeps growing new fruit after you pick it.', 'rbx-data' ), esc_html( $name ) )
+				/* translators: %s: crop */
+				: sprintf( esc_html__( 'The %s is a single-harvest crop: you pick the whole plant once, so you need a new seed to grow it again.', 'rbx-data' ), esc_html( $name ) );
+		}
+		$huge = $rec['data']['huge_chance_prob'] ?? null;
+		if ( is_numeric( $huge ) && (float) $huge > 0 ) {
+			/* translators: 1: crop, 2: one in N */
+			$facts[] = sprintf( esc_html__( 'The community wiki gives each %1$s about a 1 in %2$s chance to grow huge.', 'rbx-data' ), esc_html( $name ), esc_html( number_format_i18n( round( 1 / (float) $huge ) ) ) );
+		}
+		if ( ! empty( $rec['data']['never_decays'] ) ) {
+			/* translators: %s: crop */
+			$facts[] = sprintf( esc_html__( 'Harvested %s fruit never decays, so it keeps its full value until you sell it.', 'rbx-data' ), esc_html( $name ) );
+		} elseif ( is_numeric( $rec['data']['prime_time_s'] ?? null ) && (float) $rec['data']['prime_time_s'] > 0 ) {
+			/* translators: 1: crop, 2: duration */
+			$facts[] = sprintf( esc_html__( 'A harvested %1$s stays fresh for %2$s, then slowly loses value as it decays, unless it has a mutation.', 'rbx-data' ), esc_html( $name ), Ui::raw( $ds, array( 'type' => 'duration_s' ), (float) $rec['data']['prime_time_s'] ) );
+		}
+		if ( array_key_exists( 'obtainable_now', $rec['data'] ) && empty( $rec['data']['obtainable_now'] ) && null !== $rec['data']['obtainable_now'] ) {
+			$facts[] = esc_html__( 'The community wiki lists it as not obtainable right now; it came from an event, pack or limited shop.', 'rbx-data' );
+		}
+		if ( ! $facts ) {
+			return '';
+		}
+		$li = '';
+		foreach ( $facts as $f ) {
+			$li .= '<li>' . $f . '</li>';
+		}
+		/* translators: %s: crop */
+		return '<section class="rbx-glance">' . Ui::h2( sprintf( __( '%s at a glance', 'rbx-data' ), $name ), 'at-a-glance' ) . '<ul>' . $li . '</ul>' . self::source_note() . '</section>';
+	}
+
+	private static function plant_value( Dataset $ds, array $rec ): string {
+		$base = self::crop_value( $ds, (string) $rec['id'] );
+		if ( null === $base ) {
+			return '';
+		}
+		$name  = (string) $rec['name'];
+		$cur   = self::currency( $ds, $rec );
+		$rows  = '';
+		$intro = '';
+		$game  = $ds->game();
+		if ( $game->entity( 'VAR' ) ) {
+			foreach ( self::variants( $ds ) as $v ) {
+				$val = self::crop_value( $ds, (string) $rec['id'], array( 'variant' => (string) $v['record']['id'] ) );
+				if ( null !== $val ) {
+					$rows .= '<tr><th scope="row">' . esc_html( (string) $v['record']['name'] ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $v['mult'], 'mult' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $val, 'abbr' ) . '</td></tr>';
+				}
+			}
+			/* translators: 1: crop */
+			$intro = sprintf( esc_html__( 'Every %1$s fruit has one variant. Normal is the most common; Gold, Rainbow and the other variants multiply the whole value, mutations included.', 'rbx-data' ), esc_html( $name ) );
+			/* translators: 1: crop, 2: currency */
+			$cap = sprintf( __( 'Value of one %1$s at its base weight with no mutation, by variant (%2$s)', 'rbx-data' ), $name, $cur );
+			$head = '<th scope="col">' . esc_html__( 'Variant', 'rbx-data' ) . '</th>';
+		} else {
+			$rows = '<tr><th scope="row">' . esc_html__( 'No mutation', 'rbx-data' ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, 1.0, 'mult' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $base, 'abbr' ) . '</td></tr>';
+			$best = null;
+			foreach ( self::crop_mutations( $ds ) as $m ) {
+				$val = self::crop_value( $ds, (string) $rec['id'], array( 'mutation' => (string) $m['record']['id'] ) );
+				if ( null === $val ) {
+					continue;
+				}
+				$best  = array( $m['record'], $val );
+				$rows .= '<tr><th scope="row">' . Ui::link( $m['record'] ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $m['mult'], 'mult' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $val, 'abbr' ) . '</td></tr>';
+			}
+			if ( null === $best ) {
+				return '';
+			}
+			$intro = sprintf(
+				/* translators: 1: crop, 2: best mutation, 3: value, 4: currency */
+				esc_html__( 'A %1$s can carry one mutation at a time. The strongest in our list, %2$s, makes a base-weight %1$s worth %3$s %4$s.', 'rbx-data' ),
+				esc_html( $name ),
+				esc_html( (string) $best[0]['name'] ),
+				Ui::number( $ds, $best[1], 'abbr' ),
+				esc_html( $cur )
+			);
+			/* translators: 1: crop, 2: currency */
+			$cap  = sprintf( __( 'Value of one fresh %1$s at its base weight, by mutation (%2$s)', 'rbx-data' ), $name, $cur );
+			$head = '<th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th>';
+		}
+		if ( '' === $rows ) {
+			return '';
+		}
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr>' . $head . '<th scope="col">' . esc_html__( 'Multiplier', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Sell value', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		/* translators: %s: crop */
+		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much is a %s worth?', 'rbx-data' ), $name ), 'value' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
+	}
+
+	private static function plant_weight( Dataset $ds, array $rec ): string {
+		$bw   = $rec['data']['base_weight_kg'] ?? null;
+		$base = self::crop_value( $ds, (string) $rec['id'] );
+		if ( ! is_numeric( $bw ) || (float) $bw <= 0 || null === $base || $base <= 0 ) {
+			return '';
+		}
+		$bw   = (float) $bw;
+		$name = (string) $rec['name'];
+		$rows = '';
+		foreach ( self::CROP_WEIGHT_STEPS as $k ) {
+			$v = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => round( $bw * $k, 4 ) ) );
+			if ( null === $v ) {
+				return '';
+			}
+			$rows .= '<tr><th scope="row">' . Ui::number( $ds, round( $bw * $k, 2 ), 'decimal(2)' ) . ' kg</th><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, round( $v / $base, 2 ), 'mult' ) . '</td></tr>';
+		}
+		$two   = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $bw * 2 ) );
+		$intro = sprintf(
+			/* translators: 1: crop, 2: base weight, 3: ratio */
+			esc_html__( 'Each %1$s fruit grows to its own weight around the base weight of %2$s kg. Value climbs faster than weight: a fruit twice as heavy is worth about %3$s times as much.', 'rbx-data' ),
+			esc_html( $name ),
+			Ui::number( $ds, $bw, 'decimal(2)' ),
+			esc_html( self::ratio( (float) $two / $base ) )
+		);
+		/* translators: %s: crop */
+		$cap   = sprintf( __( 'Value of one %s with no mutation at different weights', 'rbx-data' ), $name );
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Weight', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Sell value', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Compared with base', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		/* translators: %s: crop */
+		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Is a heavier %s worth more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $intro . '</p>' . $table . '</section>';
+	}
+
+	private static function crop_mutation_effect( Dataset $ds, array $rec ): string {
+		$mult = $ds->field_state( $rec, 'income_mult' )['value'] ?? null;
+		if ( ! is_numeric( $mult ) ) {
+			return '';
+		}
+		$mult  = (float) $mult;
+		$name  = preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ) ?? (string) $rec['name'];
+		$muts  = self::crop_mutations( $ds );
+		$facts = array();
+		if ( isset( $muts[ (string) $rec['id'] ] ) ) {
+			$pos  = count( array_filter( $muts, static fn( $m ) => $m['mult'] > $mult ) );
+			$ties = count( array_filter( $muts, static fn( $m ) => abs( $m['mult'] - $mult ) < 1e-9 ) ) - 1;
+			$facts[] = sprintf(
+				/* translators: 1: mutation, 2: multiplier, 3: ordinal, 4: count */
+				esc_html__( '%1$s multiplies a fruit\'s sell value by %2$s. That makes it %3$s of the %4$s crop mutations in our list.', 'rbx-data' ),
+				esc_html( $name ),
+				Ui::number( $ds, $mult, 'mult' ),
+				esc_html( self::nth( $pos + 1, __( 'strongest', 'rbx-data' ) ) ),
+				esc_html( number_format_i18n( count( $muts ) ) )
+			);
+			if ( $ties > 0 ) {
+				/* translators: %s: number */
+				$facts[] = sprintf( esc_html( _n( '%s other mutation has the same multiplier.', '%s other mutations have the same multiplier.', $ties, 'rbx-data' ) ), esc_html( number_format_i18n( $ties ) ) );
+			}
+		}
+		$stack = (string) ( $rec['data']['stack_rule'] ?? '' );
+		if ( 'add_bonus' === $stack && $mult > 1 ) {
+			$facts[] = sprintf(
+				/* translators: 1: mutation, 2: bonus multiplier */
+				esc_html__( 'Mutations add up rather than multiply: on a fruit with other mutations, %1$s adds %2$s to the total mutation multiplier. A Gold or Rainbow variant then multiplies that total.', 'rbx-data' ),
+				esc_html( $name ),
+				Ui::number( $ds, $mult - 1, 'mult' )
+			);
+		} elseif ( 'exclusive' === $stack ) {
+			/* translators: %s: mutation */
+			$facts[] = sprintf( esc_html__( 'A crop can carry only one mutation at a time, so %s never stacks with another mutation.', 'rbx-data' ), esc_html( $name ) );
+		}
+
+		$rows = '';
+		$n    = 0;
+		foreach ( self::example_crops( $ds ) as $pid => $p ) {
+			$plain = self::crop_value( $ds, (string) $pid );
+			$v     = self::crop_value( $ds, (string) $pid, array( 'mutation' => (string) $rec['id'] ) );
+			if ( null === $plain || null === $v ) {
+				continue;
+			}
+			$rows .= '<tr><th scope="row">' . Ui::link( $p ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $plain, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td></tr>';
+			if ( ++$n >= self::MUT_TABLE_MAX ) {
+				break;
+			}
+		}
+		$li = '';
+		foreach ( $facts as $f ) {
+			$li .= '<li>' . $f . '</li>';
+		}
+		$out = '<section class="rbx-glance">' . Ui::h2( sprintf( /* translators: %s: mutation */ __( 'What %s does to a crop\'s value', 'rbx-data' ), $name ), 'effect' ) . ( $li ? '<ul>' . $li . '</ul>' : '' );
+		if ( $n >= 2 ) {
+			/* translators: %s: mutation */
+			$cap  = sprintf( __( 'Sell value of one fruit at base weight, without a mutation and with only %s', 'rbx-data' ), $name );
+			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Crop', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'No mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $name ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		}
+		return $out . self::source_note() . '</section>';
+	}
+
+	/**
+	 * Sell value of one fruit from the live calculator formula, or null.
+	 *
+	 * @param array<string, mixed> $extra Extra inputs (weight, variant, mutation).
+	 */
+	private static function crop_value( Dataset $ds, string $plant, array $extra = array() ): ?float {
+		$key = self::formula_key( $ds );
+		if ( null === $key ) {
+			return null;
+		}
+		$r = Api::evaluate( $key, array_merge( array( 'plant' => $plant, 'count' => 1 ), $extra ), $ds->game() );
+		return $r['ok'] && is_numeric( $r['value'] ) ? (float) $r['value'] : null;
+	}
+
+	private static function currency( Dataset $ds, array $rec ): string {
+		$c = $ds->get( (string) ( $rec['data']['currency_id'] ?? '' ) );
+		return $c ? (string) $c['name'] : __( 'Sheckles', 'rbx-data' );
+	}
+
+	/**
+	 * Crops with a usable base value, most valuable first.
+	 *
+	 * @return array<string, array{record: array<string, mixed>, value: float}>
+	 */
+	private static function ranked_crops( Dataset $ds, ?string $rarity ): array {
+		$out = array();
+		foreach ( $ds->all( 'PLT', array( 'live', 'limited' ) ) as $id => $p ) {
+			if ( null !== $rarity && ( $p['data']['rarity_id'] ?? '' ) !== $rarity ) {
+				continue;
+			}
+			$st = $ds->field_state( $p, 'base_value' );
+			if ( ! $st['calc_usable'] || ! is_numeric( $st['value'] ) ) {
+				continue;
+			}
+			$out[ (string) $id ] = array(
+				'record' => $p,
+				'value'  => (float) $st['value'],
+			);
+		}
+		uasort( $out, static fn( $a, $b ) => ( $b['value'] <=> $a['value'] ) ?: strcmp( (string) $a['record']['id'], (string) $b['record']['id'] ) );
+		return $out;
+	}
+
+	/**
+	 * Crops for mutation example tables: published crop pages first, then well-known crops.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function example_crops( Dataset $ds ): array {
+		$out = array();
+		foreach ( $ds->all( 'PLT', array( 'live', 'limited' ) ) as $id => $p ) {
+			if ( ! empty( $p['post_id'] ) && 'publish' === get_post_status( (int) $p['post_id'] ) && '' !== trim( (string) ( $p['data']['notes__en'] ?? '' ) ) ) {
+				$out[ (string) $id ] = $p;
+			}
+		}
+		if ( count( $out ) < 8 ) {
+			foreach ( $ds->all( 'PLT', array( 'live', 'limited' ) ) as $id => $p ) {
+				if ( in_array( (string) $p['slug'], self::EXAMPLE_CROPS, true ) ) {
+					$out[ (string) $id ] = $p;
+				}
+			}
+		}
+		uasort( $out, static fn( $a, $b ) => (float) ( $a['data']['base_value'] ?? 0 ) <=> (float) ( $b['data']['base_value'] ?? 0 ) );
+		return $out;
+	}
+
+	/**
+	 * Crop mutations with a usable multiplier above x1, weakest first.
+	 *
+	 * @return array<string, array{record: array<string, mixed>, mult: float}>
+	 */
+	private static function crop_mutations( Dataset $ds ): array {
+		$out = array();
+		foreach ( $ds->all( 'MUT', array( 'live', 'limited' ) ) as $id => $m ) {
+			$st = $ds->field_state( $m, 'income_mult' );
+			if ( ! $st['calc_usable'] || ! is_numeric( $st['value'] ) ) {
+				continue;
+			}
+			$out[ (string) $id ] = array(
+				'record' => $m,
+				'mult'   => (float) $st['value'],
+			);
+		}
+		uasort( $out, static fn( $a, $b ) => ( $a['mult'] <=> $b['mult'] ) ?: strcmp( (string) $a['record']['name'], (string) $b['record']['name'] ) );
+		return $out;
+	}
+
+	/**
+	 * Variants in sort order.
+	 *
+	 * @return array<int, array{record: array<string, mixed>, mult: float}>
+	 */
+	private static function variants( Dataset $ds ): array {
+		$out = array();
+		foreach ( $ds->all( 'VAR', array( 'live', 'limited' ) ) as $v ) {
+			$st = $ds->field_state( $v, 'value_mult' );
+			if ( $st['calc_usable'] && is_numeric( $st['value'] ) ) {
+				$out[] = array(
+					'record' => $v,
+					'mult'   => (float) $st['value'],
+				);
+			}
+		}
+		usort( $out, static fn( $a, $b ) => (int) ( $a['record']['data']['sort_order'] ?? 0 ) <=> (int) ( $b['record']['data']['sort_order'] ?? 0 ) );
+		return $out;
 	}
 
 	/* ---------------------------------------------------------------- helpers */

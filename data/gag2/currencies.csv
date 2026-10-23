@@ -1,0 +1,4 @@
+id,slug,name,symbol_text,is_premium,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+GAG2-CUR-0001,sheckles,Sheckles,,FALSE,live,community,https://growagarden2.fandom.com/wiki/Currencies,,Sell currency named in the wiki crop data,2026-10-23,claude,,,,
+GAG2-CUR-0002,leaves,Leaves,,FALSE,live,community,https://growagarden2.fandom.com/wiki/Currencies,,Sell currency named in the wiki crop data,2026-10-23,claude,,,,
+GAG2-CUR-0003,candy-corn,Candy Corn,,FALSE,live,community,https://growagarden2.fandom.com/wiki/Currencies,,Sell currency named in the wiki crop data,2026-10-23,claude,,,,

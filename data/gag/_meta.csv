@@ -1,0 +1,15 @@
+key,value,source_type,source_url,last_verified,verified_by
+game_code,GAG,,,,
+schema_version,1.0,,,,
+roblox_universe_id,7436755782,official,https://games.roblox.com/v1/games?universeIds=7436755782,2026-10-23,claude
+roblox_place_id,126884695634066,official,https://www.roblox.com/games/126884695634066,2026-10-23,claude
+timezone_note,All times on this site are UTC.,,,,
+game_name,Grow a Garden,official,https://www.roblox.com/games/126884695634066,2026-10-23,claude
+developer_name,The Garden Game,official,https://www.roblox.com/communities/35789249,2026-10-23,claude
+developer_roblox_url,https://www.roblox.com/communities/35789249,official,https://www.roblox.com/games/126884695634066,2026-10-23,claude
+official_channels,https://www.roblox.com/games/126884695634066|https://www.roblox.com/communities/35789249,official,https://www.roblox.com/games/126884695634066,2026-10-23,claude
+release_date,2025-03-25,official,https://games.roblox.com/v1/games?universeIds=7436755782,2026-10-23,claude
+genre,"Simulation, Tycoon",official,https://games.roblox.com/v1/games?universeIds=7436755782,2026-10-23,claude
+redeem_ui_exists,yes,community,https://growagarden.fandom.com/wiki/Codes,2026-10-23,claude
+suffix_ladder,"[{""s"":""K"",""e"":3},{""s"":""M"",""e"":6},{""s"":""B"",""e"":9},{""s"":""T"",""e"":12},{""s"":""Qa"",""e"":15},{""s"":""Qi"",""e"":18}]",community,https://growagarden.fandom.com/wiki/Sheckles,2026-10-23,claude
+calc_defaults,"{""calculator"": {""plant"": ""GAG-PLT-0003"", ""count"": 1}}",,,2026-10-23,claude

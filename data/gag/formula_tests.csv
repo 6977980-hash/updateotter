@@ -1,0 +1,4 @@
+id,formula_id,inputs,expected,tolerance_abs,tolerance_rel,evidence_media_id,captured_in_update_id,verified_by,status
+GAG-TST-0001,GAG-FRM-0001,"{""plant"": ""carrot"", ""count"": 1}",20,0.5,,,,claude,live
+GAG-TST-0002,GAG-FRM-0001,"{""plant"": ""carrot"", ""weight"": 0.55, ""count"": 1}",80,0.5,,,,claude,live
+GAG-TST-0003,GAG-FRM-0001,"{""plant"": ""carrot"", ""variant"": ""gold"", ""mutation"": ""shocked"", ""mutation2"": ""frozen"", ""count"": 1}",43600,0.5,,,,claude,live

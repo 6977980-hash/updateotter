@@ -325,10 +325,13 @@ final class Sections {
 		$codes   = $game->entity( 'COD' ) ? $ds->all( 'COD', null ) : array();
 		$active  = array_filter( $codes, static fn( $c ) => 'active' === ( $c['data']['code_status'] ?? '' ) && 'live' === $c['status'] );
 		$expired = array_filter( $codes, static fn( $c ) => 'expired' === ( $c['data']['code_status'] ?? '' ) && in_array( $c['status'], array( 'live', 'removed_from_game' ), true ) );
-		$last    = CheckLog::last_checked( $game );
-		self::show( array_keys( $active + $expired ) );
+		$reported = array_filter( $codes, static fn( $c ) => 'unverified' === ( $c['data']['code_status'] ?? '' ) && 'live' === $c['status'] );
+		$last     = CheckLog::last_checked( $game );
+		self::show( array_keys( $active + $expired + $reported ) );
 		$out = '<div class="rbx-codes-status" role="region" aria-label="' . esc_attr__( 'Code status', 'rbx-data' ) . '">';
-		if ( ! $active ) {
+		if ( ! $active && $reported ) {
+			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No codes tested by us yet', 'rbx-data' ) . '</strong></p><p>' . esc_html( sprintf( /* translators: %s: number */ _n( '%s code is reported as working on the community wiki. We have not redeemed it ourselves, so it may not work.', '%s codes are reported as working on the community wiki. We have not redeemed them ourselves, so some may not work.', count( $reported ), 'rbx-data' ), number_format_i18n( count( $reported ) ) ) ) . '</p>';
+		} elseif ( ! $active ) {
 			/* translators: %s: game name */
 			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No working codes right now', 'rbx-data' ) . '</strong></p><p>' . sprintf( esc_html__( 'There are no %s codes right now.', 'rbx-data' ), esc_html( $game->name() ) ) . ( '' !== $last ? ' ' . esc_html__( 'We last checked on', 'rbx-data' ) . ' ' . Ui::date( $last ) . '.' : '' ) . '</p>';
 		} else {
@@ -350,6 +353,15 @@ final class Sections {
 			$out .= Ui::h2( __( 'Active codes', 'rbx-data' ), 'active-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'First seen', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Tested', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
 			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), RBX_DATA_VERSION );
 		}
+		if ( $reported ) {
+			$rows = '';
+			foreach ( $reported as $c ) {
+				$d     = $c['data'];
+				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> <button type="button" class="rbx-copy" data-copy="' . esc_attr( (string) $d['code'] ) . '" hidden>' . esc_html__( 'Copy', 'rbx-data' ) . '</button></th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Status', 'rbx-data' ) . '"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested by us', 'rbx-data' ) . '</span></td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
+			}
+			$out .= Ui::h2( __( 'Reported codes', 'rbx-data' ), 'reported-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Status', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
+			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), RBX_DATA_VERSION );
+		}
 		if ( $expired ) {
 			$li = '';
 			foreach ( $expired as $c ) {
@@ -364,7 +376,7 @@ final class Sections {
 			? esc_html__( 'Yes. The game has a place to type codes.', 'rbx-data' )
 			: ( 'no' === $redeem ? esc_html__( 'No. The game has no place to type codes right now, so any site that says it does is wrong.', 'rbx-data' ) : esc_html__( 'We have not confirmed this yet.', 'rbx-data' ) ) ) . '</p>';
 		$channels = (array) ( $ds->meta( 'official_channels' ) ?? array() );
-		$out     .= Ui::h2( __( 'How we check for codes', 'rbx-data' ), 'how-we-check' ) . '<p>' . esc_html__( 'We check the channels below at least once a week and after every game update. We only list a code after we redeem it in the game or the developer posts it.', 'rbx-data' ) . '</p>';
+		$out     .= Ui::h2( __( 'How we check for codes', 'rbx-data' ), 'how-we-check' ) . '<p>' . esc_html__( 'We check the channels below at least once a week and after every game update. We mark a code as working only after we redeem it in the game or the developer posts it. Codes that other players report, but we have not tested, are listed separately as reported codes.', 'rbx-data' ) . '</p>';
 		if ( $channels ) {
 			$out .= '<ul>';
 			foreach ( $channels as $u ) {
@@ -469,7 +481,7 @@ final class Sections {
 		if ( '' !== $cad ) {
 			$rows .= '<tr><th scope="row">' . esc_html__( 'Updates', 'rbx-data' ) . '</th><td>' . esc_html__( 'Usually', 'rbx-data' ) . ' ' . esc_html( wp_strip_all_tags( $cad ) ) . '</td></tr>';
 		}
-		foreach ( array( 'PET', 'EGG', 'BIO', 'MUT' ) as $e ) {
+		foreach ( array( 'PET', 'EGG', 'BIO', 'PLT', 'MUT' ) as $e ) {
 			if ( $game->entity( $e ) ) {
 				$n = $ds->count( $e );
 				if ( $n > 0 ) {
