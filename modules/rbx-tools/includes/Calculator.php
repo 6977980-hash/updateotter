@@ -251,7 +251,7 @@ final class Calculator {
 					$suffix = '<label class="screen-reader-text" for="' . esc_attr( $fid ) . '-s">' . esc_html__( 'Suffix', 'rbx-tools' ) . '</label><select id="' . esc_attr( $fid ) . '-s" class="rbx-calc__suffix" data-rbx-suffix="' . esc_attr( $key ) . '">' . $o . '</select>';
 				}
 				$shown = is_numeric( $value ) ? \RBX\Data\Format\Number::format( $value + 0, ! empty( $d['integer'] ) ? 'int' : 'plain' ) : '';
-				return '<div class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><span class="rbx-calc__num"><input type="text" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $shown ) . '" inputmode="decimal" autocomplete="off" spellcheck="false" maxlength="24" enterkeyhint="done" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $suffix . '</span>' . $err . '</div>';
+				return '<div class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><span class="rbx-calc__num"><input type="text" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $shown ) . '" inputmode="' . ( ! empty( $d['integer'] ) ? 'numeric' : 'decimal' ) . '" autocomplete="off" spellcheck="false" maxlength="24" enterkeyhint="done" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $suffix . '</span>' . $err . '</div>';
 		}
 	}
 

@@ -207,7 +207,14 @@
 }
 .breadcrumbs li {
 	display: inline-flex;
+	align-items: center;
 	min-width: 0;
+}
+/* UO-52: breadcrumb links are 44 px tall tap targets. */
+.breadcrumbs a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 }
 .breadcrumbs li + li::before {
 	content: "›";

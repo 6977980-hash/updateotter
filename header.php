@@ -29,7 +29,7 @@ $updateotter_game = updateotter_game();
 			<?php echo updateotter_icon( 'chevron-down', 'icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</button>
 		<?php endif; ?>
-		<a class="icon-btn" href="<?php echo esc_url( home_url( '/?s=' ) ); ?>" data-search-open aria-controls="site-search" aria-expanded="false">
+		<a class="icon-btn" href="<?php echo esc_url( home_url( '/?s=' ) ); ?>" data-search-open aria-controls="site-search" aria-expanded="false" aria-label="<?php esc_attr_e( 'Search', 'updateotter' ); ?>">
 			<?php echo updateotter_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<span class="icon-btn__label"><?php esc_html_e( 'Search', 'updateotter' ); ?></span>
 		</a>
