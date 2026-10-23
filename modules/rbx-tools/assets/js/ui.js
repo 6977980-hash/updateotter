@@ -14,6 +14,43 @@ export function createUI( root, cfg ) {
 	const suffixes = new Map( [ ...form.querySelectorAll( '[data-rbx-suffix]' ) ].map( ( n ) => [ n.dataset.rbxSuffix, n ] ) );
 	const decl = Object.fromEntries( cfg.inputs.map( ( d ) => [ d.key, d ] ) );
 	let compiled = [];
+	const hints = new Map();
+
+	// UO-32: a long list (over 30 options) gets a type-to-find box; the select stays the real input.
+	for ( const c of controls.values() ) {
+		if ( c.tagName !== 'SELECT' || c.options.length <= 30 || ! c.id ) {
+			continue;
+		}
+		const list = document.createElement( 'datalist' );
+		list.id = c.id + '-list';
+		const names = new Map();
+		for ( const o of c.options ) {
+			if ( o.value !== '' && ! names.has( o.textContent ) ) {
+				names.set( o.textContent, o.value );
+				const opt = document.createElement( 'option' );
+				opt.value = o.textContent;
+				list.append( opt );
+			}
+		}
+		const find = document.createElement( 'input' );
+		find.type = 'text';
+		find.className = 'rbx-calc__find';
+		find.setAttribute( 'list', list.id );
+		find.setAttribute( 'aria-label', t.find + ': ' + ( root.querySelector( 'label[for="' + CSS.escape( c.id ) + '"]' )?.textContent || '' ) );
+		find.placeholder = t.find;
+		find.autocomplete = 'off';
+		find.spellcheck = false;
+		find.addEventListener( 'input', ( e ) => {
+			e.stopPropagation();
+			const slug = names.get( find.value );
+			if ( slug !== undefined && c.value !== slug ) {
+				c.value = slug;
+				c.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+			}
+		} );
+		find.addEventListener( 'change', ( e ) => e.stopPropagation() );
+		c.before( find, list );
+	}
 	let lastSpoken = 0;
 	let speakTimer = null;
 
@@ -99,6 +136,18 @@ export function createUI( root, cfg ) {
 		for ( const e of v.errors ) {
 			errors[ e.key ] = e.code;
 		}
+		// UO-33: the same mutation in two slots counts once in the game, so it is an input error.
+		const seen = new Set();
+		for ( const d of cfg.inputs ) {
+			const val = values[ d.key ];
+			if ( d.type === 'ref' && typeof val === 'string' && val !== '' && controls.has( d.key ) ) {
+				const k = d.target + '|' + val;
+				if ( seen.has( k ) && ! errors[ d.key ] ) {
+					errors[ d.key ] = 'duplicate';
+				}
+				seen.add( k );
+			}
+		}
 		return { values, errors };
 	}
 
@@ -155,6 +204,27 @@ export function createUI( root, cfg ) {
 		}
 	}
 
+	// Note under a field that is not an error (UO-34: weight ignored for this pick).
+	function setHint( key, text ) {
+		const c = controls.get( key );
+		if ( ! c ) {
+			return;
+		}
+		let h = hints.get( key );
+		if ( ! h && text ) {
+			h = document.createElement( 'p' );
+			h.className = 'rbx-calc__hint';
+			h.id = c.id + '-h';
+			( c.closest( '.rbx-calc__field' ) || c.parentNode ).append( h );
+			c.setAttribute( 'aria-describedby', ( c.getAttribute( 'aria-describedby' ) || '' ) + ' ' + h.id );
+			hints.set( key, h );
+		}
+		if ( h ) {
+			h.textContent = text || '';
+			h.hidden = ! text;
+		}
+	}
+
 	function speak( sentence ) {
 		clearTimeout( speakTimer );
 		const wait = Math.max( 0, 1000 - ( Date.now() - lastSpoken ) );
@@ -182,6 +252,7 @@ export function createUI( root, cfg ) {
 		}
 		let first = null;
 		let waiting = false;
+		const ignored = new Set();
 		for ( const f of compiled ) {
 			const node = outs.get( f.key );
 			if ( ! node ) {
@@ -192,9 +263,22 @@ export function createUI( root, cfg ) {
 				continue;
 			}
 			try {
-				const v = evaluate( f.ast, engineInputs, data );
+				let v;
+				try {
+					v = evaluate( f.ast, engineInputs, data );
+				} catch ( e ) {
+					// UO-34: when the pick has no base weight, the result without weight beats no result.
+					const optional = cfg.inputs.filter( ( d ) => d.type === 'number' && d.optional && typeof engineInputs[ d.key ] === 'number' );
+					if ( ! ( e instanceof Unavailable ) || e.reason === 'record' || ! optional.length ) {
+						throw e;
+					}
+					const without = { ...engineInputs };
+					optional.forEach( ( d ) => ( without[ d.key ] = null ) );
+					v = evaluate( f.ast, without, data );
+					optional.forEach( ( d ) => ignored.add( d.key ) );
+				}
 				const text = formatValue( v, f.format, cfg.locale, cfg.ladder );
-				show( node, text, formatExact( v, cfg.locale ), f.unit );
+				show( node, text, formatExact( v, cfg.locale, cfg.ladder ), f.unit );
 				first ??= text + ( f.unit ? ' ' + f.unit : '' );
 			} catch ( e ) {
 				if ( e instanceof Unavailable && e.reason === 'record' && opts.partial ) {
@@ -203,6 +287,11 @@ export function createUI( root, cfg ) {
 				}
 				const r = e instanceof Unavailable ? e.reason : '';
 				show( node, r.startsWith( 'state_' ) && r !== 'state_m' ? t.unknown : t.na, null );
+			}
+		}
+		for ( const d of cfg.inputs ) {
+			if ( d.type === 'number' && d.optional ) {
+				setHint( d.key, ignored.has( d.key ) ? t.noWeight : '' );
 			}
 		}
 		if ( first !== null && opts.announce ) {

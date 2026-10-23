@@ -124,6 +124,7 @@ summary.rbx-chip {
 .rbx-icon-img {
 	border-radius: var(--r-md);
 	background: var(--surface);
+	object-fit: cover;
 }
 .rbx-summary {
 	font-size: var(--fs-lg);
@@ -254,6 +255,7 @@ summary.rbx-chip {
 .rbx-cell-name img {
 	width: 40px;
 	height: 40px;
+	object-fit: cover;
 }
 .rbx-list__controls {
 	display: grid;
@@ -282,6 +284,51 @@ summary.rbx-chip {
 	padding: 0;
 }
 .rbx-live:empty {
+	display: none;
+}
+.rbx-filters summary {
+	min-height: 44px;
+	display: flex;
+	align-items: center;
+	gap: var(--sp-1);
+	font-weight: 600;
+	cursor: pointer;
+}
+.rbx-filters summary::after {
+	content: "▾";
+	color: var(--text-muted);
+}
+.rbx-filters[open] summary::after {
+	content: "▴";
+}
+.rbx-filters__body {
+	display: grid;
+	gap: var(--sp-3);
+	padding-block: var(--sp-2);
+}
+.rbx-legend {
+	font-size: var(--fs-sm);
+	color: var(--text-muted);
+	margin: 0 0 var(--sp-2);
+}
+.rbx-backtop {
+	position: fixed;
+	inset-inline-end: var(--sp-4);
+	bottom: calc(var(--sp-4) + env(safe-area-inset-bottom));
+	z-index: 30;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	padding-inline: var(--sp-3);
+	border-radius: 999px;
+	background: var(--surface);
+	border: 1px solid var(--border-strong);
+	color: var(--text);
+	font-weight: 600;
+	text-decoration: none;
+	box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+}
+.rbx-backtop[hidden] {
 	display: none;
 }
 .rbx-tiles ul,
@@ -565,7 +612,8 @@ summary.rbx-chip {
 		grid-template-columns: 1fr auto;
 		align-items: end;
 	}
-	.rbx-facet {
+	.rbx-facet,
+	.rbx-filters {
 		grid-column: 1 / -1;
 	}
 }
@@ -601,27 +649,29 @@ summary.rbx-chip {
 .rbx-table--list tr {
 	border-bottom: 1px solid var(--border);
 	padding-block: var(--sp-2);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--sp-1) var(--sp-3);
 }
 .rbx-table--list tr[hidden] {
 	display: none;
 }
+/* UO-30: a phone card is the name line plus one wrapped line of "Label value" pairs. */
 .rbx-table--list td {
 	border: 0;
-	padding-block: var(--sp-1);
-	text-align: end;
-}
-.rbx-table--list td::after {
-	content: "";
-	display: block;
-	clear: both;
+	padding: 0;
+	width: auto;
+	text-align: start;
 }
 .rbx-table--list td::before {
-	content: attr(data-label);
-	float: inline-start;
-	margin-inline-end: var(--sp-3);
-	text-align: start;
+	content: attr(data-label) " ";
 	color: var(--text-muted);
 	font-size: var(--fs-sm);
+}
+.rbx-table--list .rbx-cell-name {
+	flex: 1 0 100%;
+	min-width: 0;
 }
 .rbx-table--list th {
 	border: 0;

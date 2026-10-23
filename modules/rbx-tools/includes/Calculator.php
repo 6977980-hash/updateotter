@@ -136,18 +136,21 @@ final class Calculator {
 				: esc_html__( 'no data date yet', 'rbx-tools' )
 		);
 
-		$title = $mini ? esc_html__( 'Quick calculator', 'rbx-tools' ) : esc_html( (string) ( $tool['label__en'] ?? '' ) );
-		$out   = '<section class="rbx-calc' . ( $mini ? ' rbx-calc--mini' : '' ) . '" id="' . esc_attr( $id ) . '" aria-labelledby="' . esc_attr( $id ) . '-t" data-rbx-calculator>'
-			. '<h2 class="rbx-calc__title" id="' . esc_attr( $id ) . '-t">' . $title . '</h2>'
+		// UO-41: the full calculator sits under the page H1 with the same words, so only the mini
+		// calculator on item pages gets its own heading.
+		$out = '<section class="rbx-calc' . ( $mini ? ' rbx-calc--mini' : '' ) . '" id="' . esc_attr( $id ) . '"'
+			. ( $mini ? ' aria-labelledby="' . esc_attr( $id ) . '-t"' : ' aria-label="' . esc_attr( \RBX\Data\Content\Lang::t( (string) ( $tool['label__en'] ?? '' ) ) ) . '"' ) . ' data-rbx-calculator>'
+			. ( $mini ? '<h2 class="rbx-calc__title" id="' . esc_attr( $id ) . '-t">' . esc_html__( 'Quick calculator', 'rbx-tools' ) . '</h2>' : '' )
 			. '<form class="rbx-calc__form" novalidate>' . $fields . '</form>'
 			. '<noscript><p class="rbx-note">' . esc_html__( 'Turn on JavaScript to change inputs; the example below is still accurate.', 'rbx-tools' ) . '</p></noscript>'
-			. '<div class="rbx-calc__result"><p class="rbx-calc__fix" hidden data-rbx-fix>' . esc_html__( 'Fix the highlighted field to update', 'rbx-tools' ) . '</p><dl class="rbx-calc__outs">' . $results . '</dl>'
-			. '<p class="rbx-calc__meta">' . $meta . '</p>'
+			// UO-29: only the result itself is sticky on phones; the notes below it scroll with the page.
+			. '<div class="rbx-calc__result"><p class="rbx-calc__fix" hidden data-rbx-fix>' . esc_html__( 'Fix the highlighted field to update', 'rbx-tools' ) . '</p><dl class="rbx-calc__outs">' . $results . '</dl></div>'
+			. '<div class="rbx-calc__info"><p class="rbx-calc__meta">' . $meta . '</p>'
 			. ( $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Source: community wiki.', 'rbx-tools' ) . '</strong> ' . ( $game->wiki_formula_ok()
 				? esc_html__( 'The values and the formula come from the community wiki. We have not tested them in the game ourselves yet.', 'rbx-tools' )
 				: esc_html__( 'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.', 'rbx-tools' ) ) . '</p>' : '' )
 			. '<p class="rbx-calc__notice" role="alert" hidden data-rbx-notice></p>'
-			. '<div class="rbx-calc__error" hidden data-rbx-load-error><p>' . esc_html__( 'The live calculator could not load. The example result below is correct for the default inputs.', 'rbx-tools' ) . '</p><button type="button" class="button" data-rbx-retry>' . esc_html__( 'Try again', 'rbx-tools' ) . '</button></div>'
+			. '<div class="rbx-calc__error" hidden data-rbx-load-error><p>' . esc_html__( 'The live calculator could not load. The example result shown is correct for the default inputs.', 'rbx-tools' ) . '</p><button type="button" class="button" data-rbx-retry>' . esc_html__( 'Try again', 'rbx-tools' ) . '</button></div>'
 			. '</div>'
 			. '<p class="screen-reader-text" role="status" aria-live="polite" aria-atomic="true" data-rbx-live></p>';
 		if ( ! $mini ) {
@@ -215,18 +218,29 @@ final class Calculator {
 						$seed[ $target ][ $rid ] = $ds->calc_record( $r );
 					}
 				}
-				$opts = ! empty( $d['optional'] ) ? '<option value="">' . esc_html( (string) ( $d['none_label__en'] ?? __( 'None', 'rbx-tools' ) ) ) . '</option>' : '';
+				$opts  = ! empty( $d['optional'] ) ? '<option value="">' . esc_html( \RBX\Data\Content\Lang::t( (string) ( $d['none_label__en'] ?? __( 'None', 'rbx-tools' ) ) ) ) . '</option>' : '';
+				$count = array_sum( array_map( 'count', $groups ) );
+				$popular = '';
 				foreach ( $groups as $g => $recs ) {
 					$o = '';
 					foreach ( $recs as $r ) {
-						$o .= '<option value="' . esc_attr( (string) $r['slug'] ) . '" data-id="' . esc_attr( (string) $r['id'] ) . '"' . selected( $r['id'], $value, false ) . '>' . esc_html( (string) $r['name'] ) . '</option>';
+						$text = self::option_text( $r );
+						$o   .= '<option value="' . esc_attr( (string) $r['slug'] ) . '" data-id="' . esc_attr( (string) $r['id'] ) . '"' . selected( $r['id'], $value, false ) . '>' . esc_html( $text ) . '</option>';
+						// UO-32: long lists start with the items that have a full guide page.
+						$pid = (int) ( $r['post_id'] ?? 0 );
+						if ( $count > 30 && $pid && \RBX\Data\Gate\PageState::INDEX === get_post_meta( $pid, '_rbx_page_state', true ) ) {
+							$popular .= '<option value="' . esc_attr( (string) $r['slug'] ) . '" data-id="' . esc_attr( (string) $r['id'] ) . '">' . esc_html( $text ) . '</option>';
+						}
 					}
 					$gr    = '' !== $g ? $ds->get( $g ) : null;
 					$opts .= $gr ? '<optgroup label="' . esc_attr( (string) $gr['name'] ) . '">' . $o . '</optgroup>' : $o;
 				}
-				return '<p class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><select id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $opts . '</select>' . $err . '</p>';
+				if ( '' !== $popular ) {
+					$opts = '<optgroup label="' . esc_attr__( 'Popular', 'rbx-tools' ) . '">' . $popular . '</optgroup>' . $opts;
+				}
+				return '<div class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><select id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $opts . '</select>' . $err . '</div>';
 			case 'bool':
-				return '<p class="rbx-calc__field rbx-calc__field--check"><input type="checkbox" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="1" data-rbx-input="' . esc_attr( $key ) . '"' . checked( (bool) $value, true, false ) . '> <label for="' . esc_attr( $fid ) . '">' . $label . '</label></p>';
+				return '<div class="rbx-calc__field rbx-calc__field--check"><input type="checkbox" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="1" data-rbx-input="' . esc_attr( $key ) . '"' . checked( (bool) $value, true, false ) . '> <label for="' . esc_attr( $fid ) . '">' . $label . '</label></div>';
 			default:
 				$suffix = '';
 				if ( ! empty( $d['suffix'] ) ) {
@@ -237,8 +251,23 @@ final class Calculator {
 					$suffix = '<label class="screen-reader-text" for="' . esc_attr( $fid ) . '-s">' . esc_html__( 'Suffix', 'rbx-tools' ) . '</label><select id="' . esc_attr( $fid ) . '-s" class="rbx-calc__suffix" data-rbx-suffix="' . esc_attr( $key ) . '">' . $o . '</select>';
 				}
 				$shown = is_numeric( $value ) ? \RBX\Data\Format\Number::format( $value + 0, ! empty( $d['integer'] ) ? 'int' : 'plain' ) : '';
-				return '<p class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><span class="rbx-calc__num"><input type="text" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $shown ) . '" inputmode="decimal" autocomplete="off" spellcheck="false" maxlength="24" enterkeyhint="done" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $suffix . '</span>' . $err . '</p>';
+				return '<div class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><span class="rbx-calc__num"><input type="text" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $shown ) . '" inputmode="decimal" autocomplete="off" spellcheck="false" maxlength="24" enterkeyhint="done" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $suffix . '</span>' . $err . '</div>';
 		}
+	}
+
+	/**
+	 * Option text: the name, plus the multiplier for mutations and variants ("Shocked ×100", UO-32).
+	 *
+	 * @param array<string, mixed> $r Record.
+	 */
+	private static function option_text( array $r ): string {
+		foreach ( array( 'income_mult', 'value_mult' ) as $f ) {
+			$m = $r['data'][ $f ] ?? null;
+			if ( is_int( $m ) || is_float( $m ) ) {
+				return (string) $r['name'] . ' ' . \RBX\Data\Format\Number::format( $m, 'mult', \RBX\Data\Content\Lang::num() );
+			}
+		}
+		return (string) $r['name'];
 	}
 
 	/**
@@ -254,7 +283,7 @@ final class Calculator {
 		}
 		$v     = (float) $res['value'];
 		$short = \RBX\Data\Format\Number::format( $v, $format, \RBX\Data\Content\Lang::num(), $ladder );
-		$exact = \RBX\Data\Format\Number::exact( $v, \RBX\Data\Content\Lang::num() );
+		$exact = \RBX\Data\Format\Number::exact( $v, \RBX\Data\Content\Lang::num(), $ladder );
 		$html  = $short === $exact ? '<span class="rbx-calc__v" data-exact="' . esc_attr( $exact ) . '">' . esc_html( $short ) . '</span>' : '<span class="rbx-calc__v" data-exact="' . esc_attr( $exact ) . '"><span aria-hidden="true">' . esc_html( $short ) . '</span><span class="screen-reader-text">' . esc_html( $exact ) . '</span></span>';
 		return $html . ( '' !== $unit ? ' <span class="rbx-calc__unit">' . esc_html( $unit ) . '</span>' : '' );
 	}
@@ -289,6 +318,10 @@ final class Calculator {
 			'not_integer' => __( 'Use a whole number.', 'rbx-tools' ),
 			'too_big'     => __( 'That number is too big.', 'rbx-tools' ),
 			'too_small'   => __( 'That number is too small.', 'rbx-tools' ),
+			'duplicate'   => __( 'Each mutation counts once. Pick a different one.', 'rbx-tools' ),
+			'badNumber'   => __( 'A number in this link could not be read, so the default is shown.', 'rbx-tools' ),
+			'noWeight'    => __( 'The weight effect is not known for this pick, so the result uses the base weight.', 'rbx-tools' ),
+			'find'        => __( 'Type to find', 'rbx-tools' ),
 		);
 	}
 

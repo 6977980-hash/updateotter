@@ -72,7 +72,7 @@ final class Shortcodes {
 			$ladder = $ds->meta( 'suffix_ladder' );
 			return array(
 				'text'  => Number::format( $v, $fmt, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null ),
-				'exact' => Number::exact( $v, \RBX\Data\Content\Lang::num() ),
+				'exact' => Number::exact( $v, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null ),
 			);
 		}
 		if ( 'ref' === ( $def['type'] ?? '' ) ) {

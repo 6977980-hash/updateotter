@@ -39,7 +39,8 @@ export function readState( hash, toolSchema, data, knownSlugs = null ) {
 		} else {
 			let n = /^-?\d+(\.\d+)?$/.test( raw ) ? Number( raw ) : NaN;
 			if ( ! Number.isFinite( n ) ) {
-				notices.includes( 'reset' ) || notices.push( 'reset' );
+				// A number we cannot read keeps the default; "reset" is about items that no longer exist (UO-36).
+				notices.includes( 'badNumber' ) || notices.push( 'badNumber' );
 				continue;
 			}
 			let clamped = false;

@@ -332,7 +332,7 @@ final class Insights {
 			$bw = $rec['data']['base_weight_kg'] ?? null;
 			$facts[] = is_numeric( $bw )
 				/* translators: 1: crop, 2: value, 3: currency, 4: weight */
-				? sprintf( esc_html__( 'A plain %1$s at its base weight of %4$s kg sells for %2$s %3$s.', 'rbx-data' ), esc_html( $name ), Ui::number( $ds, $base, 'abbr' ), esc_html( $cur ), Ui::number( $ds, (float) $bw, 'decimal(2)' ) )
+				? sprintf( esc_html__( 'A plain %1$s at its base weight of %4$s kg sells for %2$s %3$s.', 'rbx-data' ), esc_html( $name ), Ui::number( $ds, $base, 'abbr' ), esc_html( $cur ), Ui::number( $ds, (float) $bw, 'decimal(' . self::decimals( (float) $bw ) . ')' ) )
 				/* translators: 1: crop, 2: value, 3: currency */
 				: sprintf( esc_html__( 'A plain %1$s sells for %2$s %3$s at its base weight.', 'rbx-data' ), esc_html( $name ), Ui::number( $ds, $base, 'abbr' ), esc_html( $cur ) );
 			if ( $rar ) {
@@ -448,6 +448,16 @@ final class Insights {
 		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much is a %s worth?', 'rbx-data' ), $name ), 'value' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
 	}
 
+	/** Decimals needed to show a base weight exactly: 2 to 4 (0.4 → 2, 0.275 → 3). */
+	private static function decimals( float $v ): int {
+		for ( $dp = 2; $dp < 4; $dp++ ) {
+			if ( abs( round( $v, $dp ) - $v ) < 1e-9 ) {
+				return $dp;
+			}
+		}
+		return 4;
+	}
+
 	private static function plant_weight( Dataset $ds, array $rec ): string {
 		$bw   = $rec['data']['base_weight_kg'] ?? null;
 		$base = self::crop_value( $ds, (string) $rec['id'] );
@@ -457,19 +467,23 @@ final class Insights {
 		$bw   = (float) $bw;
 		$name = (string) $rec['name'];
 		$rows = '';
+		// UO-28: print each weight with as many decimals as the base weight has (0.275 → 3) and
+		// compute at that printed weight, so the row matches the calculator at the same input.
+		$dp = self::decimals( $bw );
 		foreach ( self::CROP_WEIGHT_STEPS as $k ) {
-			$v = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => round( $bw * $k, 4 ) ) );
+			$w = round( $bw * $k, $dp );
+			$v = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $w ) );
 			if ( null === $v ) {
 				return '';
 			}
-			$rows .= '<tr><th scope="row">' . Ui::number( $ds, round( $bw * $k, 2 ), 'decimal(2)' ) . ' kg</th><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, round( $v / $base, 2 ), 'mult' ) . '</td></tr>';
+			$rows .= '<tr><th scope="row">' . Ui::number( $ds, $w, 'decimal(' . $dp . ')' ) . ' kg</th><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, round( $v / $base, 2 ), 'mult' ) . '</td></tr>';
 		}
 		$two   = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $bw * 2 ) );
 		$intro = sprintf(
 			/* translators: 1: crop, 2: base weight, 3: ratio */
 			esc_html__( 'Each %1$s fruit grows to its own weight around the base weight of %2$s kg. Value climbs faster than weight: a fruit twice as heavy is worth about %3$s times as much.', 'rbx-data' ),
 			esc_html( $name ),
-			Ui::number( $ds, $bw, 'decimal(2)' ),
+			Ui::number( $ds, $bw, 'decimal(' . $dp . ')' ),
 			esc_html( self::ratio( (float) $two / $base ) )
 		);
 		/* translators: %s: crop */

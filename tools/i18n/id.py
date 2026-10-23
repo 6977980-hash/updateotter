@@ -154,6 +154,10 @@ RBX_DATA = {
     '%s code is reported as working on the community wiki. We have not redeemed it ourselves, so it may not work.':
         '%s kode dilaporkan berfungsi di wiki komunitas. Kami belum menukarnya sendiri, jadi bisa saja tidak berfungsi.',
     'Working codes: %s': 'Kode yang berfungsi: %s',
+    'Filters': 'Filter',
+    'Confidence for every row:': 'Tingkat keyakinan untuk semua baris:',
+    'Showing %1$s of %2$s %3$s': 'Menampilkan %1$s dari %2$s %3$s',
+    'Back to top': 'Kembali ke atas',
 }
 
 RBX_TOOLS = {
@@ -166,7 +170,7 @@ RBX_TOOLS = {
     'Source: community wiki.': 'Sumber: wiki komunitas.',
     'The values and the formula come from the community wiki. We have not tested them in the game ourselves yet.': 'Nilai dan rumusnya berasal dari wiki komunitas. Kami belum mengetesnya sendiri di game.',
     'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.': 'Nilai pet berasal dari wiki komunitas. Rumusnya cocok dengan satu tes kami di game sejauh ini (Golden Chicken); cek lainnya sedang direncanakan.',
-    'The live calculator could not load. The example result below is correct for the default inputs.': 'Kalkulator gagal dimuat. Contoh hasil di bawah benar untuk input bawaan.',
+    'The live calculator could not load. The example result shown is correct for the default inputs.': 'Kalkulator gagal dimuat. Contoh hasil yang tampil benar untuk input bawaan.',
     'Try again': 'Coba lagi',
     'Copy link': 'Salin link',
     'Reset': 'Atur ulang',
@@ -190,6 +194,11 @@ RBX_TOOLS = {
     'Use a whole number.': 'Gunakan bilangan bulat.',
     'That number is too big.': 'Angka itu terlalu besar.',
     'That number is too small.': 'Angka itu terlalu kecil.',
+    'Popular': 'Populer',
+    'Each mutation counts once. Pick a different one.': 'Tiap mutasi hanya dihitung sekali. Pilih yang lain.',
+    'A number in this link could not be read, so the default is shown.': 'Ada angka di link ini yang tidak terbaca, jadi nilai bawaan yang ditampilkan.',
+    'The weight effect is not known for this pick, so the result uses the base weight.': 'Efek berat untuk pilihan ini belum diketahui, jadi hasilnya memakai berat dasar.',
+    'Type to find': 'Ketik untuk mencari',
 }
 
 UPDATEOTTER = {

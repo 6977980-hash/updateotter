@@ -94,7 +94,8 @@ function init( root, ownsHash ) {
 			if ( ownsHash ) {
 				history.replaceState( null, '', window.location.pathname + window.location.search );
 			}
-			run( true );
+			// No announce: an announced run saves the state, which would put the hash right back (UO-36).
+			run( false );
 		} );
 	}
 

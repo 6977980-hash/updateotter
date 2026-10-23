@@ -23,6 +23,14 @@
 .rbx-calc__field > label {
 	font-weight: 600;
 }
+.rbx-calc__find {
+	margin-bottom: var(--sp-1, 4px);
+}
+.rbx-calc__hint {
+	margin: 0;
+	font-size: var(--fs-sm, 0.875rem);
+	color: var(--warning, #9a4a06);
+}
 .rbx-calc select,
 .rbx-calc input[type="text"] {
 	min-height: 48px;
@@ -69,17 +77,32 @@
 }
 .rbx-calc__result {
 	margin-top: var(--sp-4, 16px);
-	min-height: 120px;
 	position: sticky;
 	bottom: 0;
 	z-index: 20;
 	background: var(--surface, #f4f6fa);
 	border-top: 1px solid var(--border-strong, #737f91);
-	padding-block: var(--sp-3, 12px) calc(var(--sp-3, 12px) + env(safe-area-inset-bottom));
+	padding-block: var(--sp-2, 8px) calc(var(--sp-2, 8px) + env(safe-area-inset-bottom));
+}
+/* UO-29: on phones the sticky bar holds only the value (about 60 px) and fields scroll clear of it. */
+.rbx-calc input,
+.rbx-calc select {
+	scroll-margin-bottom: 96px;
+}
+.rbx-calc__result .rbx-calc__out {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	column-gap: var(--sp-2, 8px);
+}
+.rbx-calc__result .rbx-calc__out:first-child .rbx-calc__v {
+	font-size: 1.5rem;
+}
+.rbx-calc__info {
+	margin-top: var(--sp-2, 8px);
 }
 .rbx-calc--mini .rbx-calc__result {
 	position: static;
-	min-height: 64px;
 }
 .rbx-calc__outs {
 	margin: 0;
@@ -169,15 +192,32 @@
 	.rbx-calc:not(.rbx-calc--mini) {
 		display: grid;
 		grid-template-columns: minmax(360px, 1fr) minmax(280px, 1fr);
+		grid-template-rows: auto auto 1fr;
 		column-gap: var(--sp-5, 24px);
 		align-items: start;
 	}
-	.rbx-calc:not(.rbx-calc--mini) > :not(.rbx-calc__form):not(.rbx-calc__result) {
+	.rbx-calc:not(.rbx-calc--mini) > :not(.rbx-calc__form):not(.rbx-calc__result):not(.rbx-calc__info) {
 		grid-column: 1 / -1;
+	}
+	.rbx-calc:not(.rbx-calc--mini) .rbx-calc__form {
+		grid-row: 1 / span 3;
+	}
+	.rbx-calc:not(.rbx-calc--mini) .rbx-calc__info {
+		grid-column: 2;
+		grid-row: 2;
+		margin-top: 0;
+		border-inline-start: 1px solid var(--border, #d5dce5);
+		padding-inline-start: var(--sp-5, 24px);
+	}
+	.rbx-calc:not(.rbx-calc--mini) .rbx-calc__result .rbx-calc__out {
+		display: grid;
+	}
+	.rbx-calc:not(.rbx-calc--mini) .rbx-calc__out:first-child .rbx-calc__v {
+		font-size: var(--fs-result, 2rem);
 	}
 	.rbx-calc:not(.rbx-calc--mini) .rbx-calc__result {
 		grid-column: 2;
-		grid-row: 2 / span 2;
+		grid-row: 1;
 		position: sticky;
 		top: 16px;
 		bottom: auto;
