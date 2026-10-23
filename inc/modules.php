@@ -81,6 +81,37 @@ add_action(
 	99
 );
 
+/**
+ * One-time site defaults so the owner does not have to click through them (spec ENG-02,
+ * REV-G15, §2.4): UTC timezone, post-name permalinks, search engines discouraged while the
+ * pre-launch lock is on, default byline, and the §2.4 draft page skeleton. Runs on the first
+ * wp-admin visit by an administrator, so content is saved with that user's rights.
+ */
+add_action(
+	'admin_init',
+	static function (): void {
+		if ( get_option( 'updateotter_site_defaults' ) || ! current_user_can( 'manage_options' ) || ! class_exists( '\RBX\Data\Admin\SetupScreen' ) ) {
+			return;
+		}
+		update_option( 'updateotter_site_defaults', 1, true );
+		if ( 'UTC' !== get_option( 'timezone_string' ) ) {
+			update_option( 'timezone_string', 'UTC' );
+			update_option( 'gmt_offset', 0 );
+		}
+		if ( '/%postname%/' !== get_option( 'permalink_structure' ) ) {
+			update_option( 'permalink_structure', '/%postname%/' );
+		}
+		if ( (bool) get_option( 'rbx_prelaunch_lock', 1 ) ) {
+			update_option( 'blog_public', 0 );
+		}
+		if ( ! get_option( 'rbx_default_author' ) ) {
+			update_option( 'rbx_default_author', get_current_user_id(), false );
+		}
+		\RBX\Data\Admin\SetupScreen::create();
+		flush_rewrite_rules( false );
+	}
+);
+
 // Switching away from the theme stops the module cron jobs; switching back re-runs the install.
 add_action(
 	'switch_theme',

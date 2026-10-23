@@ -176,6 +176,7 @@ final class SetupScreen {
 					array(
 						'post_type'      => 'page',
 						'post_status'    => 'draft',
+						'post_author'    => (int) get_option( 'rbx_default_author', 0 ) ?: get_current_user_id(),
 						'post_title'     => (string) $p['title'],
 						'post_name'      => $slug,
 						'post_parent'    => $parent ? $parent->ID : 0,
