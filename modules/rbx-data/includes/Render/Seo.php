@@ -13,6 +13,7 @@ namespace RBX\Data\Render;
 
 use RBX\Data\Codes\CheckLog;
 use RBX\Data\Config\Game;
+use RBX\Data\Config\Loader;
 use RBX\Data\Data\Repository;
 use RBX\Data\Gate\PageState;
 use RBX\Data\Plugin;
@@ -139,7 +140,33 @@ final class Seo {
 		if ( 'report' === $c['kind'] ) {
 			return PageState::NOINDEX;
 		}
+		// POL-15: an updates list with no published update is an empty page; keep it out of the index.
+		if ( 'updates' === $c['kind'] && $c['game'] && ! self::has_updates( $c['game'] ) ) {
+			return PageState::NOINDEX;
+		}
 		return '';
+	}
+
+	/** True when the game has at least one published update page. */
+	public static function has_updates( Game $game ): bool {
+		foreach ( Repository::dataset( $game )->all( 'UPD', array( 'live', 'limited' ) ) as $u ) {
+			if ( ! empty( $u['post_id'] ) && 'publish' === get_post_status( (int) $u['post_id'] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** @return int[] Page IDs of updates lists that are still empty (kept out of sitemaps). */
+	private static function empty_update_pages(): array {
+		$ids = array();
+		foreach ( Loader::games() as $game ) {
+			$page = get_page_by_path( $game->folder() . '/updates', OBJECT, 'page' );
+			if ( $page && ! self::has_updates( $game ) ) {
+				$ids[] = (int) $page->ID;
+			}
+		}
+		return $ids;
 	}
 
 	/* ---------------------------------------------------------------- robots */
@@ -562,7 +589,7 @@ final class Seo {
 				return false;
 			}
 		}
-		if ( 'page' === $obj->post_type && 'report' === $obj->post_name && 0 === (int) $obj->post_parent ) {
+		if ( 'page' === $obj->post_type && ( ( 'report' === $obj->post_name && 0 === (int) $obj->post_parent ) || in_array( (int) $obj->ID, self::empty_update_pages(), true ) ) ) {
 			return false;
 		}
 		$lc = (string) get_post_meta( $obj->ID, '_rbx_last_changed', true );
@@ -605,9 +632,13 @@ final class Seo {
 				),
 			);
 		} elseif ( 'page' === $post_type ) {
-			$report = get_page_by_path( 'report', OBJECT, 'page' );
+			$report  = get_page_by_path( 'report', OBJECT, 'page' );
+			$exclude = self::empty_update_pages();
 			if ( $report ) {
-				$args['post__not_in'] = array( $report->ID );
+				$exclude[] = (int) $report->ID;
+			}
+			if ( $exclude ) {
+				$args['post__not_in'] = $exclude;
 			}
 		}
 		return $args;

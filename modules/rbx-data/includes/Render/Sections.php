@@ -635,6 +635,7 @@ final class Sections {
 		foreach ( array_slice( $all, 0, 5 ) as [ $game, $u ] ) {
 			$li .= '<li>' . Ui::link( $u ) . ' <span class="rbx-meta">' . esc_html( $game->short_name() ) . ', ' . Ui::date( (string) ( $u['data']['release_date'] ?? '' ) ) . '</span></li>';
 		}
-		return '' === $li ? '' : '<ul class="rbx-latest">' . $li . '</ul>';
+		// The heading comes with the list so an empty list leaves no empty section.
+		return '' === $li ? '' : '<h2 class="wp-block-heading" id="latest-updates">' . esc_html__( 'Latest updates', 'rbx-data' ) . '</h2><ul class="rbx-latest">' . $li . '</ul>';
 	}
 }
