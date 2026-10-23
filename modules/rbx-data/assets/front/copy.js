@@ -9,7 +9,7 @@ if ( navigator.clipboard ) {
 				await navigator.clipboard.writeText( btn.dataset.copy );
 				btn.textContent = '✓';
 				if ( status ) {
-					status.textContent = btn.dataset.copy;
+					status.textContent = btn.dataset.copied || btn.dataset.copy;
 				}
 				setTimeout( () => ( btn.textContent = label ), 1500 );
 			} catch ( e ) {}

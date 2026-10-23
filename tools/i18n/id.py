@@ -163,6 +163,8 @@ RBX_DATA = {
     '%s tier list': 'Tier list %s',
     'Search pets, crops and pages': 'Cari pet, tanaman, dan halaman',
     'Popular now:': 'Populer sekarang:',
+    'Copy code %s': 'Salin kode %s',
+    'Copied %s': '%s disalin',
 }
 
 RBX_TOOLS = {
