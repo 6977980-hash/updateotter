@@ -68,7 +68,7 @@ final class Game {
 		return max( 1, (int) ( $this->config['min_formula_tests'] ?? 3 ) );
 	}
 
-	/** Owner decision: one community source is enough for calculator use (shown as "Unconfirmed"; DATA-13 default needs 2). */
+	/** Owner decision: one community source is enough for calculator use (shown as "Source: community wiki"; DATA-13 default needs 2). */
 	public function community_single_source(): bool {
 		return ! empty( $this->config['community_single_source_calc'] );
 	}
