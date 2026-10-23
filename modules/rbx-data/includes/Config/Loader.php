@@ -112,7 +112,7 @@ final class Loader {
 				self::$errors[ basename( $file ) ] = array( 'Invalid JSON.' );
 				continue;
 			}
-			$configs[ basename( $file ) ] = self::apply_overrides( $json );
+			$configs[ basename( $file ) ] = \RBX\Data\Content\Lang::localize( self::apply_overrides( $json ) );
 		}
 		$keep_errors = self::$errors;
 		self::set( $configs );

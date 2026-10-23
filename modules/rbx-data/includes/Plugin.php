@@ -67,6 +67,7 @@ final class Plugin {
 		Rest\Routes::boot();
 		Import\Bundled::boot();
 		Content\BundledPages::boot();
+		Content\Lang::boot();
 		if ( is_admin() ) {
 			Admin\Menu::boot();
 			Admin\Editor::boot();

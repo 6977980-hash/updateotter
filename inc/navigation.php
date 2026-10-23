@@ -15,8 +15,26 @@ function updateotter_games(): array {
 	return class_exists( '\RBX\Data\Api' ) ? \RBX\Data\Api::games() : array();
 }
 
+/** Site URL of a path; on Indonesian pages the Indonesian twin when one is published. */
+function updateotter_url( string $path = '' ): string {
+	return class_exists( '\RBX\Data\Content\Lang' ) ? \RBX\Data\Content\Lang::url( $path ) : home_url( '/' . ( '' !== trim( $path, '/' ) ? trim( $path, '/' ) . '/' : '' ) );
+}
+
 function updateotter_game_url( \RBX\Data\Config\Game $g, string $path = '' ): string {
-	return home_url( '/' . $g->folder() . '/' . ( '' !== $path ? trim( $path, '/' ) . '/' : '' ) );
+	return updateotter_url( $g->folder() . ( '' !== $path ? '/' . trim( $path, '/' ) : '' ) );
+}
+
+/** Link to the other language of this page (TECH-20 pairs only). */
+function updateotter_lang_switch(): void {
+	$pair = class_exists( '\RBX\Data\Content\Lang' ) ? \RBX\Data\Content\Lang::pair() : null;
+	if ( null === $pair ) {
+		return;
+	}
+	if ( \RBX\Data\Content\Lang::is_id() ) {
+		echo '<p class="lang-switch"><a href="' . esc_url( $pair['en'] ) . '" hreflang="en" lang="en">Read this page in English</a></p>';
+	} else {
+		echo '<p class="lang-switch"><a href="' . esc_url( $pair['id'] ) . '" hreflang="id" lang="id">Baca dalam Bahasa Indonesia</a></p>';
+	}
 }
 
 /** @return array<int, array{0: string, 1: string}> label, url of each menu entry in config order. */
@@ -68,10 +86,10 @@ function updateotter_game_menu(): void {
 
 /** Breadcrumbs (TECH-18 data from RBX Data; visual per UX-23). Called by plugin templates too. */
 function updateotter_breadcrumbs(): void {
-	if ( is_front_page() || ! class_exists( '\RBX\Data\Render\Breadcrumbs' ) ) {
-		return;
+	if ( ! is_front_page() && class_exists( '\RBX\Data\Render\Breadcrumbs' ) ) {
+		echo \RBX\Data\Render\Breadcrumbs::html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Breadcrumbs.
 	}
-	echo \RBX\Data\Render\Breadcrumbs::html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Breadcrumbs.
+	updateotter_lang_switch();
 }
 add_action( 'updateotter_breadcrumbs', 'updateotter_breadcrumbs' );
 

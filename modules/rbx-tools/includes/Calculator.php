@@ -73,11 +73,11 @@ final class Calculator {
 			$d        = $f['record']['data'];
 			$format   = (string) ( $d['display_format'] ?? 'abbr' );
 			$res      = $f['available'] ? Api::evaluate( (string) $fkey, $values, $game ) : array( 'ok' => false, 'reason' => (string) $f['reason'] );
-			$results .= '<div class="rbx-calc__out" data-rbx-output="' . esc_attr( (string) $fkey ) . '"><dt>' . esc_html( (string) ( $d['label__en'] ?? $fkey ) ) . '</dt><dd>' . self::value_html( $res, $format, $ladder, (string) ( $d['output_unit__en'] ?? '' ) ) . '</dd></div>';
+			$results .= '<div class="rbx-calc__out" data-rbx-output="' . esc_attr( (string) $fkey ) . '"><dt>' . esc_html( \RBX\Data\Content\Lang::t( (string) ( $d['label__en'] ?? $fkey ) ) ) . '</dt><dd>' . self::value_html( $res, $format, $ladder, \RBX\Data\Content\Lang::t( (string) ( $d['output_unit__en'] ?? '' ) ) ) . '</dd></div>';
 			$item     = array(
 				'key'    => (string) $fkey,
-				'label'  => (string) ( $d['label__en'] ?? $fkey ),
-				'unit'   => (string) ( $d['output_unit__en'] ?? '' ),
+				'label'  => \RBX\Data\Content\Lang::t( (string) ( $d['label__en'] ?? $fkey ) ),
+				'unit'   => \RBX\Data\Content\Lang::t( (string) ( $d['output_unit__en'] ?? '' ) ),
 				'format' => $format,
 			);
 			if ( $f['available'] ) {
@@ -111,7 +111,7 @@ final class Calculator {
 			'tool'     => $tool_key,
 			'mini'     => $mini,
 			'version'  => $manifest['version'],
-			'locale'   => 'en',
+			'locale'   => \RBX\Data\Content\Lang::num(),
 			'ladder'   => $ladder,
 			'slices'   => $slices,
 			'inputs'   => $decls,
@@ -253,8 +253,8 @@ final class Calculator {
 			return '<span class="rbx-calc__na">' . esc_html( $t ) . '</span>';
 		}
 		$v     = (float) $res['value'];
-		$short = \RBX\Data\Format\Number::format( $v, $format, 'en', $ladder );
-		$exact = \RBX\Data\Format\Number::exact( $v, 'en' );
+		$short = \RBX\Data\Format\Number::format( $v, $format, \RBX\Data\Content\Lang::num(), $ladder );
+		$exact = \RBX\Data\Format\Number::exact( $v, \RBX\Data\Content\Lang::num() );
 		$html  = $short === $exact ? '<span class="rbx-calc__v" data-exact="' . esc_attr( $exact ) . '">' . esc_html( $short ) . '</span>' : '<span class="rbx-calc__v" data-exact="' . esc_attr( $exact ) . '"><span aria-hidden="true">' . esc_html( $short ) . '</span><span class="screen-reader-text">' . esc_html( $exact ) . '</span></span>';
 		return $html . ( '' !== $unit ? ' <span class="rbx-calc__unit">' . esc_html( $unit ) . '</span>' : '' );
 	}

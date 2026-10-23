@@ -11,6 +11,7 @@ namespace RBX\Data\Render;
 
 use RBX\Data\Config\Game;
 use RBX\Data\Config\Loader;
+use RBX\Data\Content\Lang;
 use RBX\Data\Data\Repository;
 use RBX\Data\Plugin;
 
@@ -26,8 +27,11 @@ final class Breadcrumbs {
 		if ( is_front_page() ) {
 			return array();
 		}
-		$home  = array( __( 'Home', 'rbx-data' ), home_url( '/' ) );
+		$home  = array( __( 'Home', 'rbx-data' ), Lang::url() );
 		$post  = null === $post_id ? get_queried_object() : get_post( $post_id );
+		if ( $post instanceof \WP_Post && Lang::is_root( $post ) ) {
+			return array();
+		}
 		if ( is_404() || is_search() || ! $post instanceof \WP_Post ) {
 			if ( is_search() ) {
 				return array( $home, array( __( 'Search', 'rbx-data' ), '' ) );
@@ -48,7 +52,7 @@ final class Breadcrumbs {
 				return array_values( array_filter( $trail, static fn( $c ) => '' !== $c[0] ) );
 			}
 		}
-		foreach ( array_reverse( get_post_ancestors( $post ) ) as $aid ) {
+		foreach ( array_reverse( Lang::ancestors( $post ) ) as $aid ) {
 			$trail[] = array( self::crumb_name( (int) $aid ), (string) get_permalink( (int) $aid ) );
 		}
 		$trail[] = array( self::crumb_name( $post->ID ), '' );
@@ -58,7 +62,7 @@ final class Breadcrumbs {
 	/** Game hub crumbs use the game's canonical name, not the hub's H1 ("Steal an Egg Wiki"). */
 	private static function crumb_name( int $id ): string {
 		$p = get_post( $id );
-		if ( $p && 'page' === $p->post_type && 0 === (int) $p->post_parent ) {
+		if ( $p && 'page' === $p->post_type && 0 === Lang::parent( $p ) ) {
 			$g = Loader::by_folder( $p->post_name );
 			if ( $g ) {
 				return $g->name();
@@ -70,7 +74,7 @@ final class Breadcrumbs {
 
 	/** URL of a WP Page by path, or '' when it does not exist (crumb then renders as text). */
 	public static function page_url( string $path ): string {
-		$p = get_page_by_path( $path );
+		$p = get_page_by_path( Lang::path( $path ) );
 		return $p && 'publish' === $p->post_status ? (string) get_permalink( $p ) : '';
 	}
 
@@ -100,7 +104,7 @@ final class Breadcrumbs {
 		if ( $g ) {
 			return $g;
 		}
-		$anc  = get_post_ancestors( $post );
+		$anc  = Lang::ancestors( $post );
 		$root = $anc ? get_post( (int) end( $anc ) ) : $post;
 		return $root ? Loader::by_folder( (string) $root->post_name ) : null;
 	}

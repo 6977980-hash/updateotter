@@ -71,8 +71,8 @@ final class Shortcodes {
 			$fmt    = '' !== $format ? $format : Ui::format_of( $def );
 			$ladder = $ds->meta( 'suffix_ladder' );
 			return array(
-				'text'  => Number::format( $v, $fmt, 'en', is_array( $ladder ) ? $ladder : null ),
-				'exact' => Number::exact( $v, 'en' ),
+				'text'  => Number::format( $v, $fmt, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null ),
+				'exact' => Number::exact( $v, \RBX\Data\Content\Lang::num() ),
 			);
 		}
 		if ( 'ref' === ( $def['type'] ?? '' ) ) {

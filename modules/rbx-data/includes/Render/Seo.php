@@ -11,6 +11,7 @@ declare( strict_types=1 );
 
 namespace RBX\Data\Render;
 
+use RBX\Data\Content\Lang;
 use RBX\Data\Codes\CheckLog;
 use RBX\Data\Config\Game;
 use RBX\Data\Config\Loader;
@@ -105,11 +106,11 @@ final class Seo {
 			return $ctx;
 		}
 		$ctx['game'] = $game;
-		if ( 0 === (int) $post->post_parent ) {
+		if ( 0 === Lang::parent( $post ) ) {
 			$ctx['kind'] = 'hub';
 			return $ctx;
 		}
-		$parent = get_post( (int) $post->post_parent );
+		$parent = get_post( Lang::parent( $post ) );
 		if ( 'guide' !== $ctx['kind'] && $parent && $parent->post_name === $game->folder() ) {
 			$s = $game->section( $post->post_name );
 			if ( $s ) {
@@ -354,7 +355,7 @@ final class Seo {
 			return null;
 		}
 		$v = $map[ $key ][ $field ] ?? null;
-		return is_string( $v ) && '' !== $v ? str_replace( '{month}', gmdate( 'F Y' ), $v ) : null;
+		return is_string( $v ) && '' !== $v ? str_replace( '{month}', Lang::month_year(), $v ) : null;
 	}
 
 	public static function rm_description( string $desc ): string {

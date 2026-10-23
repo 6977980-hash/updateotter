@@ -105,7 +105,11 @@ function init( root, ownsHash ) {
 			const merged = mergeSlices( data, slices );
 			data = { records: merged.records, params: merged.params };
 			if ( merged.formulas ) {
-				ui.setFormulas( merged.formulas.filter( ( f ) => cfg.formulas.some( ( c ) => c.key === f.key ) ) );
+				// Labels and units stay as the page rendered them (translated on /id/ pages).
+				ui.setFormulas( merged.formulas.flatMap( ( f ) => {
+					const c = cfg.formulas.find( ( x ) => x.key === f.key );
+					return c ? [ { ...f, label: c.label, unit: c.unit } ] : [];
+				} ) );
 			}
 			loaded = true;
 			run( false );

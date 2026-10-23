@@ -130,5 +130,37 @@
   "steal-an-egg/guides/beginners-guide": {
     "title": "Steal an Egg Beginner's Guide: How to Play & Progress | UpdateOtter",
     "description": "New to Steal an Egg? Which eggs to steal first, how to raise Speed, when to move biomes, how mutations and weight work, and mistakes to avoid."
+  },
+  "id": {
+    "title": "UpdateOtter: Kalkulator & Wiki Game Roblox (Bahasa Indonesia)",
+    "description": "Kalkulator dan wiki tidak resmi buatan penggemar untuk game Roblox. Setiap nilai menunjukkan sumbernya dan kapan terakhir kami mengeceknya."
+  },
+  "id/steal-an-egg": {
+    "title": "Wiki Steal an Egg: Pet, Telur, Mutasi & Biome | UpdateOtter",
+    "description": "Wiki Steal an Egg dalam Bahasa Indonesia: cara main, semua pet, telur dan mutasi, dengan sumber dan tanggal cek di setiap nilai."
+  },
+  "id/steal-an-egg/calculator": {
+    "title": "Kalkulator Steal an Egg: Hitung Pendapatan Pet | UpdateOtter",
+    "description": "Hitung Cash per detik pet Steal an Egg dari pendapatan dasar, mutasi dan beratnya. Gratis, tanpa daftar, bisa dipakai di HP."
+  },
+  "id/steal-an-egg/pets": {
+    "title": "Daftar Pet Steal an Egg Lengkap per Kelangkaan | UpdateOtter",
+    "description": "Semua pet Steal an Egg diurutkan menurut kelangkaan, dengan pendapatan dasar, telur asal dan tanggal setiap nilai dicek."
+  },
+  "id/steal-an-egg/eggs": {
+    "title": "Daftar Telur Steal an Egg & Waktu Menetas | UpdateOtter",
+    "description": "Semua telur di Steal an Egg dengan harga, waktu menetas, zona dan pet yang bisa menetas. Setiap nilai menunjukkan sumbernya."
+  },
+  "id/steal-an-egg/mutations": {
+    "title": "Mutasi Steal an Egg & Pengali Pendapatan | UpdateOtter",
+    "description": "Semua mutasi Steal an Egg dengan pengali pendapatannya, pengaruh berat pada pendapatan, dan cara keduanya digabung."
+  },
+  "id/steal-an-egg/codes": {
+    "title": "Kode Steal an Egg ({month}): Belum Ada, Ini Alasannya | UpdateOtter",
+    "description": "Apakah ada kode Steal an Egg? Belum. Ini yang kami cek, di mana kode akan muncul, dan cara menghindari situs kode palsu."
+  },
+  "id/steal-an-egg/tier-list": {
+    "title": "Tier List Steal an Egg: Pet Terbaik | UpdateOtter",
+    "description": "Pet Steal an Egg yang masih bisa didapat, diurutkan dari S sampai B menurut pendapatan dasar, dengan tanggal dan cara kami mengurutkan."
   }
 }
