@@ -1,0 +1,26 @@
+name: rbx-tools checks
+on:
+  push:
+    branches: [rbx-tools]
+  pull_request:
+    branches: [rbx-tools]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: rbx-data
+          path: rbx-data-src
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: PHP syntax
+        run: find . -name '*.php' -not -path './.git/*' -not -path './rbx-data-src/*' -print0 | xargs -0 -n1 php -l
+      - name: PHP/JS parity
+        run: RBX_DATA_DIR=rbx-data-src node --test tests/
+      - name: No eval or innerHTML in front-end JS
+        run: "! grep -rnE 'eval\\(|new Function|innerHTML' assets/js"
