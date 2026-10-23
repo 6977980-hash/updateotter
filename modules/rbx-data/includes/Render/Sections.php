@@ -409,7 +409,9 @@ final class Sections {
 		$upds = $ds->all( 'UPD', array( 'live', 'limited' ) );
 		uasort( $upds, static fn( $a, $b ) => strcmp( (string) ( $b['data']['release_date'] ?? '' ), (string) ( $a['data']['release_date'] ?? '' ) ) ?: strcmp( (string) $b['id'], (string) $a['id'] ) );
 		$cadence = (string) ( $ds->meta( 'update_cadence_text' ) ?? '' );
-		$out     = '';
+		$pub     = Ui::last_publish( $game );
+		/* translators: %s: date and time in UTC */
+		$out     = '' !== $pub ? '<p class="rbx-live-now"><strong>' . esc_html__( 'Live now:', 'rbx-data' ) . '</strong> ' . sprintf( esc_html__( 'Roblox shows the newest version of the game was published on %s.', 'rbx-data' ), $pub ) . '</p>' : '';
 		$first   = reset( $upds );
 		if ( $first ) {
 			/* translators: 1: update name, 2: date */
@@ -491,6 +493,10 @@ final class Sections {
 		$place = $game->place_id() ?? (string) ( $ds->meta( 'roblox_place_id' ) ?? '' );
 		if ( $place ) {
 			$rows .= '<tr><th scope="row">' . esc_html__( 'Play on Roblox', 'rbx-data' ) . '</th><td><a href="' . esc_url( 'https://www.roblox.com/games/' . rawurlencode( (string) $place ) ) . '" rel="noopener nofollow">roblox.com</a></td></tr>';
+		}
+		$pub = Ui::last_publish( $game );
+		if ( '' !== $pub ) {
+			$rows .= '<tr><th scope="row">' . esc_html__( 'Latest publish on Roblox', 'rbx-data' ) . '</th><td>' . $pub . ' <a href="' . esc_url( home_url( '/' . $game->folder() . '/updates/' ) ) . '">' . esc_html__( 'Updates', 'rbx-data' ) . '</a></td></tr>';
 		}
 		$cad = (string) ( $ds->meta( 'update_cadence_text' ) ?? '' );
 		if ( '' !== $cad ) {

@@ -141,17 +141,38 @@ final class Seo {
 		if ( 'report' === $c['kind'] ) {
 			return PageState::NOINDEX;
 		}
-		// POL-15: an updates list with no published update is an empty page; keep it out of the index.
+		// POL-15: an updates list with fewer than three published updates is thin; keep it out of the index (UO-09).
 		if ( 'updates' === $c['kind'] && $c['game'] && ! self::has_updates( $c['game'] ) ) {
+			return PageState::NOINDEX;
+		}
+		if ( is_page() && in_array( (int) get_queried_object_id(), self::thin_pages(), true ) ) {
 			return PageState::NOINDEX;
 		}
 		return '';
 	}
 
-	/** True when the game has at least one published update page. */
-	public static function has_updates( Game $game ): bool {
+	/** @return int[] Page IDs marked `"noindex": true` in content/seo.json until they have enough content (UO-12). */
+	private static function thin_pages(): array {
+		static $ids = null;
+		if ( null === $ids ) {
+			$ids  = array();
+			$file = get_template_directory() . '/content/seo.json';
+			$map  = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : array(); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			foreach ( is_array( $map ) ? $map : array() as $path => $row ) {
+				$page = is_array( $row ) && ! empty( $row['noindex'] ) ? get_page_by_path( (string) $path, OBJECT, 'page' ) : null;
+				if ( $page ) {
+					$ids[] = (int) $page->ID;
+				}
+			}
+		}
+		return $ids;
+	}
+
+	/** True when the game has at least $min published update pages. */
+	public static function has_updates( Game $game, int $min = 3 ): bool {
+		$n = 0;
 		foreach ( Repository::dataset( $game )->all( 'UPD', array( 'live', 'limited' ) ) as $u ) {
-			if ( ! empty( $u['post_id'] ) && 'publish' === get_post_status( (int) $u['post_id'] ) ) {
+			if ( ! empty( $u['post_id'] ) && 'publish' === get_post_status( (int) $u['post_id'] ) && ++$n >= $min ) {
 				return true;
 			}
 		}
@@ -160,7 +181,7 @@ final class Seo {
 
 	/** @return int[] Page IDs of updates lists that are still empty (kept out of sitemaps). */
 	private static function empty_update_pages(): array {
-		$ids = array();
+		$ids = self::thin_pages();
 		foreach ( Loader::games() as $game ) {
 			$page = get_page_by_path( $game->folder() . '/updates', OBJECT, 'page' );
 			if ( $page && ! self::has_updates( $game ) ) {
