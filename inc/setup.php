@@ -13,6 +13,8 @@ add_action(
 	'after_setup_theme',
 	static function (): void {
 		load_theme_textdomain( 'updateotter', UPDATEOTTER_DIR . '/languages' );
+		// Direct load as well: the just-in-time loader caches the folder listing, so a new file can be missed.
+		load_textdomain( 'updateotter', UPDATEOTTER_DIR . '/languages/updateotter-' . determine_locale() . '.mo' );
 		add_theme_support( 'title-tag' );
 		add_theme_support( 'post-thumbnails' );
 		add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script', 'navigation-widgets' ) );
