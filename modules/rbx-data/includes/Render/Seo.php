@@ -38,10 +38,20 @@ final class Seo {
 		add_filter( 'pre_get_document_title', array( self::class, 'core_title' ) );
 		add_action( 'wp_head', array( self::class, 'core_head' ), 2 );
 		add_filter( 'request', array( self::class, 'feed' ) );
+		// Core sitemap (used when Rank Math's sitemap is off): TECH-13 contents, index pages only.
+		add_filter( 'wp_sitemaps_add_provider', array( self::class, 'core_sitemap_provider' ), 10, 2 );
+		add_filter( 'wp_sitemaps_post_types', array( self::class, 'core_sitemap_types' ) );
+		add_filter( 'wp_sitemaps_posts_query_args', array( self::class, 'core_sitemap_query' ), 10, 2 );
+		add_filter( 'wp_sitemaps_posts_entry', array( self::class, 'core_sitemap_entry' ), 10, 2 );
+		add_action( 'template_redirect', array( self::class, 'sitemap_index_redirect' ), 1 );
 	}
 
+	/**
+	 * True only once Rank Math has printed its head. An installed Rank Math whose front end does
+	 * not run (seen on live at launch, 2026-10-23) must not switch the core fallbacks off.
+	 */
 	private static function rank_math(): bool {
-		return defined( 'RANK_MATH_VERSION' );
+		return defined( 'RANK_MATH_VERSION' ) && did_action( 'rank_math/head' ) > 0;
 	}
 
 	/**
@@ -537,6 +547,71 @@ final class Seo {
 			$url['mod'] = $lc . 'T00:00:00+00:00';
 		}
 		return $url;
+	}
+
+	public static function core_sitemaps_on(): bool {
+		return function_exists( 'wp_sitemaps_get_server' ) && wp_sitemaps_get_server()->sitemaps_enabled();
+	}
+
+	/**
+	 * @param \WP_Sitemaps_Provider|mixed $provider Provider.
+	 * @return \WP_Sitemaps_Provider|false|mixed
+	 */
+	public static function core_sitemap_provider( $provider, string $name ) {
+		return in_array( $name, array( 'users', 'taxonomies' ), true ) ? false : $provider;
+	}
+
+	/**
+	 * @param array<string, \WP_Post_Type> $types Post types.
+	 * @return array<string, \WP_Post_Type>
+	 */
+	public static function core_sitemap_types( array $types ): array {
+		return array_intersect_key( $types, array_flip( array_merge( array( 'page' ), Plugin::post_types() ) ) );
+	}
+
+	/**
+	 * @param array<string, mixed> $args Query args.
+	 * @return array<string, mixed>
+	 */
+	public static function core_sitemap_query( array $args, string $post_type ): array {
+		if ( in_array( $post_type, Plugin::post_types(), true ) ) {
+			$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_query
+				array(
+					'key'   => '_rbx_page_state',
+					'value' => PageState::INDEX,
+				),
+			);
+		} elseif ( 'page' === $post_type ) {
+			$report = get_page_by_path( 'report', OBJECT, 'page' );
+			if ( $report ) {
+				$args['post__not_in'] = array( $report->ID );
+			}
+		}
+		return $args;
+	}
+
+	/**
+	 * @param array<string, string> $entry Entry.
+	 * @return array<string, string>
+	 */
+	public static function core_sitemap_entry( array $entry, \WP_Post $post ): array {
+		$lc = (string) get_post_meta( $post->ID, '_rbx_last_changed', true );
+		if ( '' !== $lc ) {
+			$entry['lastmod'] = $lc . 'T00:00:00+00:00';
+		}
+		return $entry;
+	}
+
+	/** /sitemap_index.xml (the address in the spec) goes to the core index when Rank Math's sitemap is off. */
+	public static function sitemap_index_redirect(): void {
+		if ( ! is_404() || ! self::core_sitemaps_on() ) {
+			return;
+		}
+		$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( '/sitemap_index.xml' === $path ) {
+			wp_safe_redirect( home_url( '/wp-sitemap.xml' ), 301 );
+			exit;
+		}
 	}
 
 	/* ---------------------------------------------------------------- Rank Math variables (DATA-30) */
