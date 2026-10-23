@@ -68,6 +68,8 @@ final class Plugin {
 		Import\Bundled::boot();
 		Content\BundledPages::boot();
 		Content\Lang::boot();
+		Index\IndexNow::boot();
+		Index\Llms::boot();
 		if ( is_admin() ) {
 			Admin\Menu::boot();
 			Admin\Editor::boot();

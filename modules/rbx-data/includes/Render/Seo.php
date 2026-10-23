@@ -153,7 +153,7 @@ final class Seo {
 	}
 
 	/** @return int[] Page IDs marked `"noindex": true` in content/seo.json until they have enough content (UO-12). */
-	private static function thin_pages(): array {
+	public static function thin_pages(): array {
 		static $ids = null;
 		if ( null === $ids ) {
 			$ids  = array();
@@ -181,7 +181,7 @@ final class Seo {
 	}
 
 	/** @return int[] Page IDs of updates lists that are still empty (kept out of sitemaps). */
-	private static function empty_update_pages(): array {
+	public static function empty_update_pages(): array {
 		$ids = self::thin_pages();
 		foreach ( Loader::games() as $game ) {
 			$page = get_page_by_path( $game->folder() . '/updates', OBJECT, 'page' );
@@ -298,7 +298,29 @@ final class Seo {
 
 	/** Generated description for shells (CONT-08): what the page gives, a fact, freshness. */
 	public static function description(): ?string {
-		$c = self::context();
+		return self::description_from( self::context() );
+	}
+
+	/** Meta description of an item or update page by post ID, outside its own request (llms.txt). */
+	public static function item_description( int $post_id ): string {
+		$found = Repository::for_post( $post_id );
+		$post  = get_post( $post_id );
+		if ( ! $found || ! $post ) {
+			return '';
+		}
+		return (string) self::description_from(
+			array(
+				'kind'    => 'UPD' === $found[1]['entity'] ? 'update' : 'item',
+				'game'    => $found[0],
+				'rec'     => $found[1],
+				'post'    => $post,
+				'section' => '',
+			)
+		);
+	}
+
+	/** @param array<string, mixed> $c Context. */
+	private static function description_from( array $c ): ?string {
 		if ( ! $c['game'] || ! $c['rec'] || ! $c['post'] ) {
 			return self::page_seo( 'description' );
 		}
@@ -318,22 +340,33 @@ final class Seo {
 		$mul  = 'MUT' === $rec['entity'] ? $ds->field_state( $rec, 'income_mult' ) : null;
 		$val  = 'PLT' === $rec['entity'] ? $ds->field_state( $rec, 'base_value' ) : null;
 		$crop = null !== $game->entity( 'PLT' );
+		// UO-18: the number first, "a"/"an" by sound, and at most 155 characters with the date.
+		$rname = $rar ? (string) $rar['name'] : '';
+		$extra = '';
 		if ( $val && $val['calc_usable'] && is_numeric( $val['value'] ) ) {
 			$cur = $ds->get( (string) ( $rec['data']['currency_id'] ?? '' ) );
-			/* translators: 1: crop, 2: game, 3: rarity, 4: value, 5: currency */
-			$bits[] = sprintf( __( 'How much a %1$s sells for in %2$s: a %3$s crop worth %4$s %5$s at its base weight, with every mutation and at heavier weights.', 'rbx-data' ), $rec['name'], $game->name(), $rar ? $rar['name'] : '', \RBX\Data\Format\Number::format( $val['value'] + 0, 'abbr', 'en' ), $cur ? $cur['name'] : 'Sheckles' );
+			/* translators: 1: crop, 2: value, 3: currency, 4: game */
+			$bits[] = sprintf( __( '%1$s sells for %2$s %3$s at base weight in %4$s.', 'rbx-data' ), $rec['name'], \RBX\Data\Format\Number::format( $val['value'] + 0, 'abbr', 'en' ), $cur ? $cur['name'] : 'Sheckles', $game->name() );
+			/* translators: %s: "a Common" / "an Uncommon" */
+			$extra = '' !== $rname ? sprintf( __( '%s crop; value with every mutation and weight.', 'rbx-data' ), ucfirst( self::a_an( $rname ) ) ) : __( 'Value with every mutation and weight.', 'rbx-data' );
 		} elseif ( $crop && $mul && is_numeric( $mul['value'] ) ) {
-			/* translators: 1: mutation, 2: game, 3: multiplier */
-			$bits[] = sprintf( __( 'The %1$s mutation in %2$s multiplies a crop\'s sell value by %3$s. How to get it, how it stacks, and what it does to real crops.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), $game->name(), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ) );
+			/* translators: 1: mutation, 2: multiplier, 3: game */
+			$bits[] = sprintf( __( 'The %1$s mutation multiplies a crop\'s sell value by %2$s in %3$s.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ), $game->name() );
+			$extra  = __( 'How to get it, how it stacks and what it does to real crops.', 'rbx-data' );
 		} elseif ( $inc && $inc['calc_usable'] && is_numeric( $inc['value'] ) ) {
-			/* translators: 1: pet, 2: game, 3: rarity, 4: income per second */
-			$bits[] = sprintf( __( 'How much the %1$s earns in %2$s: a %3$s pet with %4$s Cash per second base income, with every mutation and at higher weights.', 'rbx-data' ), $rec['name'], $game->name(), $rar ? $rar['name'] : '', \RBX\Data\Format\Number::format( $inc['value'] + 0, 'abbr', 'en' ) );
+			/* translators: 1: pet, 2: rarity, 3: income per second, 4: game */
+			$bits[] = sprintf( __( '%1$s (%2$s) earns %3$s Cash/s in %4$s.', 'rbx-data' ), $rec['name'], '' !== $rname ? $rname : $game->entity_label( 'PET' ), \RBX\Data\Format\Number::format( $inc['value'] + 0, 'abbr', 'en' ), $game->name() );
+			$extra  = __( 'Income for every mutation and weight.', 'rbx-data' );
 		} elseif ( $mul && is_numeric( $mul['value'] ) ) {
-			/* translators: 1: mutation, 2: game, 3: multiplier */
-			$bits[] = sprintf( __( 'The %1$s mutation in %2$s multiplies income by %3$s. How to get it, how it compares, and what it does to real pets.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), $game->name(), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ) );
+			/* translators: 1: mutation, 2: multiplier, 3: game */
+			$bits[] = sprintf( __( 'The %1$s mutation multiplies income by %2$s in %3$s.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ), $game->name() );
+			$extra  = __( 'How to get it, how it compares and what it does to real pets.', 'rbx-data' );
 		} else {
-			/* translators: 1: item name, 2: entity label, 3: game */
-			$bits[] = sprintf( __( 'Stats, sources and change history for %1$s, a %2$s in %3$s.', 'rbx-data' ), $rec['name'], strtolower( ( $rar ? $rar['name'] . ' ' : '' ) . $game->entity_label( (string) $rec['entity'] ) ), $game->name() );
+			/* translators: 1: item name, 2: "a common fish" etc., 3: game */
+			$bits[] = sprintf( __( 'Stats, sources and change history for %1$s, %2$s in %3$s.', 'rbx-data' ), $rec['name'], self::a_an( strtolower( ( '' !== $rname ? $rname . ' ' : '' ) . $game->entity_label( (string) $rec['entity'] ) ) ), $game->name() );
+		}
+		if ( '' !== $extra ) {
+			$bits[] = $extra;
 		}
 		if ( 'PET' === $rec['entity'] ) {
 			$eggs = array();
@@ -351,11 +384,20 @@ final class Seo {
 			/* translators: %s: date */
 			$bits[] = sprintf( __( 'Wiki data as of %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
 		}
+		// Too long: drop the middle sentences (never the number or the date) until it fits.
+		while ( count( $bits ) > 2 && mb_strlen( implode( ' ', $bits ) ) > 155 ) {
+			array_splice( $bits, count( $bits ) - 2, 1 );
+		}
 		return implode( ' ', $bits );
 	}
 
+	/** "a Common", "an Epic", "an Uncommon" (UO-18). */
+	public static function a_an( string $word ): string {
+		return ( preg_match( '/^[aeiou]/i', $word ) ? 'an ' : 'a ' ) . $word;
+	}
+
 	public static function rm_title( string $title ): string {
-		return self::title() ?? self::page_seo( 'title' ) ?? $title;
+		return self::fit_title( self::title() ?? self::page_seo( 'title' ) ?? $title );
 	}
 
 	/**
@@ -365,18 +407,23 @@ final class Seo {
 	 * is older than the game's freshness window (UO-05), so the title never claims a check nobody did.
 	 */
 	public static function page_seo( string $field ): ?string {
-		static $map = null;
-		if ( null === $map ) {
-			$file = get_template_directory() . '/content/seo.json';
-			$map  = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : array(); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			$map  = is_array( $map ) ? $map : array();
-		}
 		if ( is_front_page() ) {
 			$key = 'home';
 		} elseif ( is_page() ) {
 			$key = get_page_uri( get_queried_object_id() );
 		} else {
 			return null;
+		}
+		return self::seo_text( (string) $key, $field );
+	}
+
+	/** Title or description from content/seo.json by page path (`home` for the front page). */
+	public static function seo_text( string $key, string $field ): ?string {
+		static $map = null;
+		if ( null === $map ) {
+			$file = get_template_directory() . '/content/seo.json';
+			$map  = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : array(); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$map  = is_array( $map ) ? $map : array();
 		}
 		$v = $map[ $key ][ $field ] ?? null;
 		if ( ! is_string( $v ) || '' === $v ) {
@@ -421,7 +468,17 @@ final class Seo {
 			return $title;
 		}
 		$page = self::page_seo( 'title' );
-		return self::title() ?? ( null === $page ? $title : esc_html( $page ) );
+		$t    = self::title() ?? ( null === $page ? null : esc_html( $page ) );
+		return null === $t ? $title : self::fit_title( $t );
+	}
+
+	/** Over 60 characters the brand suffix goes: Google shows the site name on its own line (UO-19). */
+	public static function fit_title( string $title ): string {
+		$suffix = ' | ' . self::BRAND;
+		if ( mb_strlen( html_entity_decode( $title, ENT_QUOTES, 'UTF-8' ) ) > 60 && str_ends_with( $title, $suffix ) ) {
+			return substr( $title, 0, -strlen( $suffix ) );
+		}
+		return $title;
 	}
 
 	/* ---------------------------------------------------------------- breadcrumbs */
