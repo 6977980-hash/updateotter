@@ -114,6 +114,13 @@ add_action(
 		if ( ! $todo ) {
 			return;
 		}
+		// Only a normal front-end page view runs the steps: LiteSpeed sends its purge header with
+		// page responses, not with REST, cron, AJAX or admin requests, so a purge there is lost and
+		// pages cached mid-deploy stay stale (seen 2026-10-23 after the phase 2 deploys).
+		$uri = (string) ( $_SERVER['REQUEST_URI'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( is_admin() || wp_doing_cron() || wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) || str_contains( $uri, '/wp-json/' ) || str_contains( $uri, 'rest_route=' ) || 'GET' !== ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+			return;
+		}
 		// One attempt per 5 minutes; parallel first requests and retries skip.
 		if ( get_transient( 'updateotter_launch_wait' ) ) {
 			return;
