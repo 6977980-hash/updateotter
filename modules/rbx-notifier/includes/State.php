@@ -74,11 +74,11 @@ final class State {
 		return sha1( implode( ',', $ids ) . '|' . (int) get_option( 'rbx_notifier_use_open_cloud' ) );
 	}
 
-	/** green < 2 × interval since last success; amber < 6 h; red otherwise. */
-	public static function health( ?string $last_success ): string {
+	/** none before the first poll; green < 2 × interval since last success; amber < 6 h; red otherwise. */
+	public static function health( ?string $last_success, ?string $last_poll = null ): string {
 		$t = Clock::ts( $last_success );
 		if ( null === $t ) {
-			return 'red';
+			return null === Clock::ts( $last_poll ) ? 'none' : 'red';
 		}
 		$age = Clock::now() - $t;
 		if ( $age < 2 * self::interval() * MINUTE_IN_SECONDS ) {
