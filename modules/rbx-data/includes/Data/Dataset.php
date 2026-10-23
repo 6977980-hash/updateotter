@@ -261,7 +261,7 @@ final class Dataset {
 			if ( 'verified' === $out['state'] ) {
 				$out['calc_usable'] = true;
 			} elseif ( 'community' === $out['state'] ) {
-				$out['calc_usable'] = self::community_agrees( $rows, $value );
+				$out['calc_usable'] = ( $this->game->community_single_source() && null !== $value ) || self::community_agrees( $rows, $value );
 			}
 		}
 		$out['label']              = self::state_label( $out['state'], (bool) $out['mechanic_ok'] );

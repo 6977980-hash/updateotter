@@ -5,7 +5,12 @@
     "rarity_order": "Wiki values kept as reported; flagged for Ali's in-game check list.",
     "meta_provenance": "calc_defaults is our own editorial choice, not a game fact."
   },
-  "large": [],
+  "large": [
+    "SAE-FRM-0001",
+    "SAE-MEC-0001",
+    "SAE-MEC-0002",
+    "SAE-MEC-0003"
+  ],
   "corrections": [],
   "missing": {}
 }

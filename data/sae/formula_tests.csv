@@ -1,1 +1,2 @@
 id,formula_id,inputs,expected,tolerance_abs,tolerance_rel,evidence_media_id,captured_in_update_id,verified_by,status
+SAE-TST-0001,SAE-FRM-0001,"{""pet"": ""chicken"", ""mutation"": ""golden"", ""weight"": 26, ""count"": 1}",5,0.5,,SAE-MED-0001,,ali,live

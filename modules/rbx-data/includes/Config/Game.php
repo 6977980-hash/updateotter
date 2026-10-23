@@ -63,6 +63,16 @@ final class Game {
 		return (int) ( $this->config['freshness_days'] ?? 30 );
 	}
 
+	/** Live tests a live formula needs (DATA-34 default 3; a game config may lower it by owner decision). */
+	public function min_formula_tests(): int {
+		return max( 1, (int) ( $this->config['min_formula_tests'] ?? 3 ) );
+	}
+
+	/** Owner decision: one community source is enough for calculator use (shown as "Unconfirmed"; DATA-13 default needs 2). */
+	public function community_single_source(): bool {
+		return ! empty( $this->config['community_single_source_calc'] );
+	}
+
 	public function schema_version(): string {
 		return (string) ( $this->config['schema_version'] ?? '1.0' );
 	}

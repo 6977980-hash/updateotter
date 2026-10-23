@@ -1,1 +1,2 @@
 id,file_name,alt__en,caption__en,captured_on,captured_in_update_id,captured_by,depicts_record_ids,shows_fields,is_cropped_ui,contains_usernames,image_source,image_credit,license_note,status
+SAE-MED-0001,sae-golden-chicken-26kg.jpg,"Steal an Egg pen: a Common Golden Chicken weighing 26 kg, earning $5 per second","Golden Chicken, 26 kg, $5/s (in-game test of the income formula)",2026-10-23,,Ali Ahmad,SAE-PET-0001|SAE-MUT-0003,base_income_per_s|income_mult,FALSE,FALSE,own_screenshot,UpdateOtter (Ali Ahmad),Our own screenshot of Roblox gameplay,live
