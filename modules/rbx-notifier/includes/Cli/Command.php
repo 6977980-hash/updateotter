@@ -72,7 +72,7 @@ final class Command {
 			$rows[] = array(
 				'game'        => $g->key(),
 				'universe'    => $id,
-				'health'      => State::health( $u['last_success_at'] ),
+				'health'      => State::health( $u['last_success_at'], $u['last_poll_at'] ),
 				'last_seen'   => (string) $u['last_seen_updated'],
 				'last_poll'   => (string) $u['last_poll_at'],
 				'failures'    => (int) $u['consecutive_failures'],

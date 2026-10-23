@@ -130,11 +130,13 @@ final class StatusPage {
 			'green' => '#00a32a',
 			'amber' => '#dba617',
 			'red'   => '#d63638',
+			'none'  => '#646970',
 		);
 		$t = array(
 			'green' => __( 'Healthy', 'rbx-notifier' ),
 			'amber' => __( 'Late', 'rbx-notifier' ),
 			'red'   => __( 'Blind', 'rbx-notifier' ),
+			'none'  => __( 'Not polled yet', 'rbx-notifier' ),
 		);
 		return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;background:' . esc_attr( $c[ $h ] ) . '">' . esc_html( $t[ $h ] ) . '</span>';
 	}
@@ -177,9 +179,15 @@ final class StatusPage {
 		echo '</tr></thead><tbody>';
 		foreach ( $universes as $id => $g ) {
 			$u = State::universe( (string) $id );
-			echo '<tr><td>' . esc_html( $g->name() ) . '</td><td>' . self::badge( State::health( $u['last_success_at'] ) ) . '</td><td>' . esc_html( $id . ' / ' . ( $u['root_place_id'] ?? $g->place_id() ?? '—' ) ) . '</td><td>' . esc_html( Clock::human( $u['last_seen_updated'] ) ) . '</td><td>' . esc_html( Clock::human( $u['last_poll_at'] ) ) . '</td><td>' . esc_html( Clock::human( $u['last_success_at'] ) ) . '</td><td>' . (int) $u['consecutive_failures'] . '</td><td>' . esc_html( Clock::human( $u['next_allowed_at'] ) ) . '</td><td>' . esc_html( $u['last_error_kind'] ? $u['last_error_kind'] . ', ' . Clock::human( $u['last_error_at'] ) : '—' ) . '</td><td>' . esc_html( ( $u['ratelimit_remaining'] ?? '' ) !== '' && null !== $u['ratelimit_remaining'] ? $u['ratelimit_remaining'] . ' left, reset ' . Clock::human( $u['ratelimit_reset_at'] ) : '—' ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() escapes.
+			echo '<tr><td>' . esc_html( $g->name() ) . '</td><td>' . self::badge( State::health( $u['last_success_at'], $u['last_poll_at'] ) ) . '</td><td>' . esc_html( $id . ' / ' . ( $u['root_place_id'] ?? $g->place_id() ?? '—' ) ) . '</td><td>' . esc_html( Clock::human( $u['last_seen_updated'] ) ) . '</td><td>' . esc_html( Clock::human( $u['last_poll_at'] ) ) . '</td><td>' . esc_html( Clock::human( $u['last_success_at'] ) ) . '</td><td>' . (int) $u['consecutive_failures'] . '</td><td>' . esc_html( Clock::human( $u['next_allowed_at'] ) ) . '</td><td>' . esc_html( $u['last_error_kind'] ? $u['last_error_kind'] . ', ' . Clock::human( $u['last_error_at'] ) : '—' ) . '</td><td>' . esc_html( ( $u['ratelimit_remaining'] ?? '' ) !== '' && null !== $u['ratelimit_remaining'] ? $u['ratelimit_remaining'] . ' left, reset ' . Clock::human( $u['ratelimit_reset_at'] ) : '—' ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() escapes.
 		}
 		echo '</tbody></table>';
+		foreach ( $universes as $id => $g ) {
+			if ( (string) $id === (string) $g->place_id() ) {
+				/* translators: %s: game name */
+				echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( '%s: the universe ID is the same as the place ID. They are different numbers: use "Look up universe" below, then save the result on RBX Data, Setup.', 'rbx-notifier' ), $g->name() ) ) . '</p></div>';
+			}
+		}
 		$cron_seen = '';
 		foreach ( State::get()['u'] as $u ) {
 			$cron_seen = max( $cron_seen, (string) ( $u['last_cron_seen_at'] ?? '' ) );

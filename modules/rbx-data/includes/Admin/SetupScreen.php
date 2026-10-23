@@ -225,11 +225,16 @@ final class SetupScreen {
 
 	public static function save_ids(): void {
 		Menu::guard( 'manage_options', 'rbx_setup_ids' );
-		$all = (array) get_option( 'rbx_game_overrides', array() );
+		$all  = (array) get_option( 'rbx_game_overrides', array() );
+		$same = array();
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		foreach ( Loader::games() as $g ) {
 			$u = preg_replace( '/\D/', '', (string) wp_unslash( $_POST['universe'][ $g->key() ] ?? '' ) );
 			$p = preg_replace( '/\D/', '', (string) wp_unslash( $_POST['place'][ $g->key() ] ?? '' ) );
+			if ( '' !== $u && $u === $p ) {
+				$u      = ''; // A universe ID is never the place ID; keep it empty until looked up.
+				$same[] = $g->name();
+			}
 			$all[ $g->key() ] = array(
 				'roblox_universe_id' => '' === $u ? null : $u,
 				'roblox_place_id'    => '' === $p ? null : $p,
@@ -238,6 +243,10 @@ final class SetupScreen {
 		// phpcs:enable
 		update_option( 'rbx_game_overrides', $all, false );
 		Loader::reset();
+		if ( $same ) {
+			/* translators: %s: game names */
+			Menu::back( admin_url( 'admin.php?page=rbx-setup' ), sprintf( __( 'Place ID saved. The universe ID for %s was the same as the place ID, so it was not saved: get it with RBX Data, Notifier, "Look up universe".', 'rbx-data' ), implode( ', ', $same ) ), true );
+		}
 		Menu::back( admin_url( 'admin.php?page=rbx-setup' ), __( 'Roblox IDs saved. Put the same IDs in the Sheet _meta tab.', 'rbx-data' ) );
 	}
 
