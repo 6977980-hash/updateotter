@@ -58,6 +58,8 @@
         "cost": { "type": "decimal", "label__en": "Cost", "currency_field": "currency_id", "display_format": "abbr", "list": true, "compare": true },
         "currency_id": { "type": "ref", "target": "CUR", "label__en": "Currency" },
         "hatch_time_s": { "type": "duration_s", "label__en": "Hatch time", "requires_mechanics": ["hatch_time"], "display_format": "duration", "list": true, "compare": true },
+        "reward_speed": { "type": "int", "label__en": "Speed reward", "display_format": "abbr" },
+        "reward_cash": { "type": "decimal", "label__en": "Cash reward", "display_format": "abbr" },
         "is_lab_egg": { "type": "bool", "label__en": "Lab egg (Dr. Scramble)" },
         "obtain_method": { "type": "enum", "enum": ["biome_spawn", "shop", "lab", "event", "game_pass", "other"], "label__en": "How to get", "required_for_index": true, "facet": true },
         "odds_published": { "type": "bool", "label__en": "Odds published by the developer" },
