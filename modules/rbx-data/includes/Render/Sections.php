@@ -433,7 +433,7 @@ final class Sections {
 			}
 			$out .= '</ul></section>';
 		}
-		return $out . '<p class="rbx-note">' . esc_html__( 'This is our opinion based on testing; your best pet depends on your goal.', 'rbx-data' ) . '</p>';
+		return $out . '<p class="rbx-note">' . esc_html__( 'Ranked by base income from the community wiki; your best pet depends on your goal.', 'rbx-data' ) . '</p>';
 	}
 
 	/** Hub tiles (UX-10): tools first, then sections, from menu_order; only existing Pages link. */
