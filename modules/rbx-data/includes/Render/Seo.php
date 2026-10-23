@@ -238,7 +238,7 @@ final class Seo {
 	public static function description(): ?string {
 		$c = self::context();
 		if ( ! $c['game'] || ! $c['rec'] || ! $c['post'] ) {
-			return null;
+			return self::page_seo( 'description' );
 		}
 		$ex = trim( (string) $c['post']->post_excerpt );
 		if ( '' !== $ex ) {
@@ -274,7 +274,29 @@ final class Seo {
 	}
 
 	public static function rm_title( string $title ): string {
-		return self::title() ?? $title;
+		return self::title() ?? self::page_seo( 'title' ) ?? $title;
+	}
+
+	/**
+	 * Title or description of a site Page from `content/seo.json` (CONT-06/08), keyed by page
+	 * path, `home` for the front page. `{month}` becomes the current month, e.g. October 2026.
+	 */
+	public static function page_seo( string $field ): ?string {
+		static $map = null;
+		if ( null === $map ) {
+			$file = get_template_directory() . '/content/seo.json';
+			$map  = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : array(); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$map  = is_array( $map ) ? $map : array();
+		}
+		if ( is_front_page() ) {
+			$key = 'home';
+		} elseif ( is_page() ) {
+			$key = get_page_uri( get_queried_object_id() );
+		} else {
+			return null;
+		}
+		$v = $map[ $key ][ $field ] ?? null;
+		return is_string( $v ) && '' !== $v ? str_replace( '{month}', gmdate( 'F Y' ), $v ) : null;
 	}
 
 	public static function rm_description( string $desc ): string {
@@ -285,7 +307,8 @@ final class Seo {
 		if ( self::rank_math() ) {
 			return $title;
 		}
-		return self::title() ?? $title;
+		$page = self::page_seo( 'title' );
+		return self::title() ?? ( null === $page ? $title : esc_html( $page ) );
 	}
 
 	/* ---------------------------------------------------------------- breadcrumbs */
