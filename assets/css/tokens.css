@@ -1,0 +1,116 @@
+/* Design tokens (UX-27 colours, UX-29 type, UX-30 spacing). Dark values per UX-28. */
+:root {
+	color-scheme: light dark;
+	--bg: #ffffff;
+	--surface: #f4f6fa;
+	--surface-2: #e9eef5;
+	--text: #111827;
+	--text-muted: #4a5565;
+	--border: #d5dce5;
+	--border-strong: #737f91;
+	--primary: #5032c8;
+	--on-primary: #ffffff;
+	--link: #4329b0;
+	--focus: #1f5fd6;
+	--success: #15723a;
+	--warning: #9a4a06;
+	--danger: #b42318;
+	--accent: #0b6e5b;
+	--success-bg: #e6f4ea;
+	--warning-bg: #fdf0e1;
+	--danger-bg: #fceae8;
+	--primary-bg: #eeeafc;
+	--shadow-1: 0 1px 2px rgb(0 0 0 / 0.08), 0 2px 8px rgb(0 0 0 / 0.06);
+
+	--font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--fs-xs: 0.8125rem;
+	--fs-sm: 0.875rem;
+	--fs-base: 1rem;
+	--fs-lg: 1.125rem;
+	--fs-xl: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+	--fs-2xl: clamp(1.375rem, 1.2rem + 1vw, 1.75rem);
+	--fs-3xl: clamp(1.5rem, 1.25rem + 1.6vw, 2.25rem);
+	--fs-result: clamp(1.75rem, 1.4rem + 2vw, 2.5rem);
+
+	--sp-1: 4px;
+	--sp-2: 8px;
+	--sp-3: 12px;
+	--sp-4: 16px;
+	--sp-5: 24px;
+	--sp-6: 32px;
+	--sp-7: 48px;
+	--sp-8: 64px;
+	--r-sm: 6px;
+	--r-md: 12px;
+	--r-pill: 999px;
+	--container: 1200px;
+	--prose: 68ch;
+	--game-accent: var(--primary);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #0e131d;
+		--surface: #161d2b;
+		--surface-2: #202a3c;
+		--text: #e9edf4;
+		--text-muted: #a9b3c4;
+		--border: #2c3648;
+		--border-strong: #7f8ba0;
+		--primary: #a897ff;
+		--on-primary: #14102b;
+		--link: #b9abff;
+		--focus: #7fb0ff;
+		--success: #5bd38a;
+		--warning: #f5b451;
+		--danger: #ff8a7a;
+		--accent: #4fd1b4;
+		--success-bg: #12301f;
+		--warning-bg: #3a2a10;
+		--danger-bg: #3d1c18;
+		--primary-bg: #252046;
+		--shadow-1: none;
+	}
+}
+
+:root[data-theme="dark"] {
+	--bg: #0e131d;
+	--surface: #161d2b;
+	--surface-2: #202a3c;
+	--text: #e9edf4;
+	--text-muted: #a9b3c4;
+	--border: #2c3648;
+	--border-strong: #7f8ba0;
+	--primary: #a897ff;
+	--on-primary: #14102b;
+	--link: #b9abff;
+	--focus: #7fb0ff;
+	--success: #5bd38a;
+	--warning: #f5b451;
+	--danger: #ff8a7a;
+	--accent: #4fd1b4;
+	--success-bg: #12301f;
+	--warning-bg: #3a2a10;
+	--danger-bg: #3d1c18;
+	--primary-bg: #252046;
+	--shadow-1: none;
+}
+
+:root[data-theme="light"] {
+	color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
