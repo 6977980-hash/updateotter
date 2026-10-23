@@ -1,0 +1,9 @@
+id,slug,name,sort_order,ui_color_hex,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+FISH-RAR-0001,common,Common,1,#A0A0A0,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0002,uncommon,Uncommon,2,#3CB043,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0003,rare,Rare,3,#2F80ED,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0004,epic,Epic,4,#9B51E0,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0005,legendary,Legendary,5,#F2C94C,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0006,mythic,Mythic,6,#EB5757,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0007,secret,Secret,7,#00BFA5,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,
+FISH-RAR-0008,exclusive,Exclusive,8,#F2994A,live,community,https://fish-it.fandom.com/wiki/Fish,,"Rarity tiers used by the wiki fish, rod and bait lists",2026-10-23,claude,,,,

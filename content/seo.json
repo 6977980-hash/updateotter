@@ -162,5 +162,25 @@
   "id/steal-an-egg/tier-list": {
     "title": "Tier List Steal an Egg: Pet Terbaik | UpdateOtter",
     "description": "Pet Steal an Egg yang masih bisa didapat, diurutkan dari S sampai B menurut pendapatan dasar, dengan tanggal dan cara kami mengurutkan."
+  },
+  "fish-it": {
+    "title": "Fish It! Wiki: Fish, Rods, Baits & Mutations | UpdateOtter",
+    "description": "Fan-made Fish It! wiki: every fish with its rarity, chance and location, plus all rods and baits by Luck, and the mutation list. Sources shown on every value."
+  },
+  "fish-it/fish": {
+    "title": "Fish It! Fish List: Rarity, Chance & Location | UpdateOtter",
+    "description": "All Fish It! fish from Common to Secret with their base chance and where to catch them. Filter by rarity or event fish."
+  },
+  "fish-it/rods": {
+    "title": "Fish It! Rods: Best Rod by Luck, Speed & Price | UpdateOtter",
+    "description": "Every Fish It! rod with its Luck, Speed, weight limit and price, which rod to buy next, and how to get the quest rods."
+  },
+  "fish-it/baits": {
+    "title": "Fish It! Baits: Luck, Price & Effects | UpdateOtter",
+    "description": "Every Fish It! bait with its Luck bonus, price and extra effects such as mutation and shiny chance, and which bait to use."
+  },
+  "fish-it/mutations": {
+    "title": "Fish It! Mutations List & Chances | UpdateOtter",
+    "description": "All Fish It! mutations with their chance per catch, how baits raise them, and how Shiny and Big tags differ."
   }
 }

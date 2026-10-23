@@ -1,0 +1,304 @@
+{
+  "game_code": "FISH",
+  "name": "Fish It!",
+  "short_name": "Fish It",
+  "nav_order": 4,
+  "folder": "fish-it",
+  "roblox_universe_id": "6701277882",
+  "roblox_place_id": "121864768012064",
+  "schema_version": "1.0",
+  "locales": [
+    "en"
+  ],
+  "freshness_days": 30,
+  "min_formula_tests": 1,
+  "community_single_source_calc": true,
+  "index_community_data": true,
+  "_owner_decision": "2026-10-23 Ali picked Fish It! (lean) as the new game. Built on community wiki data like SAE and GAG; no in-game checks asked of Ali. The wiki has no sell values, so there is no calculator yet: only lists (fish, rods, baits, mutations). Lists are Pages and index; there are no item pages.",
+  "game_accent": "#0277BD",
+  "notifier": {
+    "update_windows": []
+  },
+  "menu_order": [
+    "fish",
+    "rods",
+    "baits",
+    "mutations"
+  ],
+  "sections": {
+    "fish": {
+      "label__en": "Fish",
+      "type": "list",
+      "entity": "FSH"
+    },
+    "rods": {
+      "label__en": "Rods",
+      "type": "list",
+      "entity": "ROD"
+    },
+    "baits": {
+      "label__en": "Baits",
+      "type": "list",
+      "entity": "BAI"
+    },
+    "mutations": {
+      "label__en": "Mutations",
+      "type": "list",
+      "entity": "MUT"
+    }
+  },
+  "entities": {
+    "CUR": {
+      "tab": "currencies",
+      "label__en": "Currency",
+      "plural__en": "Currencies",
+      "named": true,
+      "page": false,
+      "fields": {
+        "symbol_text": {
+          "type": "string",
+          "label__en": "Symbol"
+        },
+        "is_premium": {
+          "type": "bool",
+          "label__en": "Premium currency"
+        }
+      }
+    },
+    "RAR": {
+      "tab": "rarities",
+      "label__en": "Rarity",
+      "plural__en": "Rarities",
+      "named": true,
+      "page": false,
+      "fields": {
+        "sort_order": {
+          "type": "int",
+          "label__en": "Sort order",
+          "required": true
+        },
+        "ui_color_hex": {
+          "type": "string",
+          "label__en": "Colour",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "FSH": {
+      "tab": "fish",
+      "label__en": "Fish",
+      "plural__en": "Fish",
+      "named": true,
+      "page": false,
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        },
+        "rarity_id": {
+          "type": "ref",
+          "target": "RAR",
+          "label__en": "Rarity",
+          "list": true,
+          "facet": true
+        },
+        "chance_prob": {
+          "type": "prob",
+          "label__en": "Base chance",
+          "display_format": "prob",
+          "list": true,
+          "compare": true
+        },
+        "location_text__en": {
+          "type": "text",
+          "label__en": "Where to catch",
+          "list": true
+        },
+        "weight_min_kg": {
+          "type": "decimal",
+          "label__en": "Lightest (kg)",
+          "display_format": "abbr"
+        },
+        "weight_max_kg": {
+          "type": "decimal",
+          "label__en": "Heaviest (kg)",
+          "display_format": "abbr"
+        },
+        "is_event": {
+          "type": "bool",
+          "label__en": "Event fish",
+          "facet": true
+        }
+      }
+    },
+    "ROD": {
+      "tab": "rods",
+      "label__en": "Rod",
+      "plural__en": "Rods",
+      "named": true,
+      "page": false,
+      "fields": {
+        "rarity_id": {
+          "type": "ref",
+          "target": "RAR",
+          "label__en": "Rarity",
+          "list": true,
+          "facet": true
+        },
+        "price": {
+          "type": "decimal",
+          "label__en": "Price",
+          "currency_field": "currency_id",
+          "display_format": "abbr",
+          "list": true,
+          "compare": true
+        },
+        "currency_id": {
+          "type": "ref",
+          "target": "CUR",
+          "label__en": "Currency"
+        },
+        "luck_pct": {
+          "type": "decimal",
+          "label__en": "Luck bonus (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        },
+        "speed_pct": {
+          "type": "decimal",
+          "label__en": "Speed bonus (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        },
+        "max_weight_kg": {
+          "type": "decimal",
+          "label__en": "Max fish weight (kg)",
+          "display_format": "abbr",
+          "list": true,
+          "compare": true
+        },
+        "obtain_method_text__en": {
+          "type": "text",
+          "label__en": "How to get",
+          "list": true
+        }
+      }
+    },
+    "BAI": {
+      "tab": "baits",
+      "label__en": "Bait",
+      "plural__en": "Baits",
+      "named": true,
+      "page": false,
+      "fields": {
+        "rarity_id": {
+          "type": "ref",
+          "target": "RAR",
+          "label__en": "Rarity",
+          "list": true,
+          "facet": true
+        },
+        "price": {
+          "type": "decimal",
+          "label__en": "Price",
+          "currency_field": "currency_id",
+          "display_format": "abbr",
+          "list": true,
+          "compare": true
+        },
+        "currency_id": {
+          "type": "ref",
+          "target": "CUR",
+          "label__en": "Currency"
+        },
+        "price_robux": {
+          "type": "robux",
+          "label__en": "Price (Robux)"
+        },
+        "luck_pct": {
+          "type": "decimal",
+          "label__en": "Luck bonus (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        },
+        "extra_text__en": {
+          "type": "text",
+          "label__en": "Other effects",
+          "list": true
+        },
+        "obtain_method_text__en": {
+          "type": "text",
+          "label__en": "How to get",
+          "list": true
+        }
+      }
+    },
+    "MUT": {
+      "tab": "mutations",
+      "label__en": "Mutation",
+      "plural__en": "Mutations",
+      "named": true,
+      "page": false,
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        },
+        "chance_prob": {
+          "type": "prob",
+          "label__en": "Chance per catch",
+          "display_format": "prob",
+          "list": true,
+          "compare": true
+        }
+      }
+    },
+    "UPD": {
+      "tab": "updates",
+      "post_type": "rbx_update",
+      "path": "updates",
+      "label__en": "Update",
+      "plural__en": "Updates",
+      "named": false,
+      "slugged": true,
+      "page": true,
+      "fields": {
+        "title__en": {
+          "type": "text",
+          "label__en": "Title",
+          "required": true
+        },
+        "release_date": {
+          "type": "date",
+          "label__en": "Release date",
+          "required_for_index": true
+        },
+        "roblox_updated_at": {
+          "type": "datetime",
+          "label__en": "Roblox update time"
+        },
+        "official_source_url": {
+          "type": "url",
+          "label__en": "Official notes"
+        },
+        "summary__en": {
+          "type": "text",
+          "label__en": "Summary",
+          "required_for_index": true,
+          "editorial": true
+        },
+        "affected_record_ids": {
+          "type": "ref_list",
+          "target": "*",
+          "label__en": "Affected items"
+        }
+      },
+      "slug_pattern": "^\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(-[a-z0-9]+)*$",
+      "require_screenshot_for_index": false
+    }
+  },
+  "tools": []
+}
