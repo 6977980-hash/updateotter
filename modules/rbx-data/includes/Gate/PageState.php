@@ -76,19 +76,17 @@ final class PageState {
 			}
 		}
 
-		// I-1 required fields verified.
+		// I-1 required fields verified (or community, when the game allows it).
 		$i1 = true;
 		foreach ( $required as $f ) {
-			$st = $this->ds->field_state( $rec, $f );
-			if ( 'verified' !== $st['state'] || ! $st['mechanic_ok'] ) {
+			if ( ! self::counts( $this->ds, $this->ds->field_state( $rec, $f ) ) ) {
 				$i1 = false;
 			}
 		}
 		foreach ( (array) ( $def['index_any_of'] ?? array() ) as $set ) {
 			$any = false;
 			foreach ( (array) $set as $f ) {
-				$st = $this->ds->field_state( $rec, $f );
-				if ( 'verified' === $st['state'] && $st['mechanic_ok'] ) {
+				if ( self::counts( $this->ds, $this->ds->field_state( $rec, $f ) ) ) {
 					$any        = true;
 					$required[] = $f;
 					break;
@@ -161,7 +159,7 @@ final class PageState {
 		}
 
 		// I-5 screenshot evidence.
-		if ( ! empty( $def['require_screenshot_for_index'] ) ) {
+		if ( ! empty( $def['require_screenshot_for_index'] ) && ! $game->index_community() ) {
 			$all_official = (bool) $required;
 			foreach ( $required as $f ) {
 				if ( 'official' !== ( $this->ds->field_state( $rec, $f )['source_type'] ?? null ) ) {
@@ -290,6 +288,11 @@ final class PageState {
 		return self::find_siblings( $this->ds, $rec, $compare, $by, $max );
 	}
 
+	/** A field state that counts toward indexing: verified, or community when the game allows it. */
+	private static function counts( Dataset $ds, array $st ): bool {
+		return $st['mechanic_ok'] && ( 'verified' === $st['state'] || ( 'community' === $st['state'] && $ds->game()->index_community() ) );
+	}
+
 	/**
 	 * @param array<string, mixed> $rec     Record.
 	 * @param array<int, string>   $compare Compare fields.
@@ -300,7 +303,7 @@ final class PageState {
 		$field = null;
 		foreach ( $compare as $f ) {
 			$st = $ds->field_state( $rec, $f );
-			if ( 'verified' === $st['state'] && $st['mechanic_ok'] && is_numeric( $st['value'] ) ) {
+			if ( self::counts( $ds, $st ) && is_numeric( $st['value'] ) ) {
 				$field = $f;
 				break;
 			}
@@ -321,7 +324,7 @@ final class PageState {
 				}
 			}
 			$st = $ds->field_state( $s, $field );
-			if ( ! $same || 'verified' !== $st['state'] || ! $st['mechanic_ok'] || ! is_numeric( $st['value'] ) ) {
+			if ( ! $same || ! self::counts( $ds, $st ) || ! is_numeric( $st['value'] ) ) {
 				continue;
 			}
 			$cand[ $sid ] = array(

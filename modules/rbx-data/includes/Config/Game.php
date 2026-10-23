@@ -73,6 +73,11 @@ final class Game {
 		return ! empty( $this->config['community_single_source_calc'] );
 	}
 
+	/** Owner decision: community values may count for indexing (I-1, I-6) and no screenshot is required (I-5); I-3 notes still gate. */
+	public function index_community(): bool {
+		return ! empty( $this->config['index_community_data'] );
+	}
+
 	public function schema_version(): string {
 		return (string) ( $this->config['schema_version'] ?? '1.0' );
 	}
