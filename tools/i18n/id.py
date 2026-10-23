@@ -158,6 +158,11 @@ RBX_DATA = {
     'Confidence for every row:': 'Tingkat keyakinan untuk semua baris:',
     'Showing %1$s of %2$s %3$s': 'Menampilkan %1$s dari %2$s %3$s',
     'Back to top': 'Kembali ke atas',
+    'Guides': 'Panduan',
+    '%s calculator': 'Kalkulator %s',
+    '%s tier list': 'Tier list %s',
+    'Search pets, crops and pages': 'Cari pet, tanaman, dan halaman',
+    'Popular now:': 'Populer sekarang:',
 }
 
 RBX_TOOLS = {
@@ -244,4 +249,12 @@ UPDATEOTTER = {
     'Report a missing item': 'Laporkan item yang belum ada',
     'Search UpdateOtter': 'Cari di UpdateOtter',
     'Only %s': 'Hanya %s',
+    'No results for "%s". Press Enter to search all pages.': 'Tidak ada hasil untuk "%s". Tekan Enter untuk mencari di semua halaman.',
+    'Nothing in %s. Results from all games:': 'Tidak ada di %s. Hasil dari semua game:',
+    'Page': 'Halaman',
+    '%s calculator': 'Kalkulator %s',
+    '%s codes': 'Kode %s',
+    '%s tier list': 'Tier list %s',
+    'Go to the %s hub': 'Ke halaman utama %s',
+    'Popular pages': 'Halaman populer',
 }

@@ -15,6 +15,8 @@
  *   file with that plugin's signature is deleted.
  * - `indexnow`: sends the home, hub, tool, list, codes and guide URLs to IndexNow once and keeps
  *   the answer code in the step state (audit UO-22).
+ * - `search_index`: rebuilds the header search index file once (audit UO-31), for changes to
+ *   what goes into it that come with code rather than with a data import.
  *
  * A step runs once per id, on the first request after the deploy. Turning the lock back on in
  * RBX Data → Setup is not undone by a later request. Status: GET /wp-json/rbx/v1/launch.
@@ -39,7 +41,7 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live', 'purge', 'llms', 'indexnow' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'search_index', 'purge', 'llms', 'indexnow' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
@@ -134,6 +136,15 @@ add_action(
 				'pending' => $todo['publish'],
 				'at'      => gmdate( 'Y-m-d H:i:s' ),
 			) + $r;
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		// Rebuilds the header search index when its contents changed in code, not only after an import (UO-31).
+		if ( isset( $todo['search_index'] ) && class_exists( '\RBX\Data\Export\SearchIndex' ) ) {
+			$state['search_index'] = array(
+				'id'   => $todo['search_index'],
+				'at'   => gmdate( 'Y-m-d H:i:s' ),
+				'file' => \RBX\Data\Export\SearchIndex::write(),
+			);
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
 		if ( isset( $todo['purge'] ) ) {

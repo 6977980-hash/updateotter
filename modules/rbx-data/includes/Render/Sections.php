@@ -477,7 +477,7 @@ final class Sections {
 		$ds   = self::ds( $game );
 		$upds = $ds->all( 'UPD', array( 'live', 'limited' ) );
 		uasort( $upds, static fn( $a, $b ) => strcmp( (string) ( $b['data']['release_date'] ?? '' ), (string) ( $a['data']['release_date'] ?? '' ) ) ?: strcmp( (string) $b['id'], (string) $a['id'] ) );
-		$cadence = (string) ( $ds->meta( 'update_cadence_text' ) ?? '' );
+		$cadence = Lang::t( (string) ( $ds->meta( 'update_cadence_text' ) ?? '' ) );
 		$pub     = Ui::last_publish( $game );
 		/* translators: %s: date and time in UTC */
 		$out     = '' !== $pub ? '<p class="rbx-live-now"><strong>' . esc_html__( 'Live now:', 'rbx-data' ) . '</strong> ' . sprintf( esc_html__( 'Roblox shows the newest version of the game was published on %s.', 'rbx-data' ), $pub ) . '</p>' : '';
@@ -568,7 +568,7 @@ final class Sections {
 			$upd   = Ui::updates_url( $game );
 			$rows .= '<tr><th scope="row">' . esc_html__( 'Latest publish on Roblox', 'rbx-data' ) . '</th><td>' . $pub . ( '' !== $upd ? ' <a href="' . esc_url( $upd ) . '">' . esc_html__( 'Updates', 'rbx-data' ) . '</a>' : '' ) . '</td></tr>';
 		}
-		$cad = (string) ( $ds->meta( 'update_cadence_text' ) ?? '' );
+		$cad = Lang::t( (string) ( $ds->meta( 'update_cadence_text' ) ?? '' ) ); // UO-43: /id/ wording from content/i18n/id.json.
 		if ( '' !== $cad ) {
 			$rows .= '<tr><th scope="row">' . esc_html__( 'Updates', 'rbx-data' ) . '</th><td>' . esc_html__( 'Usually', 'rbx-data' ) . ' ' . esc_html( wp_strip_all_tags( $cad ) ) . '</td></tr>';
 		}
@@ -580,7 +580,7 @@ final class Sections {
 				}
 			}
 		}
-		return '' === $rows ? '' : '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--kv"><caption>' . esc_html__( 'Game at a glance', 'rbx-data' ) . '</caption><tbody>' . $rows . '</tbody></table></div>';
+		return '' === $rows ? '' : '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--kv"><caption class="screen-reader-text">' . esc_html__( 'Game at a glance', 'rbx-data' ) . '</caption><tbody>' . $rows . '</tbody></table></div>';
 	}
 
 	/** Key terms from MEC rows with in_glossary (CONT-15). */
@@ -643,7 +643,7 @@ final class Sections {
 			return '';
 		}
 		self::show( array( (string) $u['id'] ) );
-		return '<div class="rbx-update-card rbx-update-card--latest"><p class="rbx-eyebrow">' . esc_html__( 'Latest update', 'rbx-data' ) . '</p><h3>' . Ui::link( $u ) . '</h3><p class="rbx-meta">' . Ui::date( (string) ( $u['data']['release_date'] ?? '' ) ) . '</p>' . ( ! empty( $u['data']['summary__en'] ) ? '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $u['data']['summary__en'] ), 30 ) ) . '</p>' : '' ) . '</div>';
+		return '<div class="rbx-update-card rbx-update-card--latest"><p class="rbx-eyebrow">' . esc_html__( 'Latest update', 'rbx-data' ) . '</p><h3>' . Ui::link( $u ) . '</h3><p class="rbx-meta">' . Ui::date( (string) ( $u['data']['release_date'] ?? '' ) ) . '</p>' . ( ! empty( $u['data']['summary__en'] ) && ! Lang::is_id() ? '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $u['data']['summary__en'] ), 30 ) ) . '</p>' : '' ) . '</div>';
 	}
 
 	private static function top_tier( Game $game, int $limit ): string {
@@ -701,9 +701,27 @@ final class Sections {
 		return null === $v ? (string) $stored : $v;
 	}
 
-	/** Home game cards (UX-11). */
+	/**
+	 * Section slugs of a game, most used first: the tool, codes, the tier list, then the lists in
+	 * menu order (UO-38, UO-42). Phones show the first few without a sideways swipe.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function priority_sections( Game $game ): array {
+		$rank  = static function ( string $slug ) use ( $game ): int {
+			$s = $game->section( $slug );
+			return 'tool' === ( $s['type'] ?? '' ) ? 0 : ( 'codes' === $slug ? 1 : ( 'tier-list' === $slug ? 2 : 3 ) );
+		};
+		$order = array_values( $game->menu_order() );
+		$pos   = array_flip( $order );
+		usort( $order, static fn( $a, $b ) => ( $rank( $a ) <=> $rank( $b ) ) ?: ( $pos[ $a ] <=> $pos[ $b ] ) );
+		return $order;
+	}
+
+	/** Home game cards (UX-11) with a search box and a "Popular now" row on top (UO-38). */
 	private static function home_games(): string {
-		$out = '';
+		$out     = '';
+		$popular = array();
 		foreach ( Loader::games() as $game ) {
 			$hub = Breadcrumbs::page_url( $game->folder() );
 			if ( '' === $hub ) {
@@ -711,11 +729,19 @@ final class Sections {
 			}
 			$links = '';
 			// Every section page of the game, so GAG2 and Fish It list pages get a home link too (UO-25).
-			foreach ( array_slice( $game->menu_order(), 0, 5 ) as $s ) {
+			foreach ( array_slice( self::priority_sections( $game ), 0, 6 ) as $s ) {
 				$sec = $game->section( $s );
 				$u   = $sec && 'updates' === ( $sec['type'] ?? '' ) ? Ui::updates_url( $game ) : Breadcrumbs::page_url( $game->folder() . '/' . $s );
 				if ( '' !== $u && $sec ) {
-					$links .= '<li><a href="' . esc_url( $u ) . '">' . esc_html( (string) $game->section( $s )['label__en'] ) . '</a></li>';
+					$links .= '<li><a href="' . esc_url( $u ) . '">' . esc_html( Lang::t( (string) $sec['label__en'] ) ) . '</a></li>';
+					if ( 'tool' === ( $sec['type'] ?? '' ) && count( $popular ) < 3 ) {
+						/* translators: %s: short game name */
+						$popular[] = '<a href="' . esc_url( $u ) . '">' . esc_html( sprintf( __( '%s calculator', 'rbx-data' ), $game->short_name() ) ) . '</a>';
+					}
+					if ( 'tier-list' === $s && count( $popular ) < 3 ) {
+						/* translators: %s: short game name */
+						$popular[] = '<a href="' . esc_url( $u ) . '">' . esc_html( sprintf( __( '%s tier list', 'rbx-data' ), $game->short_name() ) ) . '</a>';
+					}
 				}
 			}
 			$gu = Breadcrumbs::page_url( $game->folder() . '/guides' );
@@ -726,7 +752,12 @@ final class Sections {
 			$mono = mb_strtoupper( mb_substr( $game->short_name(), 0, 1 ) );
 			$out .= '<li class="rbx-game-card" style="--game-accent:' . esc_attr( $game->accent() ) . '"><span class="rbx-game-card__mono" aria-hidden="true">' . esc_html( $mono ) . '</span><h3><a href="' . esc_url( $hub ) . '">' . esc_html( $game->name() ) . '</a></h3>' . ( $lc ? '<p class="rbx-meta">' . esc_html__( 'Updated', 'rbx-data' ) . ' ' . Ui::date( substr( (string) $lc, 0, 10 ) ) . '</p>' : '' ) . ( '' !== $links ? '<ul class="rbx-game-card__links">' . $links . '</ul>' : '' ) . '</li>';
 		}
-		return '' === $out ? '' : '<ul class="rbx-game-cards">' . $out . '</ul>';
+		if ( '' === $out ) {
+			return '';
+		}
+		$search = '<form class="rbx-home-search" role="search" action="' . esc_url( home_url( '/' ) ) . '" method="get"><label for="rbx-home-q">' . esc_html__( 'Search pets, crops and pages', 'rbx-data' ) . '</label><span class="rbx-home-search__row"><input type="search" id="rbx-home-q" name="s" autocomplete="off"><button type="submit" class="button">' . esc_html__( 'Search', 'rbx-data' ) . '</button></span></form>';
+		$pop    = $popular ? '<p class="rbx-popular"><strong>' . esc_html__( 'Popular now:', 'rbx-data' ) . '</strong> ' . implode( ' ', $popular ) . '</p>' : '';
+		return $search . $pop . '<ul class="rbx-game-cards">' . $out . '</ul>';
 	}
 
 	/** Newest published guides across games: the children of each game's guides page. */

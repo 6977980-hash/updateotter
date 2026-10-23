@@ -128,3 +128,20 @@ add_action(
 		}
 	}
 );
+
+/**
+ * /id/?s=… has no Indonesian search results page (it was a 404): send it to the site search with
+ * the same words (UO-43). Only the query string `s` is kept.
+ */
+add_action(
+	'template_redirect',
+	static function (): void {
+		if ( ! isset( $_GET['s'] ) || ! class_exists( '\RBX\Data\Content\Lang' ) || ! \RBX\Data\Content\Lang::is_id() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+		$s = sanitize_text_field( wp_unslash( (string) $_GET['s'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		wp_safe_redirect( add_query_arg( 's', rawurlencode( $s ), home_url( '/' ) ), 301 );
+		exit;
+	},
+	1
+);

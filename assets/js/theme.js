@@ -55,16 +55,17 @@ const norm = ( s ) =>
 		.replace( /[̀-ͯ]/g, '' )
 		.replace( /[\s-]+/g, '' );
 
-function render( q ) {
-	const box = $( '[data-results]', panel );
-	box.replaceChildren();
-	if ( ! index || norm( q ).length < 2 ) {
-		return;
+// Overlay strings come from the page (translated on /id/), English as a fallback (UO-43).
+const i18n = ( () => {
+	try {
+		return JSON.parse( ( panel && panel.dataset.i18n ) || '{}' );
+	} catch ( e ) {
+		return {};
 	}
-	const only = $( '[data-only-game]', panel );
-	const game = only && only.checked ? panel.dataset.game : '';
-	const n = norm( q );
-	const hits = index.items
+} )();
+
+function find( n, game ) {
+	return index.items
 		.filter( ( it ) => ! game || it.g === game )
 		.map( ( it ) => {
 			const names = [ it.n, ...String( it.a || '' ).split( /[|,]/ ) ].map( norm );
@@ -74,10 +75,32 @@ function render( q ) {
 		.filter( ( [ s ] ) => s < 2 )
 		.sort( ( a, b ) => a[ 0 ] - b[ 0 ] || a[ 1 ].n.localeCompare( b[ 1 ].n ) )
 		.slice( 0, 30 );
+}
+
+function render( q ) {
+	const box = $( '[data-results]', panel );
+	box.replaceChildren();
+	if ( ! index || norm( q ).length < 2 ) {
+		return;
+	}
+	const only = $( '[data-only-game]', panel );
+	const game = only && only.checked ? panel.dataset.game : '';
+	const n = norm( q );
+	let hits = find( n, game );
+	// Nothing in this game: show the other games' results instead of a dead end (UO-31).
+	if ( ! hits.length && game ) {
+		hits = find( n, '' );
+		if ( hits.length ) {
+			const p = document.createElement( 'p' );
+			p.className = 'rbx-note';
+			p.textContent = ( i18n.others || 'Nothing in %s. Results from all games:' ).replace( '%s', ( index.games && index.games[ game ] ) || game );
+			box.append( p );
+		}
+	}
 	if ( ! hits.length ) {
 		const p = document.createElement( 'p' );
 		p.className = 'rbx-empty';
-		p.textContent = 'No results for "' + q + '". Press Enter to search all pages.';
+		p.textContent = ( i18n.none || 'No results for "%s". Press Enter to search all pages.' ).replace( '%s', q );
 		box.append( p );
 		return;
 	}
@@ -95,7 +118,7 @@ function render( q ) {
 			a.textContent = it.n;
 			const t = document.createElement( 'span' );
 			t.className = 'rbx-chip';
-			t.textContent = it.t;
+			t.textContent = it.t === 'Page' && i18n.page ? i18n.page : it.t;
 			li.append( a, ' ', t );
 			ul.append( li );
 		} );

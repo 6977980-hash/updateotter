@@ -162,7 +162,7 @@ final class Shortcodes {
 		if ( is_string( $v ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ) {
 			return Ui::date( $v );
 		}
-		return is_scalar( $v ) ? esc_html( (string) $v ) : '';
+		return is_scalar( $v ) ? esc_html( \RBX\Data\Content\Lang::t( (string) $v ) ) : '';
 	}
 
 	/** [rbx_section game="sae" section="list" entity="PET"] */

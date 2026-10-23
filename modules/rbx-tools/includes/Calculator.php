@@ -293,7 +293,7 @@ final class Calculator {
 		$li = '';
 		foreach ( $formulas as $f ) {
 			if ( $f['available'] ) {
-				$li .= '<li><strong>' . esc_html( (string) ( $f['record']['data']['label__en'] ?? $f['key'] ) ) . '</strong>: <code>' . esc_html( (string) $f['record']['data']['expression'] ) . '</code></li>';
+				$li .= '<li><strong>' . esc_html( \RBX\Data\Content\Lang::t( (string) ( $f['record']['data']['label__en'] ?? $f['key'] ) ) ) . '</strong>: <code>' . esc_html( (string) $f['record']['data']['expression'] ) . '</code></li>';
 			}
 		}
 		return '' === $li ? '' : '<details class="rbx-calc__formula"><summary>' . esc_html__( 'Formula used', 'rbx-tools' ) . '</summary><ul>' . $li . '</ul></details>';

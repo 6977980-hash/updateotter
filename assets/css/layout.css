@@ -181,9 +181,29 @@
 	min-height: 32px;
 	align-items: center;
 }
+.crumbs-row {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-3);
+}
+.crumbs-row > :first-child {
+	flex: 1 1 auto;
+	min-width: 0;
+}
 .lang-switch {
 	font-size: var(--fs-sm);
-	margin: var(--sp-1) 0 0;
+	margin: 0 0 0 auto;
+	flex: 0 0 auto;
+	white-space: nowrap;
+	color: var(--text-muted);
+}
+.lang-switch a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 32px;
+	min-width: 32px;
+	justify-content: center;
+	font-weight: 600;
 }
 .breadcrumbs li {
 	display: inline-flex;
@@ -361,4 +381,20 @@
 .search-results__game {
 	font-size: var(--fs-base);
 	margin: var(--sp-3) 0 var(--sp-1);
+}
+/* 404 page (UO-39): space under the search form, tap-sized links. */
+.not-found .search-form {
+	margin-block: var(--sp-4);
+}
+.not-found__links {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--sp-2) var(--sp-4);
+}
+.not-found__links a {
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
 }
