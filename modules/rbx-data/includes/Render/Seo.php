@@ -327,7 +327,7 @@ final class Seo {
 		$plv = (string) get_post_meta( $c['post']->ID, '_rbx_page_last_verified', true );
 		if ( '' !== $plv ) {
 			/* translators: %s: date */
-			$bits[] = sprintf( __( 'Last checked %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
+			$bits[] = sprintf( __( 'Wiki data as of %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
 		}
 		return implode( ' ', $bits );
 	}

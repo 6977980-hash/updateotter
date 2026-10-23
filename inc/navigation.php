@@ -150,7 +150,7 @@ function updateotter_footer_links(): array {
 		'tools' => $tools,
 		'about' => array(
 			array( __( 'About', 'updateotter' ), $p( 'about' ) ),
-			array( __( 'How we verify data', 'updateotter' ), $p( 'methodology' ) ),
+			array( __( 'Where our data comes from', 'updateotter' ), $p( 'methodology' ) ),
 			array( __( 'Authors', 'updateotter' ), $p( 'authors' ) ),
 			array( __( 'Corrections', 'updateotter' ), $p( 'corrections' ) ),
 			array( __( 'Report a wrong value', 'updateotter' ), $p( 'report' ) ),

@@ -147,7 +147,7 @@ final class Item {
 			if ( 'unknown' === $st['state'] && empty( $def['required_for_index'] ) && empty( $def['compare'] ) ) {
 				continue;
 			}
-			$lv    = $st['last_verified'] ? '<span class="rbx-lv">' . esc_html__( 'Checked', 'rbx-data' ) . ' ' . Ui::date( (string) $st['last_verified'] ) . '</span>' : '';
+			$lv    = $st['last_verified'] ? '<span class="rbx-lv">' . esc_html( Ui::as_of_label( $st ) ) . ' ' . Ui::date( (string) $st['last_verified'] ) . '</span>' : '';
 			$rows .= '<div class="rbx-stat"><dt>' . esc_html( (string) ( $def['label__en'] ?? $f ) ) . '</dt><dd>' . Ui::value( $ds, $rec, $f ) . $lv . '</dd></div>';
 		}
 		$chips = '';
@@ -169,6 +169,7 @@ final class Item {
 			$out .= '<h2 id="stats" class="rbx-card__title">' . esc_html__( 'Stats', 'rbx-data' ) . '</h2><dl class="rbx-stats">' . $rows . '</dl>';
 		}
 		$out .= Ui::trust_strip( $game, (string) get_post_meta( $c['post_id'], '_rbx_last_changed', true ), self::page_last_verified( $c['post_id'] ) );
+		$out .= Ui::license_line( $game );
 		$calc = self::calculator_link( $game, $rec );
 		$out .= '<div class="rbx-card__actions">' . $calc . Ui::report_button( $game, array( 'record_id' => (string) $rec['id'] ) ) . '</div>';
 		return $out . '</section>';
@@ -272,7 +273,7 @@ final class Item {
 		if ( '' === trim( $notes ) && '' === trim( wp_strip_all_tags( $editorial ) ) ) {
 			return '';
 		}
-		$out = '<section class="rbx-notes">' . Ui::h2( __( 'Notes from testing', 'rbx-data' ), 'notes' );
+		$out = '<section class="rbx-notes">' . Ui::h2( __( 'Our notes', 'rbx-data' ), 'notes' );
 		if ( '' !== trim( $notes ) ) {
 			$out .= wpautop( Ui::text( $notes ) );
 		}

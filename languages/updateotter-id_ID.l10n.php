@@ -15,9 +15,9 @@ return array( 'domain' => 'updateotter', 'language' => 'id_ID', 'plural-forms' =
 	'Corrections' => 'Koreksi',
 	'Dark' => 'Gelap',
 	'Disclaimer' => 'Penafian',
+	'Game data is adapted from the %1$s wikis on Fandom, licensed %2$s; our changes to that data use the same licence.' => 'Data game diadaptasi dari wiki %1$s di Fandom, berlisensi %2$s; perubahan kami pada data itu memakai lisensi yang sama.',
 	'Games' => 'Game',
 	'Home' => 'Beranda',
-	'How we verify data' => 'Cara kami mengecek data',
 	'Last updated' => 'Terakhir diperbarui',
 	'Legal' => 'Legal',
 	'Light' => 'Terang',
@@ -41,4 +41,6 @@ return array( 'domain' => 'updateotter', 'language' => 'id_ID', 'plural-forms' =
 	'Tools' => 'Alat',
 	'UpdateOtter home' => 'Beranda UpdateOtter',
 	'Updated %s' => 'Diperbarui %s',
+	'Where our data comes from' => 'Asal data kami',
+	'and' => 'dan',
 ) );

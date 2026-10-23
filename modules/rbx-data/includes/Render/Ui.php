@@ -181,6 +181,19 @@ final class Ui {
 		return '' === $src ? $out : $out . ' ' . $src;
 	}
 
+	/**
+	 * Words before a value's date: "Checked in game" only for an in-game record with a
+	 * screenshot, otherwise the date is when the wiki data was copied (UO-01).
+	 *
+	 * @param array<string, mixed> $st Field state.
+	 */
+	public static function as_of_label( array $st ): string {
+		if ( 'in_game' === ( $st['source_type'] ?? null ) && ! empty( $st['evidence_media_id'] ) ) {
+			return __( 'Checked in game', 'rbx-data' );
+		}
+		return 'community' === ( $st['source_type'] ?? null ) ? __( 'Wiki data as of', 'rbx-data' ) : __( 'Data as of', 'rbx-data' );
+	}
+
 	/** Source chip: in_game opens the evidence screenshot, official/community link out (UX-42). */
 	public static function source_link( ?string $type, ?string $url, ?string $media_id, ?Dataset $ds = null ): string {
 		$label = Dataset::source_label( $type );
@@ -202,8 +215,22 @@ final class Ui {
 		return '<span class="rbx-chip rbx-chip--source">' . esc_html( $label ) . '</span>';
 	}
 
+	/** CC BY-SA credit under a data table or card (UO-04): the wiki data's licence carries over. */
+	public static function license_line( Game $game ): string {
+		if ( '' === $game->wiki_url() ) {
+			return '';
+		}
+		return '<p class="rbx-license">' . sprintf(
+			/* translators: 1: link to the game's Fandom wiki, 2: link to the CC BY-SA licence */
+			esc_html__( 'Game data adapted from the %1$s on Fandom, licensed %2$s. Our changes to that data use the same licence.', 'rbx-data' ),
+			'<a href="' . esc_url( $game->wiki_url() ) . '" rel="noopener">' . esc_html( $game->wiki_name() ) . '</a>',
+			'<a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license noopener">CC BY-SA</a>'
+		) . '</p>';
+	}
+
 	/**
-	 * Trust strip (UX-41): Updated · Verified · How we verify data.
+	 * Trust strip (UX-41): Updated · Wiki data as of · Where our data comes from. The page date is
+	 * when the wiki data was copied, not an in-game check (UO-01).
 	 */
 	public static function trust_strip( Game $game, string $last_changed, ?string $page_last_verified ): string {
 		$parts = array();
@@ -217,11 +244,11 @@ final class Ui {
 			$stale = $page_last_verified < $cut;
 			$parts[] = $stale
 				/* translators: %s: date */
-				? sprintf( esc_html__( 'Last verified %s, may be out of date', 'rbx-data' ), self::date( $page_last_verified ) )
+				? sprintf( esc_html__( 'Wiki data as of %s, may be out of date', 'rbx-data' ), self::date( $page_last_verified ) )
 				/* translators: %s: date */
-				: sprintf( esc_html__( 'Verified %s', 'rbx-data' ), self::date( $page_last_verified ) );
+				: sprintf( esc_html__( 'Wiki data as of %s', 'rbx-data' ), self::date( $page_last_verified ) );
 		}
-		$parts[] = '<a href="' . esc_url( home_url( '/methodology/' ) ) . '">' . esc_html__( 'How we verify data', 'rbx-data' ) . '</a>';
+		$parts[] = '<a href="' . esc_url( home_url( '/methodology/' ) ) . '">' . esc_html__( 'Where our data comes from', 'rbx-data' ) . '</a>';
 		return '<p class="rbx-trust' . ( $stale ? ' rbx-trust--stale' : '' ) . '"><svg class="rbx-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg> ' . implode( ' <span aria-hidden="true">·</span> ', $parts ) . '</p>';
 	}
 
@@ -255,7 +282,7 @@ final class Ui {
 		$rec   = $ds->get( (string) $r['record_id'] );
 		$name  = $rec ? self::link( $rec ) : esc_html( (string) $r['record_id'] );
 		$date  = self::date( substr( (string) $r['changed_at'], 0, 10 ) );
-		$why   = ! empty( $r['is_correction'] ) ? __( 'Correction', 'rbx-data' ) : ( ! empty( $r['update_id'] ) ? __( 'Game update', 'rbx-data' ) : ( 'rollback' === $r['change_kind'] ? __( 'Reverted', 'rbx-data' ) : __( 'New test', 'rbx-data' ) ) );
+		$why   = ! empty( $r['is_correction'] ) ? __( 'Correction', 'rbx-data' ) : ( ! empty( $r['update_id'] ) ? __( 'Game update', 'rbx-data' ) : ( 'rollback' === $r['change_kind'] ? __( 'Reverted', 'rbx-data' ) : __( 'Data change', 'rbx-data' ) ) );
 		if ( 'create' === $r['change_kind'] ) {
 			/* translators: %s: item name */
 			return $date . ': ' . sprintf( esc_html__( '%s added', 'rbx-data' ), $name );
@@ -332,8 +359,10 @@ final class Ui {
 		}
 		/* translators: %s: author name with link */
 		$html = sprintf( esc_html__( 'By %s', 'rbx-data' ), '<a href="' . esc_url( $author['url'] ) . '" rel="author">' . esc_html( $author['name'] ) . '</a>' );
-		// AI drafting is explained on the methodology page; "claude" is not a reviewer name.
-		if ( '' !== $reviewer && 0 !== strcasecmp( trim( $reviewer ), $author['name'] ) && 0 !== strcasecmp( trim( $reviewer ), 'claude' ) ) {
+		// "claude" is not a reviewer name: say the notes were drafted with AI (methodology page, UO-02).
+		if ( 0 === strcasecmp( trim( $reviewer ), 'claude' ) ) {
+			$html .= ' <span aria-hidden="true">·</span> <a href="' . esc_url( home_url( '/methodology/#ai' ) ) . '">' . esc_html__( 'Notes drafted with AI help', 'rbx-data' ) . '</a>';
+		} elseif ( '' !== $reviewer && 0 !== strcasecmp( trim( $reviewer ), $author['name'] ) ) {
 			/* translators: %s: reviewer name */
 			$html .= ' <span aria-hidden="true">·</span> ' . sprintf( esc_html__( 'Checked by %s', 'rbx-data' ), esc_html( $reviewer ) );
 		}

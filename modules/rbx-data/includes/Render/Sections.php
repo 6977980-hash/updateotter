@@ -69,11 +69,11 @@ final class Sections {
 				case 'count':
 					return self::count( $game, (string) ( $a['entity'] ?? '' ) );
 				case 'list':
-					return self::list( $game, (string) ( $a['entity'] ?? '' ) );
+					return self::licensed( $game, self::list( $game, (string) ( $a['entity'] ?? '' ) ) );
 				case 'mutations':
-					return self::mutations( $game );
+					return self::licensed( $game, self::mutations( $game ) );
 				case 'sizes':
-					return self::sizes( $game );
+					return self::licensed( $game, self::sizes( $game ) );
 				case 'stacking':
 					return self::mechanic_text( $game, 'mutation_stacking' );
 				case 'codes':
@@ -81,7 +81,7 @@ final class Sections {
 				case 'updates':
 					return self::updates( $game );
 				case 'tier_list':
-					return self::tier_list( $game );
+					return self::licensed( $game, self::tier_list( $game ) );
 				case 'hub_tiles':
 					return self::hub_tiles( $game );
 				case 'hub_glance':
@@ -89,9 +89,9 @@ final class Sections {
 				case 'glossary':
 					return self::glossary( $game );
 				case 'biomes':
-					return self::biomes( $game );
+					return self::licensed( $game, self::biomes( $game ) );
 				case 'mounts':
-					return self::mounts( $game );
+					return self::licensed( $game, self::mounts( $game ) );
 				case 'latest_update':
 					return self::latest_update( $game );
 				case 'top_tier':
@@ -115,7 +115,12 @@ final class Sections {
 		return '';
 	}
 
-	private static function ds( Game $game ): Dataset {
+	/** Data table plus its CC BY-SA credit (UO-04); nothing when the table is empty. */
+	private static function licensed( Game $game, string $html ): string {
+		return '' === $html ? '' : $html . Ui::license_line( $game );
+	}
+
+		private static function ds( Game $game ): Dataset {
 		return Repository::dataset( $game );
 	}
 
@@ -128,7 +133,7 @@ final class Sections {
 		return $max;
 	}
 
-	/** "{n} pets, last verified {date}" (UX-08). */
+	/** "{n} pets, wiki data as of {date}" (UX-08, UO-01). */
 	private static function count( Game $game, string $entity ): string {
 		if ( null === $game->entity( $entity ) ) {
 			return '';
@@ -137,7 +142,7 @@ final class Sections {
 		$n    = count( $recs );
 		$lv   = self::newest_verified( $recs );
 		$txt  = sprintf( '%s %s', number_format_i18n( $n ), strtolower( $game->entity_label( $entity, 1 !== $n ) ) );
-		return '<p class="rbx-count">' . esc_html( $txt ) . ( '' !== $lv ? ', ' . esc_html__( 'last verified', 'rbx-data' ) . ' ' . Ui::date( $lv ) : '' ) . '</p>';
+		return '<p class="rbx-count">' . esc_html( $txt ) . ( '' !== $lv ? ', ' . esc_html__( 'wiki data as of', 'rbx-data' ) . ' ' . Ui::date( $lv ) : '' ) . '</p>';
 	}
 
 	/**
@@ -299,9 +304,9 @@ final class Sections {
 				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'income_mult' ) ) . '">' . Ui::value( $ds, $r, 'income_mult', false ) . '</td>'
 				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '">' . ( empty( $r['data']['obtain_method_text__en'] ) ? '<span class="rbx-v--unknown">' . esc_html__( 'Not confirmed yet', 'rbx-data' ) . '</span>' : Ui::text( (string) $r['data']['obtain_method_text__en'] ) ) . '</td>'
 				. '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . Ui::chip( $ds->field_state( $r, 'income_mult' ), $ds ) . '</td>'
-				. '<td data-label="' . esc_attr__( 'Last verified', 'rbx-data' ) . '">' . Ui::date( (string) ( $r['data']['last_verified'] ?? '' ) ) . '</td></tr>';
+				. '<td data-label="' . esc_attr__( 'Data as of', 'rbx-data' ) . '">' . Ui::date( (string) ( $r['data']['last_verified'] ?? '' ) ) . '</td></tr>';
 		}
-		return '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th><th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Last verified', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		return '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th><th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 	}
 
 	private static function sizes( Game $game ): string {
