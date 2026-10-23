@@ -2,7 +2,7 @@
 // Run: node --test tests/parity.test.mjs  (RBX_DATA_DIR overrides the rbx-data checkout path)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formatValue, formatExact } from '../assets/js/format.js';
@@ -49,3 +49,32 @@ test( 'formula vectors', () => {
 		}
 	}
 } );
+
+// Real-dataset fixtures from `wp rbx fixtures --game=<key>` (DATA-34): JS must give PHP's result.
+for ( const name of readdirSync( join( dataDir, 'tests', 'fixtures' ) ).filter( ( n ) => n.endsWith( '-real.json' ) ) ) {
+	test( `real dataset ${ name }`, () => {
+		const f = load( name );
+		const asts = {};
+		for ( const [ id, fm ] of Object.entries( f.formulas ) ) {
+			asts[ id ] = compile( fm.expr, fm.decl );
+			assert.deepEqual( asts[ id ], fm.ast, `${ id } AST` );
+		}
+		for ( const c of f.cases ) {
+			for ( const k of [ 'real', 'verified' ] ) {
+				const want = c[ k ];
+				const label = `${ c.formula } ${ k } ${ JSON.stringify( c.inputs ) }`;
+				try {
+					const v = evaluate( asts[ c.formula ], c.inputs, f[ k === 'real' ? 'data' : 'verified' ] );
+					assert.ok( 'value' in want, label + ' should be unavailable' );
+					assert.ok( Math.abs( v - want.value ) <= 1e-9 * Math.max( 1, Math.abs( want.value ) ), `${ label }: ${ v } vs ${ want.value }` );
+				} catch ( e ) {
+					if ( e instanceof assert.AssertionError ) {
+						throw e;
+					}
+					assert.ok( e instanceof Unavailable, label + ': ' + e.message );
+					assert.deepEqual( [ e.reason, e.what ], want.unavailable, label );
+				}
+			}
+		}
+	} );
+}

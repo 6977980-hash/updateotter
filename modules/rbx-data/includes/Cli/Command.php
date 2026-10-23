@@ -139,6 +139,157 @@ final class Command {
 	}
 
 	/**
+	 * Runs the formula tests (DATA-34) against the imported dataset. Fails on any failing test.
+	 *
+	 * ## OPTIONS
+	 *
+	 * --game=<key>
+	 * : Game key.
+	 *
+	 * @param array<int, string>    $args  Args.
+	 * @param array<string, string> $assoc Options.
+	 */
+	public function test( array $args, array $assoc ): void {
+		$game = $this->game( $assoc );
+		$ds   = \RBX\Data\Data\Repository::dataset( $game );
+		$res  = \RBX\Data\Import\Validator::run_tests( $ds );
+		$fail = 0;
+		foreach ( $res as $r ) {
+			WP_CLI::log( sprintf( '%s %s %s: expected %s, got %s', $r['pass'] ? 'PASS' : 'FAIL', $r['id'], $r['formula'], (string) $r['expected'], null === $r['actual'] ? '-' : (string) $r['actual'] ) );
+			$fail += $r['pass'] ? 0 : 1;
+		}
+		foreach ( $ds->formulas() as $key => $f ) {
+			$live = 'live' === ( $f['record']['data']['status'] ?? '' );
+			$n    = count( array_filter( $res, static fn( $r ) => $r['formula'] === $key ) );
+			if ( $live && $n < 3 ) {
+				WP_CLI::warning( "Live formula $key has only $n live tests (DATA-34 needs 3)." );
+				++$fail;
+			}
+		}
+		$fail ? WP_CLI::error( "$fail problem(s)." ) : WP_CLI::success( count( $res ) . ' test(s) passed.' );
+	}
+
+	/**
+	 * Writes PHP/JS parity fixtures from the real dataset: every formula, every live test and a
+	 * grid of sample inputs, with the PHP result for each (ENG-31, DATA-34).
+	 *
+	 * ## OPTIONS
+	 *
+	 * --game=<key>
+	 * : Game key.
+	 *
+	 * [--out=<path>]
+	 * : Output file. Default: tests/fixtures/{game}-real.json in rbx-data.
+	 *
+	 * @param array<int, string>    $args  Args.
+	 * @param array<string, string> $assoc Options.
+	 */
+	public function fixtures( array $args, array $assoc ): void {
+		$game = $this->game( $assoc );
+		$ds   = \RBX\Data\Data\Repository::dataset( $game );
+		$targets = array();
+		foreach ( $ds->all( 'FRM', null ) as $f ) {
+			foreach ( (array) $f['data']['inputs'] as $d ) {
+				if ( ! empty( $d['target'] ) ) {
+					$targets[ (string) $d['target'] ] = true;
+				}
+			}
+		}
+		$real = $ds->calc_data( array_keys( $targets ) );
+		// Same records with every value treated as verified, so the numeric paths are exercised too.
+		$verified = $real;
+		foreach ( $verified['records'] as $e => $recs ) {
+			foreach ( array_keys( $recs ) as $id ) {
+				foreach ( (array) ( $ds->get( (string) $id )['data'] ?? array() ) as $f => $v ) {
+					if ( ( is_int( $v ) || is_float( $v ) ) && $ds->is_numeric_field( (string) $e, (string) $f ) ) {
+						$verified['records'][ $e ][ $id ][ $f ] = $v;
+					}
+				}
+			}
+		}
+		$cases    = array();
+		$formulas = array();
+		foreach ( $ds->all( 'FRM', null ) as $fid => $f ) {
+			$d    = $f['data'];
+			$decl = (array) $d['inputs'];
+			$sets = array();
+			foreach ( $ds->all( 'TST', null ) as $t ) {
+				if ( (string) $t['data']['formula_id'] === $fid ) {
+					$sets[] = \RBX\Data\Import\Validator::test_inputs( $ds, $decl, (array) $t['data']['inputs'] );
+				}
+			}
+			$sets = array_merge( $sets, self::sample_inputs( $ds, $decl ) );
+			try {
+				$ast = \RBX\Data\Formula\Parser::compile( (string) $d['expression'], $decl, array( $ds, 'is_numeric_field' ) );
+			} catch ( \RBX\Data\Formula\SyntaxError $e ) {
+				WP_CLI::warning( "$fid does not compile: " . $e->getMessage() );
+				continue;
+			}
+			$formulas[ $fid ] = array(
+				'expr' => (string) $d['expression'],
+				'decl' => (object) $decl,
+				'ast'  => $ast,
+			);
+			foreach ( $sets as $in ) {
+				$c = array(
+					'formula' => (string) $fid,
+					'inputs'  => (object) $in,
+				);
+				foreach ( array( 'real' => $real, 'verified' => $verified ) as $k => $data ) {
+					try {
+						$c[ $k ] = array( 'value' => \RBX\Data\Formula\Interpreter::evaluate( $ast, $in, $data ) );
+					} catch ( \RBX\Data\Formula\Unavailable $e ) {
+						$c[ $k ] = array( 'unavailable' => array( $e->reason, $e->what ) );
+					}
+				}
+				$cases[] = $c;
+			}
+		}
+		$out  = (string) ( $assoc['out'] ?? RBX_DATA_DIR . '/tests/fixtures/' . $game->key() . '-real.json' );
+		$json = (string) wp_json_encode(
+			array(
+				'game'     => $game->code(),
+				'dataset'  => \RBX\Data\Data\Repository::version( $game ),
+				'data'     => $real,
+				'verified' => $verified,
+				'formulas' => (object) $formulas,
+				'cases'    => $cases,
+			),
+			JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION
+		);
+		file_put_contents( $out, $json . "\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		WP_CLI::success( count( $cases ) . " case(s) written to $out" );
+	}
+
+	/**
+	 * A small grid of inputs from real records: up to 8 records per ref input, numbers at a few sizes.
+	 *
+	 * @param array<string, array<string, mixed>> $decl Declared inputs.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function sample_inputs( \RBX\Data\Data\Dataset $ds, array $decl ): array {
+		$sets = array( array() );
+		foreach ( $decl as $k => $d ) {
+			$opts = array( null );
+			if ( 'ref' === ( $d['type'] ?? '' ) ) {
+				$ids  = array_keys( $ds->all( (string) $d['target'] ) );
+				$step = max( 1, (int) floor( count( $ids ) / 8 ) );
+				$opts = array_merge( array( null ), array_slice( array_values( array_filter( $ids, static fn( $i ) => 0 === array_search( $i, $ids, true ) % $step ) ), 0, 8 ) );
+			} elseif ( 'number' === ( $d['type'] ?? '' ) ) {
+				$opts = array( null, 2, 37.5, 125000 );
+			}
+			$next = array();
+			foreach ( $sets as $s ) {
+				foreach ( $opts as $o ) {
+					$next[] = null === $o ? $s : $s + array( $k => $o );
+				}
+			}
+			$sets = array_slice( $next, 0, 1500 );
+		}
+		return $sets;
+	}
+
+	/**
 	 * Applies an approved run in batches.
 	 *
 	 * ## OPTIONS
