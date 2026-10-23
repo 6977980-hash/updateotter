@@ -137,7 +137,7 @@ final class Seo {
 	/** @param array<string, string> $robots Rank Math robots. */
 	public static function rm_robots( array $robots ): array {
 		$s = self::state();
-		if ( PageState::NOINDEX === $s ) {
+		if ( PageState::NOINDEX === $s || is_404() ) { // TECH-11: the 404 template is noindex, follow.
 			$robots['index']  = 'noindex';
 			$robots['follow'] = 'follow';
 			unset( $robots['max-snippet'], $robots['max-image-preview'], $robots['max-video-preview'] );
@@ -153,7 +153,7 @@ final class Seo {
 		if ( self::rank_math() ) {
 			return $robots;
 		}
-		if ( PageState::NOINDEX === self::state() ) {
+		if ( PageState::NOINDEX === self::state() || is_404() ) {
 			$robots['noindex'] = true;
 			$robots['follow']  = true;
 			unset( $robots['max-image-preview'] );
