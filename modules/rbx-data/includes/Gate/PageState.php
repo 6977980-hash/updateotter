@@ -34,6 +34,19 @@ final class PageState {
 	public function __construct( private Dataset $ds, private array $opts = array() ) {}
 
 	/**
+	 * A note counts as reviewed only by a human editor: an id in content/author.json `reviewer_ids`
+	 * (or `opts['reviewer_ids']`). Without that list any reviewer except the AI drafter counts.
+	 */
+	private function is_reviewer( string $who ): bool {
+		$who = strtolower( trim( $who ) );
+		if ( '' === $who ) {
+			return false;
+		}
+		$ids = isset( $this->opts['reviewer_ids'] ) ? (array) $this->opts['reviewer_ids'] : \RBX\Data\Render\Ui::reviewer_ids();
+		return $ids ? in_array( $who, $ids, true ) : 'claude' !== $who;
+	}
+
+	/**
 	 * @param array<string, mixed> $rec  Record.
 	 * @param array<string, mixed> $post override ('' | noindex | index), manual_index_ok (bool), was_indexed (bool).
 	 * @return array{state:string, reasons:array<int, string>, page_last_verified:?string, notes:array<int, string>}
@@ -134,9 +147,9 @@ final class PageState {
 			}
 		}
 
-		// I-3 unique, reviewed editorial block.
+		// I-3 unique editorial block, reviewed by a person listed in content/author.json (UO-02).
 		if ( isset( $def['fields']['notes__en'] ) ) {
-			if ( '' === trim( (string) ( $d['notes__en'] ?? '' ) ) || empty( $d['notes_reviewed_by'] ) || empty( $d['notes_reviewed_on'] ) ) {
+			if ( '' === trim( (string) ( $d['notes__en'] ?? '' ) ) || ! $this->is_reviewer( (string) ( $d['notes_reviewed_by'] ?? '' ) ) || empty( $d['notes_reviewed_on'] ) ) {
 				$reasons[] = 'I-3';
 			} else {
 				$mine = $this->shingles( $rec, 'notes' );
