@@ -1,0 +1,189 @@
+/* rbx-tools calculator (UX-05, UX-06, UX-13, UX-14, UX-17, UX-18). Tokens come from the theme (UX-27..30). */
+.rbx-calc {
+	background: var(--surface, #f4f6fa);
+	border: 1px solid var(--border, #d5dce5);
+	border-radius: var(--r-md, 12px);
+	padding: var(--sp-4, 16px);
+	margin-block: var(--sp-5, 24px);
+	position: relative;
+}
+.rbx-calc__title {
+	font-size: var(--fs-lg, 1.125rem);
+	margin: 0 0 var(--sp-3, 12px);
+}
+.rbx-calc__form {
+	display: grid;
+	gap: var(--sp-3, 12px);
+}
+.rbx-calc__field {
+	margin: 0;
+	display: grid;
+	gap: var(--sp-1, 4px);
+}
+.rbx-calc__field > label {
+	font-weight: 600;
+}
+.rbx-calc select,
+.rbx-calc input[type="text"] {
+	min-height: 48px;
+	font-size: 1rem;
+	width: 100%;
+	box-sizing: border-box;
+	padding-inline: var(--sp-3, 12px);
+	background: var(--surface-2, #e9eef5);
+	color: var(--text, #111827);
+	border: 1px solid var(--border-strong, #737f91);
+	border-radius: var(--r-sm, 6px);
+}
+.rbx-calc__num {
+	display: flex;
+	gap: var(--sp-2, 8px);
+}
+.rbx-calc__num input {
+	flex: 1;
+	min-width: 0;
+}
+.rbx-calc__suffix {
+	width: auto !important;
+	flex: 0 0 auto;
+}
+.rbx-calc__field--check {
+	display: flex;
+	align-items: center;
+	min-height: 48px;
+}
+.rbx-calc__field--check input {
+	inline-size: 24px;
+	block-size: 24px;
+}
+.rbx-calc [aria-invalid="true"] {
+	border: 2px solid var(--danger, #b42318);
+}
+.rbx-calc__err {
+	color: var(--danger, #b42318);
+	margin: 0;
+	font-size: var(--fs-sm, 0.875rem);
+}
+.rbx-calc__err::before {
+	content: "⚠ ";
+}
+.rbx-calc__result {
+	margin-top: var(--sp-4, 16px);
+	min-height: 120px;
+	position: sticky;
+	bottom: 0;
+	z-index: 20;
+	background: var(--surface, #f4f6fa);
+	border-top: 1px solid var(--border-strong, #737f91);
+	padding-block: var(--sp-3, 12px) calc(var(--sp-3, 12px) + env(safe-area-inset-bottom));
+}
+.rbx-calc--mini .rbx-calc__result {
+	position: static;
+	min-height: 64px;
+}
+.rbx-calc__outs {
+	margin: 0;
+	display: grid;
+	gap: var(--sp-2, 8px);
+}
+.rbx-calc__out {
+	display: grid;
+	gap: 2px;
+}
+.rbx-calc__out dt {
+	color: var(--text-muted, #4a5565);
+	font-size: var(--fs-sm, 0.875rem);
+}
+.rbx-calc__out dd {
+	margin: 0;
+}
+.rbx-calc__out:first-child .rbx-calc__v {
+	font-size: var(--fs-result, 2rem);
+	font-weight: 800;
+	line-height: 1.1;
+}
+.rbx-calc__v {
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+}
+.rbx-calc__v[data-exact]::after {
+	content: none;
+}
+.rbx-calc__na {
+	color: var(--warning, #9a4a06);
+	font-weight: 600;
+}
+.rbx-calc.is-stale .rbx-calc__outs {
+	opacity: 0.55;
+}
+.rbx-calc__fix {
+	color: var(--danger, #b42318);
+	margin: 0 0 var(--sp-2, 8px);
+}
+.rbx-calc__meta {
+	color: var(--text-muted, #4a5565);
+	font-size: var(--fs-sm, 0.875rem);
+	margin: var(--sp-2, 8px) 0 0;
+}
+.rbx-calc__notice,
+.rbx-calc__error {
+	background: var(--warning-bg, #fdf0e1);
+	color: var(--text, #111827);
+	border-radius: var(--r-sm, 6px);
+	padding: var(--sp-2, 8px) var(--sp-3, 12px);
+	margin: var(--sp-2, 8px) 0 0;
+}
+.rbx-calc__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--sp-2, 8px);
+	align-items: center;
+	margin-top: var(--sp-3, 12px);
+}
+.rbx-calc .button,
+.rbx-calc button {
+	min-height: 48px;
+	min-width: 48px;
+}
+.rbx-calc__formula {
+	margin-top: var(--sp-3, 12px);
+}
+.rbx-calc__formula summary {
+	min-height: 44px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+.rbx-calc__formula code {
+	overflow-wrap: anywhere;
+}
+.rbx-calc .screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+@media (min-width: 900px) {
+	.rbx-calc:not(.rbx-calc--mini) {
+		display: grid;
+		grid-template-columns: minmax(360px, 1fr) minmax(280px, 1fr);
+		column-gap: var(--sp-5, 24px);
+		align-items: start;
+	}
+	.rbx-calc:not(.rbx-calc--mini) > :not(.rbx-calc__form):not(.rbx-calc__result) {
+		grid-column: 1 / -1;
+	}
+	.rbx-calc:not(.rbx-calc--mini) .rbx-calc__result {
+		grid-column: 2;
+		grid-row: 2 / span 2;
+		position: sticky;
+		top: 16px;
+		bottom: auto;
+		margin-top: 0;
+		border-top: 0;
+		border-inline-start: 1px solid var(--border, #d5dce5);
+		padding-inline-start: var(--sp-5, 24px);
+	}
+}

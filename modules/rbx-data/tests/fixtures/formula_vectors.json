@@ -1,0 +1,617 @@
+{
+    "declared": {
+        "pet": {
+            "type": "ref",
+            "target": "PET"
+        },
+        "muts": {
+            "type": "ref_list",
+            "target": "MUT"
+        },
+        "mut": {
+            "type": "ref",
+            "target": "MUT"
+        },
+        "n": {
+            "type": "number"
+        },
+        "b": {
+            "type": "bool"
+        }
+    },
+    "data": {
+        "records": {
+            "PET": {
+                "P1": {
+                    "n": "A",
+                    "base": 10,
+                    "speed": {
+                        "s": "c",
+                        "v": 3
+                    }
+                },
+                "P2": {
+                    "n": "B",
+                    "base": 2500,
+                    "speed": {
+                        "s": "m"
+                    }
+                }
+            },
+            "MUT": {
+                "M1": {
+                    "n": "G",
+                    "mult": 2
+                },
+                "M2": {
+                    "n": "R",
+                    "mult": 3.5
+                }
+            }
+        },
+        "params": {
+            "stack": {
+                "cap": 10
+            }
+        }
+    },
+    "cases": [
+        {
+            "expr": "ref(PET, pet).base * n",
+            "inputs": {
+                "pet": "P1",
+                "n": 3
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "ref",
+                    "PET",
+                    "pet",
+                    "base"
+                ],
+                [
+                    "in",
+                    "n"
+                ]
+            ],
+            "value": 30.0
+        },
+        {
+            "expr": "ref(PET, pet).base * product(refs(MUT, muts).mult)",
+            "inputs": {
+                "pet": "P2",
+                "muts": [
+                    "M1",
+                    "M2"
+                ]
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "ref",
+                    "PET",
+                    "pet",
+                    "base"
+                ],
+                [
+                    "call",
+                    "product",
+                    [
+                        [
+                            "refs",
+                            "MUT",
+                            "muts",
+                            "mult"
+                        ]
+                    ]
+                ]
+            ],
+            "value": 17500.0
+        },
+        {
+            "expr": "ref(PET, pet).base * min(product(refs(MUT, muts).mult), param(stack, cap))",
+            "inputs": {
+                "pet": "P2",
+                "muts": [
+                    "M1",
+                    "M2",
+                    "M2"
+                ]
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "ref",
+                    "PET",
+                    "pet",
+                    "base"
+                ],
+                [
+                    "call",
+                    "min",
+                    [
+                        [
+                            "call",
+                            "product",
+                            [
+                                [
+                                    "refs",
+                                    "MUT",
+                                    "muts",
+                                    "mult"
+                                ]
+                            ]
+                        ],
+                        [
+                            "param",
+                            "stack",
+                            "cap"
+                        ]
+                    ]
+                ]
+            ],
+            "value": 25000.0
+        },
+        {
+            "expr": "if(has(mut), ref(MUT, mut).mult, 1) * 2 ^ 3",
+            "inputs": {
+                "mut": ""
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "call",
+                    "if",
+                    [
+                        [
+                            "has",
+                            "mut"
+                        ],
+                        [
+                            "ref",
+                            "MUT",
+                            "mut",
+                            "mult"
+                        ],
+                        [
+                            "num",
+                            1.0
+                        ]
+                    ]
+                ],
+                [
+                    "bin",
+                    "^",
+                    [
+                        "num",
+                        2.0
+                    ],
+                    [
+                        "num",
+                        3.0
+                    ]
+                ]
+            ],
+            "value": 8.0
+        },
+        {
+            "expr": "if(has(mut), ref(MUT, mut).mult, 1) * -2 ^ 2",
+            "inputs": {
+                "mut": "M2"
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "call",
+                    "if",
+                    [
+                        [
+                            "has",
+                            "mut"
+                        ],
+                        [
+                            "ref",
+                            "MUT",
+                            "mut",
+                            "mult"
+                        ],
+                        [
+                            "num",
+                            1.0
+                        ]
+                    ]
+                ],
+                [
+                    "neg",
+                    [
+                        "bin",
+                        "^",
+                        [
+                            "num",
+                            2.0
+                        ],
+                        [
+                            "num",
+                            2.0
+                        ]
+                    ]
+                ]
+            ],
+            "value": -14.0
+        },
+        {
+            "expr": "round(n \/ 3, 2) + floor(1.5) + ceil(1.2) + abs(-4) + clamp(n, 0, 5)",
+            "inputs": {
+                "n": 10
+            },
+            "ast": [
+                "bin",
+                "+",
+                [
+                    "bin",
+                    "+",
+                    [
+                        "bin",
+                        "+",
+                        [
+                            "bin",
+                            "+",
+                            [
+                                "call",
+                                "round",
+                                [
+                                    [
+                                        "bin",
+                                        "\/",
+                                        [
+                                            "in",
+                                            "n"
+                                        ],
+                                        [
+                                            "num",
+                                            3.0
+                                        ]
+                                    ],
+                                    [
+                                        "num",
+                                        2.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "call",
+                                "floor",
+                                [
+                                    [
+                                        "num",
+                                        1.5
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            "call",
+                            "ceil",
+                            [
+                                [
+                                    "num",
+                                    1.2
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        "call",
+                        "abs",
+                        [
+                            [
+                                "neg",
+                                [
+                                    "num",
+                                    4.0
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    "call",
+                    "clamp",
+                    [
+                        [
+                            "in",
+                            "n"
+                        ],
+                        [
+                            "num",
+                            0.0
+                        ],
+                        [
+                            "num",
+                            5.0
+                        ]
+                    ]
+                ]
+            ],
+            "value": 15.33
+        },
+        {
+            "expr": "sum(refs(MUT, muts).mult) + (n >= 2) + (n == 2) + (n != 2) + b",
+            "inputs": {
+                "muts": [
+                    "M1"
+                ],
+                "n": 2,
+                "b": true
+            },
+            "ast": [
+                "bin",
+                "+",
+                [
+                    "bin",
+                    "+",
+                    [
+                        "bin",
+                        "+",
+                        [
+                            "bin",
+                            "+",
+                            [
+                                "call",
+                                "sum",
+                                [
+                                    [
+                                        "refs",
+                                        "MUT",
+                                        "muts",
+                                        "mult"
+                                    ]
+                                ]
+                            ],
+                            [
+                                "bin",
+                                ">=",
+                                [
+                                    "in",
+                                    "n"
+                                ],
+                                [
+                                    "num",
+                                    2.0
+                                ]
+                            ]
+                        ],
+                        [
+                            "bin",
+                            "==",
+                            [
+                                "in",
+                                "n"
+                            ],
+                            [
+                                "num",
+                                2.0
+                            ]
+                        ]
+                    ],
+                    [
+                        "bin",
+                        "!=",
+                        [
+                            "in",
+                            "n"
+                        ],
+                        [
+                            "num",
+                            2.0
+                        ]
+                    ]
+                ],
+                [
+                    "in",
+                    "b"
+                ]
+            ],
+            "value": 5.0
+        },
+        {
+            "expr": "ref(PET, pet).speed * 2",
+            "inputs": {
+                "pet": "P1"
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "ref",
+                    "PET",
+                    "pet",
+                    "speed"
+                ],
+                [
+                    "num",
+                    2.0
+                ]
+            ],
+            "value": 6.0
+        },
+        {
+            "expr": "ref(PET, pet).speed * 2",
+            "inputs": {
+                "pet": "P2"
+            },
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "ref",
+                    "PET",
+                    "pet",
+                    "speed"
+                ],
+                [
+                    "num",
+                    2.0
+                ]
+            ],
+            "unavailable": [
+                "state_m",
+                "P2.speed"
+            ]
+        },
+        {
+            "expr": "n \/ 0",
+            "inputs": {
+                "n": 1
+            },
+            "ast": [
+                "bin",
+                "\/",
+                [
+                    "in",
+                    "n"
+                ],
+                [
+                    "num",
+                    0.0
+                ]
+            ],
+            "unavailable": [
+                "math",
+                "division by zero"
+            ]
+        },
+        {
+            "expr": "ref(PET, pet).base",
+            "inputs": {
+                "pet": "NOPE"
+            },
+            "ast": [
+                "ref",
+                "PET",
+                "pet",
+                "base"
+            ],
+            "unavailable": [
+                "record",
+                "NOPE"
+            ]
+        },
+        {
+            "expr": "n * 2",
+            "inputs": {},
+            "ast": [
+                "bin",
+                "*",
+                [
+                    "in",
+                    "n"
+                ],
+                [
+                    "num",
+                    2.0
+                ]
+            ],
+            "unavailable": [
+                "input",
+                "n"
+            ]
+        },
+        {
+            "expr": "max(n, 2, 7) - min(3, n)",
+            "inputs": {
+                "n": 4
+            },
+            "ast": [
+                "bin",
+                "-",
+                [
+                    "call",
+                    "max",
+                    [
+                        [
+                            "in",
+                            "n"
+                        ],
+                        [
+                            "num",
+                            2.0
+                        ],
+                        [
+                            "num",
+                            7.0
+                        ]
+                    ]
+                ],
+                [
+                    "call",
+                    "min",
+                    [
+                        [
+                            "num",
+                            3.0
+                        ],
+                        [
+                            "in",
+                            "n"
+                        ]
+                    ]
+                ]
+            ],
+            "value": 4.0
+        },
+        {
+            "expr": "n +",
+            "inputs": {},
+            "syntax_error": "Expected id, got \"end of formula\"."
+        },
+        {
+            "expr": "pet * 2",
+            "inputs": {},
+            "syntax_error": "Input \"pet\" is a record; use ref(PET, pet).field."
+        },
+        {
+            "expr": "evil(n)",
+            "inputs": {},
+            "syntax_error": "Unknown function \"evil\"."
+        },
+        {
+            "expr": "ref(MUT, pet).base",
+            "inputs": {},
+            "syntax_error": "Input \"pet\" points to PET, not MUT."
+        },
+        {
+            "expr": "refs(MUT, mut).mult",
+            "inputs": {},
+            "syntax_error": "refs() needs a list input; \"mut\" is ref."
+        },
+        {
+            "expr": "n ; 2",
+            "inputs": {},
+            "syntax_error": "Unexpected character \";\"."
+        },
+        {
+            "expr": "round(n)",
+            "inputs": {
+                "n": -2.5
+            },
+            "ast": [
+                "call",
+                "round",
+                [
+                    [
+                        "in",
+                        "n"
+                    ]
+                ]
+            ],
+            "value": -3.0
+        }
+    ]
+}

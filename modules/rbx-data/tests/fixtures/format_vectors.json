@@ -1,0 +1,2829 @@
+[
+    {
+        "value": 0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×0"
+    },
+    {
+        "value": 0,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 1,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 1,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 1,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1"
+    },
+    {
+        "value": 1,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 1,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 1,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1"
+    },
+    {
+        "value": 1,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 1,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 7,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "7"
+    },
+    {
+        "value": 7,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "7"
+    },
+    {
+        "value": 7,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×7"
+    },
+    {
+        "value": 7,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "7"
+    },
+    {
+        "value": 7,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "7"
+    },
+    {
+        "value": 7,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "7"
+    },
+    {
+        "value": 7,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "7"
+    },
+    {
+        "value": 7,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "7"
+    },
+    {
+        "value": 12,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "12"
+    },
+    {
+        "value": 12,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "12"
+    },
+    {
+        "value": 12,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×12"
+    },
+    {
+        "value": 12,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "12"
+    },
+    {
+        "value": 12,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "12"
+    },
+    {
+        "value": 12,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "12"
+    },
+    {
+        "value": 12,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "12"
+    },
+    {
+        "value": 12,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "12"
+    },
+    {
+        "value": 999,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999"
+    },
+    {
+        "value": 999,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "999"
+    },
+    {
+        "value": 999,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999.4,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999.4,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999.4,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999.4"
+    },
+    {
+        "value": 999.4,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999.4"
+    },
+    {
+        "value": 999.4,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999.4"
+    },
+    {
+        "value": 999.4,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "999"
+    },
+    {
+        "value": 999.4,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "999"
+    },
+    {
+        "value": 999.4,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999.4"
+    },
+    {
+        "value": 999.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1K"
+    },
+    {
+        "value": 999.5,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000"
+    },
+    {
+        "value": 999.5,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999.5"
+    },
+    {
+        "value": 999.5,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999.5"
+    },
+    {
+        "value": 999.5,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999.5"
+    },
+    {
+        "value": 999.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1K"
+    },
+    {
+        "value": 999.5,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1K"
+    },
+    {
+        "value": 999.5,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999.5"
+    },
+    {
+        "value": 1000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1K"
+    },
+    {
+        "value": 1000,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000"
+    },
+    {
+        "value": 1000,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,000"
+    },
+    {
+        "value": 1000,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000"
+    },
+    {
+        "value": 1000,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000"
+    },
+    {
+        "value": 1000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1K"
+    },
+    {
+        "value": 1000,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1K"
+    },
+    {
+        "value": 1000,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000"
+    },
+    {
+        "value": 1250,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1.25K"
+    },
+    {
+        "value": 1250,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250"
+    },
+    {
+        "value": 1250,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,250"
+    },
+    {
+        "value": 1250,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250"
+    },
+    {
+        "value": 1250,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250"
+    },
+    {
+        "value": 1250,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1.25K"
+    },
+    {
+        "value": 1250,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1,25K"
+    },
+    {
+        "value": 1250,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250"
+    },
+    {
+        "value": 1999,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "2K"
+    },
+    {
+        "value": 1999,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,999"
+    },
+    {
+        "value": 1999,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,999"
+    },
+    {
+        "value": 1999,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,999"
+    },
+    {
+        "value": 1999,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,999"
+    },
+    {
+        "value": 1999,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "2K"
+    },
+    {
+        "value": 1999,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "2K"
+    },
+    {
+        "value": 1999,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,999"
+    },
+    {
+        "value": 12345,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "12.3K"
+    },
+    {
+        "value": 12345,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,345"
+    },
+    {
+        "value": 12345,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×12,345"
+    },
+    {
+        "value": 12345,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,345"
+    },
+    {
+        "value": 12345,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,345"
+    },
+    {
+        "value": 12345,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "12.3K"
+    },
+    {
+        "value": 12345,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "12,3K"
+    },
+    {
+        "value": 12345,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,345"
+    },
+    {
+        "value": 99950,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "100K"
+    },
+    {
+        "value": 99950,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "99,950"
+    },
+    {
+        "value": 99950,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×99,950"
+    },
+    {
+        "value": 99950,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "99,950"
+    },
+    {
+        "value": 99950,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "99,950"
+    },
+    {
+        "value": 99950,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "100K"
+    },
+    {
+        "value": 99950,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "100K"
+    },
+    {
+        "value": 99950,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "99,950"
+    },
+    {
+        "value": 999499,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "999K"
+    },
+    {
+        "value": 999499,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,499"
+    },
+    {
+        "value": 999499,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999,499"
+    },
+    {
+        "value": 999499,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,499"
+    },
+    {
+        "value": 999499,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,499"
+    },
+    {
+        "value": 999499,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "999K"
+    },
+    {
+        "value": 999499,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "999K"
+    },
+    {
+        "value": 999499,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,499"
+    },
+    {
+        "value": 999500,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1M"
+    },
+    {
+        "value": 999500,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500"
+    },
+    {
+        "value": 999500,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999,500"
+    },
+    {
+        "value": 999500,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500"
+    },
+    {
+        "value": 999500,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500"
+    },
+    {
+        "value": 999500,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1M"
+    },
+    {
+        "value": 999500,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1M"
+    },
+    {
+        "value": 999500,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500"
+    },
+    {
+        "value": 999999,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1M"
+    },
+    {
+        "value": 999999,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,999"
+    },
+    {
+        "value": 999999,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999,999"
+    },
+    {
+        "value": 999999,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,999"
+    },
+    {
+        "value": 999999,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,999"
+    },
+    {
+        "value": 999999,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1M"
+    },
+    {
+        "value": 999999,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1M"
+    },
+    {
+        "value": 999999,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,999"
+    },
+    {
+        "value": 1000000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1M"
+    },
+    {
+        "value": 1000000,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000,000"
+    },
+    {
+        "value": 1000000,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,000,000"
+    },
+    {
+        "value": 1000000,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000,000"
+    },
+    {
+        "value": 1000000,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000,000"
+    },
+    {
+        "value": 1000000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1M"
+    },
+    {
+        "value": 1000000,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1M"
+    },
+    {
+        "value": 1000000,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000,000"
+    },
+    {
+        "value": 1250000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1.25M"
+    },
+    {
+        "value": 1250000,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250,000"
+    },
+    {
+        "value": 1250000,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,250,000"
+    },
+    {
+        "value": 1250000,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250,000"
+    },
+    {
+        "value": 1250000,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250,000"
+    },
+    {
+        "value": 1250000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1.25M"
+    },
+    {
+        "value": 1250000,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1,25M"
+    },
+    {
+        "value": 1250000,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,250,000"
+    },
+    {
+        "value": 12500000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "12.5M"
+    },
+    {
+        "value": 12500000,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,500,000"
+    },
+    {
+        "value": 12500000,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×12,500,000"
+    },
+    {
+        "value": 12500000,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,500,000"
+    },
+    {
+        "value": 12500000,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,500,000"
+    },
+    {
+        "value": 12500000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "12.5M"
+    },
+    {
+        "value": 12500000,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "12,5M"
+    },
+    {
+        "value": 12500000,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "12,500,000"
+    },
+    {
+        "value": 125000000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "125M"
+    },
+    {
+        "value": 125000000,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "125,000,000"
+    },
+    {
+        "value": 125000000,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×125,000,000"
+    },
+    {
+        "value": 125000000,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "125,000,000"
+    },
+    {
+        "value": 125000000,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "125,000,000"
+    },
+    {
+        "value": 125000000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "125M"
+    },
+    {
+        "value": 125000000,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "125M"
+    },
+    {
+        "value": 125000000,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "125,000,000"
+    },
+    {
+        "value": 999500000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1B"
+    },
+    {
+        "value": 999500000,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000"
+    },
+    {
+        "value": 999500000,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999,500,000"
+    },
+    {
+        "value": 999500000,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000"
+    },
+    {
+        "value": 999500000,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000"
+    },
+    {
+        "value": 999500000,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1B"
+    },
+    {
+        "value": 999500000,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1B"
+    },
+    {
+        "value": 999500000,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1.5T"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,500,000,000,000"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,500,000,000,000"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,500,000,000,000"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,500,000,000,000"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1.5T"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1,5T"
+    },
+    {
+        "value": 1500000000000.0,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,500,000,000,000"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,000T"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000,000,000"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×999,500,000,000,000"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000,000,000"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000,000,000"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1Qa"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1.000T"
+    },
+    {
+        "value": 999500000000000.0,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "999,500,000,000,000"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "2,500T"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "2,500,000,000,000,000"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×2,500,000,000,000,000"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "2,500,000,000,000,000"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "2,500,000,000,000,000"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "2.5Qa"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "2.500T"
+    },
+    {
+        "value": 2500000000000000.0,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "2,500,000,000,000,000"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "3,000,000T"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "3,000,000,000,000,000,000"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×3,000,000,000,000,000,000"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "3,000,000,000,000,000,000"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "3,000,000,000,000,000,000"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "3Qi"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "3.000.000T"
+    },
+    {
+        "value": 3.0e+18,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "3,000,000T"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "7,250,000,000T"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "7,249,999,999,999,999,475,712"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×7,249,999,999,999,999,099,902.3616"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "7,249,999,999,999,999,475,712"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "7,249,999,999,999,999,099,902.3616"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "7,250Qi"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "7.250.000.000T"
+    },
+    {
+        "value": 7.25e+21,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "7,250,000,000T"
+    },
+    {
+        "value": -1500,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "-1.5K"
+    },
+    {
+        "value": -1500,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "-1,500"
+    },
+    {
+        "value": -1500,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×-1,500"
+    },
+    {
+        "value": -1500,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "-1,500"
+    },
+    {
+        "value": -1500,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "-1,500"
+    },
+    {
+        "value": -1500,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "-1.5K"
+    },
+    {
+        "value": -1500,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "-1,5K"
+    },
+    {
+        "value": -1500,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "-1,500"
+    },
+    {
+        "value": -0.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "-0.5"
+    },
+    {
+        "value": -0.5,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "-1"
+    },
+    {
+        "value": -0.5,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×-0.5"
+    },
+    {
+        "value": -0.5,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "-0.5"
+    },
+    {
+        "value": -0.5,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "-0.5"
+    },
+    {
+        "value": -0.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "-0.5"
+    },
+    {
+        "value": -0.5,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "-0,5"
+    },
+    {
+        "value": -0.5,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "-0.5"
+    },
+    {
+        "value": 0.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.5"
+    },
+    {
+        "value": 0.5,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1"
+    },
+    {
+        "value": 0.5,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×0.5"
+    },
+    {
+        "value": 0.5,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.5"
+    },
+    {
+        "value": 0.5,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.5"
+    },
+    {
+        "value": 0.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "0.5"
+    },
+    {
+        "value": 0.5,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "0,5"
+    },
+    {
+        "value": 0.5,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.5"
+    },
+    {
+        "value": 0.123456,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.123"
+    },
+    {
+        "value": 0.123456,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0.123456,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×0.1235"
+    },
+    {
+        "value": 0.123456,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.12"
+    },
+    {
+        "value": 0.123456,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.1235"
+    },
+    {
+        "value": 0.123456,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "0.123"
+    },
+    {
+        "value": 0.123456,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "0,123"
+    },
+    {
+        "value": 0.123456,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.1235"
+    },
+    {
+        "value": 0.0001234,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.000123"
+    },
+    {
+        "value": 0.0001234,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0.0001234,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×0.0001"
+    },
+    {
+        "value": 0.0001234,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0.0001234,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.0001"
+    },
+    {
+        "value": 0.0001234,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "0.000123"
+    },
+    {
+        "value": 0.0001234,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "0,000123"
+    },
+    {
+        "value": 0.0001234,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.0001"
+    },
+    {
+        "value": 1234567.891,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "1.23M"
+    },
+    {
+        "value": 1234567.891,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,234,568"
+    },
+    {
+        "value": 1234567.891,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×1,234,567.891"
+    },
+    {
+        "value": 1234567.891,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,234,567.89"
+    },
+    {
+        "value": 1234567.891,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,234,567.891"
+    },
+    {
+        "value": 1234567.891,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "1.23M"
+    },
+    {
+        "value": 1234567.891,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "1,23M"
+    },
+    {
+        "value": 1234567.891,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "1,234,567.891"
+    },
+    {
+        "value": 2.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "2.5"
+    },
+    {
+        "value": 2.5,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "3"
+    },
+    {
+        "value": 2.5,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×2.5"
+    },
+    {
+        "value": 2.5,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "2.5"
+    },
+    {
+        "value": 2.5,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "2.5"
+    },
+    {
+        "value": 2.5,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "2.5"
+    },
+    {
+        "value": 2.5,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "2,5"
+    },
+    {
+        "value": 2.5,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "2.5"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.0000001"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "int",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "mult",
+        "locale": "en",
+        "ladder": null,
+        "out": "×0"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "decimal(2)",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "plain",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "abbr",
+        "locale": "en",
+        "ladder": [
+            {
+                "s": "K",
+                "e": 3
+            },
+            {
+                "s": "M",
+                "e": 6
+            },
+            {
+                "s": "B",
+                "e": 9
+            },
+            {
+                "s": "T",
+                "e": 12
+            },
+            {
+                "s": "Qa",
+                "e": 15
+            },
+            {
+                "s": "Qi",
+                "e": 18
+            }
+        ],
+        "out": "0.0000001"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "abbr",
+        "locale": "id",
+        "ladder": null,
+        "out": "0,0000001"
+    },
+    {
+        "value": 1.0e-7,
+        "format": "exact",
+        "locale": "en",
+        "ladder": null,
+        "out": "0"
+    },
+    {
+        "value": 0,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "0%"
+    },
+    {
+        "value": 1,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "100%"
+    },
+    {
+        "value": 0.5,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "50%"
+    },
+    {
+        "value": 0.25,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "25%"
+    },
+    {
+        "value": 0.0123,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "1.2%"
+    },
+    {
+        "value": 0.001,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.1%"
+    },
+    {
+        "value": 0.000123,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "0.012%"
+    },
+    {
+        "value": 5.0e-7,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "1 in 2,000,000"
+    },
+    {
+        "value": 1.0e-8,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "1 in 100,000,000"
+    },
+    {
+        "value": 0.999,
+        "format": "prob",
+        "locale": "en",
+        "ladder": null,
+        "out": "99.9%"
+    },
+    {
+        "value": 0,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "0s"
+    },
+    {
+        "value": 5,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "5s"
+    },
+    {
+        "value": 59.6,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1m 00s"
+    },
+    {
+        "value": 60,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1m 00s"
+    },
+    {
+        "value": 61,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1m 01s"
+    },
+    {
+        "value": 3599,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "59m 59s"
+    },
+    {
+        "value": 3600,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1h 00m 00s"
+    },
+    {
+        "value": 3661,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1h 01m 01s"
+    },
+    {
+        "value": 86399,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "23h 59m 59s"
+    },
+    {
+        "value": 86400,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1d 00h 00m 00s"
+    },
+    {
+        "value": 90061,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "1d 01h 01m 01s"
+    },
+    {
+        "value": 1000000,
+        "format": "duration",
+        "locale": "en",
+        "ladder": null,
+        "out": "11d 13h 46m 40s"
+    }
+]

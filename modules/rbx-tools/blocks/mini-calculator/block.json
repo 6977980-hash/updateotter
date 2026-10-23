@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "rbx/mini-calculator",
+	"title": "RBX Mini Calculator",
+	"category": "widgets",
+	"icon": "calculator",
+	"description": "Compact calculator with one record fixed. Item pages add it automatically.",
+	"textdomain": "rbx-tools",
+	"attributes": {
+		"game": { "type": "string", "default": "" },
+		"tool": { "type": "string", "default": "" },
+		"record": { "type": "string", "default": "" }
+	},
+	"supports": { "html": false, "reusable": false, "inserter": false },
+	"style": "rbx-calculator-style",
+	"render": "file:./render.php"
+}

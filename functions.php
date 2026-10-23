@@ -13,6 +13,6 @@ defined( 'ABSPATH' ) || exit;
 define( 'UPDATEOTTER_VERSION', '1.0.0' );
 define( 'UPDATEOTTER_DIR', __DIR__ );
 
-foreach ( array( 'setup', 'assets', 'head', 'root-files', 'prelaunch', 'navigation', 'ads', 'template-tags' ) as $updateotter_file ) {
+foreach ( array( 'modules', 'setup', 'assets', 'head', 'root-files', 'prelaunch', 'navigation', 'ads', 'template-tags' ) as $updateotter_file ) {
 	require __DIR__ . '/inc/' . $updateotter_file . '.php';
 }
