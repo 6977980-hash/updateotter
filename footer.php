@@ -39,6 +39,7 @@ $updateotter_links = updateotter_footer_links();
 			<?php endforeach; ?>
 		</div>
 		<p class="footer-disclaimer"><?php echo esc_html( updateotter_disclaimer() ); ?></p>
+		<p class="footer-disclaimer"><?php echo wp_kses( updateotter_license_line(), array( 'a' => array( 'href' => true, 'rel' => true ) ) ); ?></p>
 		<div class="footer-bottom">
 			<?php updateotter_theme_toggle(); ?>
 			<p>&copy; <?php echo esc_html( wp_date( 'Y' ) ); ?> UpdateOtter</p>

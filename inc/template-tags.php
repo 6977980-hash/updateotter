@@ -14,6 +14,16 @@ function updateotter_disclaimer(): string {
 	return 'UpdateOtter is an independent fan site. It is not affiliated with, endorsed, sponsored or approved by Roblox Corporation or the developers of the games covered. Roblox and the game names are trademarks of their respective owners and are used here only to identify the games.';
 }
 
+/** CC BY-SA credit for the wiki data (UO-04). Our own text and code are not under it. */
+function updateotter_license_line(): string {
+	return sprintf(
+		/* translators: 1: links to the Fandom wikis, 2: link to the CC BY-SA licence */
+		esc_html__( 'Game data is adapted from the %1$s wikis on Fandom, licensed %2$s; our changes to that data use the same licence.', 'updateotter' ),
+		'<a href="https://stealanegg.fandom.com/" rel="noopener">Steal an Egg</a>, <a href="https://growagarden.fandom.com/" rel="noopener">Grow a Garden</a>, <a href="https://growagarden2.fandom.com/" rel="noopener">Grow a Garden 2</a> ' . esc_html__( 'and', 'updateotter' ) . ' <a href="https://fish-it.fandom.com/" rel="noopener">Fish It!</a>',
+		'<a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license noopener">CC BY-SA</a>'
+	);
+}
+
 /** Inline SVG lockup (UX-53): colours follow the tokens, so it switches with dark mode. */
 function updateotter_logo(): void {
 	static $svg = null;

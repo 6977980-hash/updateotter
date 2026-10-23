@@ -4,6 +4,8 @@
   "short_name": "Fish It",
   "nav_order": 4,
   "folder": "fish-it",
+  "wiki_url": "https://fish-it.fandom.com/",
+  "wiki_name": "Fish It! Wiki",
   "roblox_universe_id": "6701277882",
   "roblox_place_id": "121864768012064",
   "schema_version": "1.0",

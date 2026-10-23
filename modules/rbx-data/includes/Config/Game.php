@@ -59,6 +59,15 @@ final class Game {
 		return (string) $this->config['folder'];
 	}
 
+	/** Fandom wiki the game data is adapted from (CC BY-SA, UO-04). */
+	public function wiki_url(): string {
+		return (string) ( $this->config['wiki_url'] ?? '' );
+	}
+
+	public function wiki_name(): string {
+		return (string) ( $this->config['wiki_name'] ?? $this->name() . ' Wiki' );
+	}
+
 	public function freshness_days(): int {
 		return (int) ( $this->config['freshness_days'] ?? 30 );
 	}

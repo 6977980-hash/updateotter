@@ -4,6 +4,8 @@
   "short_name": "Steal an Egg",
   "nav_order": 1,
   "folder": "steal-an-egg",
+  "wiki_url": "https://stealanegg.fandom.com/",
+  "wiki_name": "Steal an Egg Wiki",
   "roblox_universe_id": "10563114921",
   "roblox_place_id": "107778070777162",
   "schema_version": "1.0",
@@ -64,7 +66,7 @@
         "is_lab_egg": { "type": "bool", "label__en": "Lab egg (Dr. Scramble)" },
         "obtain_method": { "type": "enum", "enum": ["biome_spawn", "shop", "lab", "event", "game_pass", "other"], "label__en": "How to get", "required_for_index": true, "facet": true },
         "odds_published": { "type": "bool", "label__en": "Odds published by the developer" },
-        "notes__en": { "type": "text", "label__en": "Notes from testing", "editorial": true },
+        "notes__en": { "type": "text", "label__en": "Our notes", "editorial": true },
         "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
         "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
       },
@@ -97,7 +99,7 @@
         "is_mountable": { "type": "bool", "label__en": "Can be ridden", "requires_mechanics": ["mounts"] },
         "tier_list_rank": { "type": "enum", "enum": ["S", "A", "B", "C", "D"], "label__en": "Tier", "opinion": true },
         "tier_rationale__en": { "type": "text", "label__en": "Why this tier", "opinion": true },
-        "notes__en": { "type": "text", "label__en": "Notes from testing", "editorial": true },
+        "notes__en": { "type": "text", "label__en": "Our notes", "editorial": true },
         "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
         "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
       },
@@ -126,7 +128,7 @@
         "obtain_method_text__en": { "type": "text", "label__en": "How to get", "required_for_index": true, "list": true },
         "visual_color_hex": { "type": "string", "label__en": "Colour", "pattern": "^#[0-9A-Fa-f]{6}$" },
         "chance_prob": { "type": "prob", "label__en": "Chance", "display_format": "prob" },
-        "notes__en": { "type": "text", "label__en": "Notes from testing", "editorial": true },
+        "notes__en": { "type": "text", "label__en": "Our notes", "editorial": true },
         "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
         "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
       },

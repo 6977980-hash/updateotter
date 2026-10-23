@@ -4,6 +4,8 @@
   "short_name": "Grow a Garden",
   "nav_order": 2,
   "folder": "grow-a-garden",
+  "wiki_url": "https://growagarden.fandom.com/",
+  "wiki_name": "Grow a Garden Wiki",
   "roblox_universe_id": "7436755782",
   "roblox_place_id": "126884695634066",
   "schema_version": "1.0",

@@ -127,13 +127,13 @@ final class Calculator {
 
 		$page_lv = (string) get_post_meta( (int) get_the_ID(), '_rbx_page_last_verified', true );
 		$meta    = sprintf(
-			/* translators: 1: dataset version, 2: "last verified <date>" or "not checked in game yet" */
+			/* translators: 1: dataset version, 2: "data from the community wiki, <date>" or "no data date yet" */
 			esc_html__( 'Data version %1$s, %2$s', 'rbx-tools' ),
 			esc_html( $manifest['version'] ),
 			'' !== $page_lv
 				/* translators: %s: date */
-				? sprintf( esc_html__( 'last verified %s', 'rbx-tools' ), '<time datetime="' . esc_attr( $page_lv ) . '">' . esc_html( wp_date( 'j M Y', strtotime( $page_lv . ' 12:00 UTC' ) ) ) . '</time>' )
-				: esc_html__( 'not checked in game yet', 'rbx-tools' )
+				? sprintf( esc_html__( 'data from the community wiki, %s', 'rbx-tools' ), '<time datetime="' . esc_attr( $page_lv ) . '">' . esc_html( wp_date( 'j M Y', strtotime( $page_lv . ' 12:00 UTC' ) ) ) . '</time>' )
+				: esc_html__( 'no data date yet', 'rbx-tools' )
 		);
 
 		$title = $mini ? esc_html__( 'Quick calculator', 'rbx-tools' ) : esc_html( (string) ( $tool['label__en'] ?? '' ) );
@@ -145,7 +145,7 @@ final class Calculator {
 			. '<p class="rbx-calc__meta">' . $meta . '</p>'
 			. ( $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Source: community wiki.', 'rbx-tools' ) . '</strong> ' . ( $game->wiki_formula_ok()
 				? esc_html__( 'The values and the formula come from the community wiki. We have not tested them in the game ourselves yet.', 'rbx-tools' )
-				: esc_html__( 'Most pet values come from the community wiki and are not all checked in game yet. The formula matched our in-game test.', 'rbx-tools' ) ) . '</p>' : '' )
+				: esc_html__( 'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.', 'rbx-tools' ) ) . '</p>' : '' )
 			. '<p class="rbx-calc__notice" role="alert" hidden data-rbx-notice></p>'
 			. '<div class="rbx-calc__error" hidden data-rbx-load-error><p>' . esc_html__( 'The live calculator could not load. The example result below is correct for the default inputs.', 'rbx-tools' ) . '</p><button type="button" class="button" data-rbx-retry>' . esc_html__( 'Try again', 'rbx-tools' ) . '</button></div>'
 			. '</div>'
