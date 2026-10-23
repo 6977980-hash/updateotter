@@ -8,6 +8,9 @@
  * - `go_live`: turns the pre-launch lock off and "Discourage search engines" off in the same
  *   step (P1-45), flushes rewrite rules and purges the page cache.
  *
+ * - `purge`: purges the whole page cache once. Change its id in a PR whose deploy changes
+ *   output on cached pages (head tags, robots.txt, sitemaps).
+ *
  * A step runs once per id, on the first request after the deploy. Turning the lock back on in
  * RBX Data → Setup is not undone by a later request. Status: GET /wp-json/rbx/v1/launch.
  *
@@ -31,7 +34,7 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'purge' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
@@ -119,6 +122,14 @@ add_action(
 				'pending' => $todo['publish'],
 				'at'      => gmdate( 'Y-m-d H:i:s' ),
 			) + $r;
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		if ( isset( $todo['purge'] ) ) {
+			do_action( 'litespeed_purge_all' );
+			$state['purge'] = array(
+				'id' => $todo['purge'],
+				'at' => gmdate( 'Y-m-d H:i:s' ),
+			);
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
 		// Go-live waits until every Page is published, so the site never opens with missing pages.
