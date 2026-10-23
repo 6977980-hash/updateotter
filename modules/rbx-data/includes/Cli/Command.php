@@ -118,6 +118,27 @@ final class Command {
 	}
 
 	/**
+	 * Writes the bundled page copy from the theme's content/pages/ folder into the Pages now.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--force]
+	 * : Also overwrite Pages that were edited in WordPress.
+	 *
+	 * @subcommand pages-sync
+	 *
+	 * @param array<int, string>    $args  Args.
+	 * @param array<string, string> $assoc Options.
+	 */
+	public function pages_sync( array $args, array $assoc ): void {
+		$s = \RBX\Data\Content\BundledPages::sync( isset( $assoc['force'] ) );
+		foreach ( $s['skipped'] as $path => $why ) {
+			WP_CLI::warning( "$path: $why" );
+		}
+		WP_CLI::success( count( $s['written'] ) . ' page(s) written.' );
+	}
+
+	/**
 	 * Applies an approved run in batches.
 	 *
 	 * ## OPTIONS

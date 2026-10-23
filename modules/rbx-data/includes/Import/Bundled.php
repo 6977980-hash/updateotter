@@ -96,6 +96,14 @@ final class Bundled {
 				'queued'        => (bool) wp_next_scheduled( self::HOOK ),
 			);
 		}
+		$pages               = \RBX\Data\Content\BundledPages::state();
+		$out['_pages']       = array(
+			'deployed_hash' => \RBX\Data\Content\BundledPages::hash(),
+			'synced_hash'   => (string) ( $pages['hash'] ?? '' ),
+			'at'            => (string) ( $pages['at'] ?? '' ),
+			'written'       => (array) ( $pages['written'] ?? array() ),
+			'skipped'       => (array) ( $pages['skipped'] ?? array() ),
+		);
 		return $out;
 	}
 

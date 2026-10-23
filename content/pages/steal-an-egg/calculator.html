@@ -1,0 +1,81 @@
+<!-- wp:paragraph -->
+<p>This calculator shows how much Cash a Steal an Egg pet earns per second, with its mutation and weight.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/calculator {"game":"sae","tool":"calculator"} /-->
+
+<!-- wp:heading {"anchor":"how-to-use"} -->
+<h2 class="wp-block-heading" id="how-to-use">How to use it</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list">
+<!-- wp:list-item -->
+<li>Pick your pet.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Pick its mutation, or leave "No mutation".</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Type the weight in kg from the pet card. Leave it empty to use the pet's normal weight.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Set how many of that pet you have.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Use "Copy link" to share the result.</li>
+<!-- /wp:list-item -->
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"anchor":"how-it-is-calculated"} -->
+<h2 class="wp-block-heading" id="how-it-is-calculated">How it is calculated</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Income per second = the pet's base income × the mutation multiplier × a weight factor × how many you have.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The weight factor compares your pet's weight with its base weight. Heavier pets earn more, but the extra income grows more slowly for very heavy pets. The exact formula is shown under the calculator.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"anchor":"worked-example"} -->
+<h2 class="wp-block-heading" id="worked-example">Worked example</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The calculator starts with a Shark at its base weight and no mutation. Its result is the Shark's base income: [rbx_value id="SAE-PET-0051" field="base_income_per_s"] Cash per second. With a Golden mutation, multiply that by [rbx_value id="SAE-MUT-0003" field="income_mult"].</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"anchor":"inputs"} -->
+<h2 class="wp-block-heading" id="inputs">What each input means</h2>
+<!-- /wp:heading -->
+
+<!-- wp:html -->
+<dl><dt>Pet</dt><dd>The pet you hatched.</dd><dt>Mutation</dt><dd>The colour mutation shown on the pet, such as Golden or Rainbow.</dd><dt>Weight in kg</dt><dd>The weight on the pet card. Bigger eggs hatch heavier pets.</dd><dt>How many</dt><dd>How many copies of this pet you have in your pen.</dd></dl>
+<!-- /wp:html -->
+
+<!-- wp:heading {"anchor":"limits"} -->
+<h2 class="wp-block-heading" id="limits">Limits and known gaps</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li>The income formula, the weight factor and the mutation multipliers are still marked "Unconfirmed" until we test them in game. Until then the calculator shows "Not available yet".</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>We do not know yet if a pet can have two colour mutations at once.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Game passes and boosts (for example a Cash booster) are not included.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>The calculator reads the <a href="/steal-an-egg/pets/">pets list</a> and the <a href="/steal-an-egg/mutations/">mutations list</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/data-section {"game":"sae","section":"changes"} /-->

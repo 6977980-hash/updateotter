@@ -80,7 +80,9 @@ final class NumberLint {
 				}
 			}
 		}
-		$lower = mb_strtolower( $text );
+		// Quoted warnings and label names (CONT-48 exceptions: scam warnings, the DATA-05 labels) sit in an element with class rbx-lint-quote.
+		$quoted = preg_replace( '/<(p|ul|figure|table)\b[^>]*\brbx-lint-quote\b[^>]*>.*?<\/\1>/s', ' ', $content ) ?? $content;
+		$lower  = mb_strtolower( self::prose( $quoted ) . "\n" . $title . "\n" . $excerpt );
 		foreach ( self::BANNED as $w ) {
 			if ( preg_match( '/(?<![\w])' . preg_quote( $w, '/' ) . '(?![\w])/u', $lower ) ) {
 				$issues[] = array(
