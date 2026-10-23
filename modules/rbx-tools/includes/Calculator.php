@@ -139,7 +139,7 @@ final class Calculator {
 			. '<noscript><p class="rbx-note">' . esc_html__( 'Turn on JavaScript to change inputs; the example below is still accurate.', 'rbx-tools' ) . '</p></noscript>'
 			. '<div class="rbx-calc__result"><p class="rbx-calc__fix" hidden data-rbx-fix>' . esc_html__( 'Fix the highlighted field to update', 'rbx-tools' ) . '</p><dl class="rbx-calc__outs">' . $results . '</dl>'
 			. '<p class="rbx-calc__meta">' . $meta . '</p>'
-			. ( $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Unconfirmed:', 'rbx-tools' ) . '</strong> ' . esc_html__( 'most values come from the community wiki and are not all checked in game yet. The formula matched our in-game test.', 'rbx-tools' ) . '</p>' : '' )
+			. ( $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Source: community wiki.', 'rbx-tools' ) . '</strong> ' . esc_html__( 'Most pet values come from the community wiki and are not all checked in game yet. The formula matched our in-game test.', 'rbx-tools' ) . '</p>' : '' )
 			. '<p class="rbx-calc__notice" role="alert" hidden data-rbx-notice></p>'
 			. '<div class="rbx-calc__error" hidden data-rbx-load-error><p>' . esc_html__( 'The live calculator could not load. The example result below is correct for the default inputs.', 'rbx-tools' ) . '</p><button type="button" class="button" data-rbx-retry>' . esc_html__( 'Try again', 'rbx-tools' ) . '</button></div>'
 			. '</div>'

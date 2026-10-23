@@ -309,13 +309,13 @@ final class Dataset {
 	/** DATA-05 display vocabulary. */
 	public static function state_label( string $state, bool $mechanic_ok = true ): string {
 		if ( ! $mechanic_ok && in_array( $state, array( 'verified', 'community' ), true ) ) {
-			return __( 'Unconfirmed', 'rbx-data' );
+			return __( 'Not tested in game yet', 'rbx-data' );
 		}
 		switch ( $state ) {
 			case 'verified':
 				return __( 'Verified', 'rbx-data' );
 			case 'community':
-				return __( 'Unconfirmed', 'rbx-data' );
+				return __( 'Source: community wiki', 'rbx-data' );
 			case 'disputed':
 				return __( 'Conflicting reports', 'rbx-data' );
 		}
