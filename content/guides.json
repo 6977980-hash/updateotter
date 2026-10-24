@@ -844,6 +844,8 @@
         "label": "Dr. Scramble's Lab guide",
         "summary": "How the Lab trade-in works, what each of the three banners asks for and gives, which banner to use and whether trading pets in is worth it",
         "queue": true,
+        "reviewed_by": "ali",
+        "reviewed_on": "2026-10-24",
         "facts": [
           [
             "rarity",
