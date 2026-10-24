@@ -22,21 +22,15 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Insights {
 
-	/**
-	 * Weight steps for the weight table, as multiples of the base weight. Capped at 10x until
-	 * heavier pets are read in game: the weight rule rests on one reading (UO-07).
-	 */
-	private const WEIGHT_STEPS = array( 1, 2, 5, 10 );
-
 	/** Most pets shown in a mutation's effect table. */
 	private const MUT_TABLE_MAX = 20;
 
 	public static function render( Dataset $ds, array $rec ): string {
 		switch ( (string) $rec['entity'] ) {
 			case 'PET':
-				return self::pet_glance( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
+				return self::pet_glance( $ds, $rec ) . self::pet_zone( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
 			case 'MUT':
-				return $ds->game()->entity( 'PLT' ) ? self::crop_mutation_effect( $ds, $rec ) : self::mutation_effect( $ds, $rec );
+				return $ds->game()->entity( 'PLT' ) ? self::crop_mutation_effect( $ds, $rec ) : self::mutation_effect( $ds, $rec ) . self::mutation_equivalents( $ds, $rec );
 			case 'PLT':
 				return self::plant_glance( $ds, $rec ) . self::plant_value( $ds, $rec ) . self::plant_weight( $ds, $rec );
 		}
@@ -211,36 +205,190 @@ final class Insights {
 		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much does a %s make?', 'rbx-data' ), $name ), 'income' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
 	}
 
+	/**
+	 * One sentence instead of a table (UO-69): the weight rule is the same for every pet, so the
+	 * table repeated itself on every page. The calculator takes the player's own weight.
+	 */
 	private static function pet_weight( Dataset $ds, array $rec ): string {
-		$bw = $rec['data']['base_weight_kg'] ?? null;
-		if ( ! is_numeric( $bw ) || (float) $bw <= 0 || null === self::base_income( $ds, $rec ) ) {
+		$bw   = $rec['data']['base_weight_kg'] ?? null;
+		$base = self::base_income( $ds, $rec );
+		if ( ! is_numeric( $bw ) || (float) $bw <= 0 || null === $base || $base <= 0 ) {
 			return '';
 		}
 		$bw   = (float) $bw;
 		$name = (string) $rec['name'];
-		$base = self::base_income( $ds, $rec );
-		$rows = '';
-		foreach ( self::WEIGHT_STEPS as $k ) {
-			$v = self::income( $ds, (string) $rec['id'], null, $bw * $k );
-			if ( null === $v ) {
-				return '';
-			}
-			$rows .= '<tr><th scope="row">' . Ui::number( $ds, $bw * $k, 'abbr' ) . ' kg</th><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, round( $v / $base, 2 ), 'mult' ) . '</td></tr>';
+		$two  = self::income( $ds, (string) $rec['id'], null, $bw * 2 );
+		$ten  = self::income( $ds, (string) $rec['id'], null, $bw * 10 );
+		if ( null === $two || null === $ten ) {
+			return '';
 		}
-		$ten   = self::income( $ds, (string) $rec['id'], null, $bw * 10 );
-		$intro = sprintf(
-			/* translators: 1: pet, 2: base weight, 3: ratio */
-			esc_html__( 'Every %1$s hatches with its own weight. The base weight is %2$s kg. A heavier one earns more, but the gain per kg shrinks as the weight grows: at ten times the base weight it earns about %3$s times as much, not ten.', 'rbx-data' ),
+		$text = sprintf(
+			/* translators: 1: pet, 2: base weight, 3: weight x2, 4: income at x2, 5: weight x10, 6: income at x10, 7: ratio at x10 */
+			esc_html__( 'Yes, but not in step with the weight. A %1$s at its base weight of %2$s kg is the plain income above; at %3$s kg it earns %4$s per second, and at %5$s kg %6$s, about %7$s times the base, not ten.', 'rbx-data' ),
 			esc_html( $name ),
 			Ui::number( $ds, $bw, 'abbr' ),
-			esc_html( self::ratio( (float) $ten / $base ) )
+			Ui::number( $ds, $bw * 2, 'abbr' ),
+			Ui::number( $ds, $two, 'abbr' ),
+			Ui::number( $ds, $bw * 10, 'abbr' ),
+			Ui::number( $ds, $ten, 'abbr' ),
+			esc_html( self::ratio( $ten / $base ) )
 		);
+		$chip = 'confirmed' !== $ds->mechanic_status( 'weight_scaling' ) ? ' <span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Partly tested in game', 'rbx-data' ) . '</span>' : '';
+		$calc = Item::calculator_link( $ds->game(), $rec );
 		/* translators: %s: pet */
-		$cap   = sprintf( __( 'Income of one %s with no mutation at different weights', 'rbx-data' ), $name );
-		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Weight', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Compared with base', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
-		$note  = 'confirmed' !== $ds->mechanic_status( 'weight_scaling' ) ? '<p class="rbx-note"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Partly tested in game', 'rbx-data' ) . '</span> ' . esc_html__( 'The weight rule comes from the community wiki and matched one in-game reading. The table stops at ten times the base weight because heavier pets have not been checked yet.', 'rbx-data' ) . '</p>' : '';
+		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $text . $chip . '</p>' . ( '' !== $calc ? '<p>' . $calc . '</p>' : '' ) . '</section>';
+	}
+
+	/**
+	 * "Is it worth it?" (UO-69): where the pet sits among the pets of its own zone, the next pet up
+	 * and down with the extra hatch time, and the Speed the zone and the next zone need. Built from
+	 * the zone's biome eggs, so each page gets numbers no other page has.
+	 */
+	private static function pet_zone( Dataset $ds, array $rec ): string {
+		$base = self::base_income( $ds, $rec );
+		$home = self::zone_of( $ds, (string) $rec['id'] );
+		if ( null === $base || $base <= 0 || null === $home ) {
+			return '';
+		}
+		[ $bio, $egg ] = $home;
+		$pets = self::zone_pets( $ds, (string) $bio['id'] );
+		$ids  = array_keys( $pets );
+		$pos  = array_search( (string) $rec['id'], $ids, true );
+		if ( false === $pos || count( $pets ) < 2 ) {
+			return '';
+		}
+		$name  = (string) $rec['name'];
+		$facts = array();
+		$facts[] = 0 === $pos
+			/* translators: 1: pet, 2: zone, 3: count */
+			? sprintf( esc_html__( 'The %1$s earns the most of the %3$s pets whose eggs spawn in %2$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ) )
+			/* translators: 1: pet, 2: zone, 3: count, 4: ordinal */
+			: sprintf( esc_html__( 'Of the %3$s pets whose eggs spawn in %2$s, the %1$s earns %4$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ), esc_html( count( $pets ) === $pos + 1 ? __( 'the least', 'rbx-data' ) : self::nth( $pos + 1, __( 'most', 'rbx-data' ) ) ) );
+		$hatch = static fn( array $e ): ?float => is_numeric( $e['data']['hatch_time_s'] ?? null ) && (float) $e['data']['hatch_time_s'] > 0 ? (float) $e['data']['hatch_time_s'] : null;
+		$mine  = $hatch( $egg );
+		if ( $pos > 0 ) {
+			$up      = $pets[ $ids[ $pos - 1 ] ];
+			$uh      = $hatch( $up['egg'] );
+			$line    = sprintf(
+				/* translators: 1: stronger pet link, 2: ratio, 3: pet */
+				esc_html__( 'The next step up in the same zone is %1$s, which earns about %2$s times as much as the %3$s', 'rbx-data' ),
+				Ui::link( $up['record'] ),
+				esc_html( self::ratio( $up['income'] / $base ) ),
+				esc_html( $name )
+			);
+			if ( null !== $uh && null !== $mine ) {
+				/* translators: 1: duration, 2: duration */
+				$line .= sprintf( esc_html__( '; its egg takes %1$s to hatch instead of %2$s', 'rbx-data' ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $uh ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $mine ) );
+			}
+			$facts[] = $line . '.';
+		}
+		if ( $pos + 1 < count( $ids ) ) {
+			$down    = $pets[ $ids[ $pos + 1 ] ];
+			$facts[] = sprintf(
+				/* translators: 1: pet, 2: ratio, 3: weaker pet link */
+				esc_html__( 'Worth replacing? A %1$s earns about %2$s times as much as %3$s, the next pet down in this zone, so it is an upgrade over that pet and everything below it.', 'rbx-data' ),
+				esc_html( $name ),
+				esc_html( self::ratio( $base / max( $down['income'], 1e-9 ) ) ),
+				Ui::link( $down['record'] )
+			);
+		}
+		$speed = $bio['data']['unlock_speed_required'] ?? null;
+		$next  = self::next_zone( $ds, $bio );
+		if ( is_numeric( $speed ) ) {
+			$line = (float) $speed > 0
+				/* translators: 1: zone, 2: speed */
+				? sprintf( esc_html__( 'To carry its egg home you first need %2$s Speed to reach %1$s', 'rbx-data' ), esc_html( (string) $bio['name'] ), Ui::number( $ds, $speed + 0, 'abbr' ) )
+				/* translators: %s: zone */
+				: sprintf( esc_html__( '%s is open from the start, so you can carry its egg home with no Speed upgrades', 'rbx-data' ), esc_html( (string) $bio['name'] ) );
+			if ( $next ) {
+				/* translators: 1: next zone, 2: speed */
+				$line .= sprintf( esc_html__( '; the next zone, %1$s, needs %2$s Speed', 'rbx-data' ), esc_html( (string) $next['name'] ), Ui::number( $ds, $next['data']['unlock_speed_required'] + 0, 'abbr' ) );
+			}
+			$facts[] = $line . '.';
+		}
+		$rows = '';
+		foreach ( $pets as $id => $p ) {
+			$me    = $id === (string) $rec['id'];
+			$h     = $hatch( $p['egg'] );
+			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' . ( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : '' ) . '</td><td class="rbx-num-cell">' . ( $me ? '' : Ui::number( $ds, round( $p['income'] / $base, 2 ), 'mult' ) ) . '</td></tr>';
+		}
+		$li = '';
+		foreach ( $facts as $f ) {
+			$li .= '<li>' . $f . '</li>';
+		}
+		/* translators: %s: zone */
+		$cap   = sprintf( __( 'Pets whose eggs spawn in %s, by base income', 'rbx-data' ), (string) $bio['name'] );
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Hatch time', 'rbx-data' ) . '</th><th scope="col">' . esc_html( sprintf( /* translators: %s: pet */ __( 'Compared with %s', 'rbx-data' ), $name ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: pet */
-		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $intro . '</p>' . $table . $note . '</section>';
+		return '<section class="rbx-zone">' . Ui::h2( sprintf( __( 'Is the %s worth it?', 'rbx-data' ), $name ), 'worth-it' ) . '<ul>' . $li . '</ul>' . $table . self::source_note() . '</section>';
+	}
+
+	/**
+	 * The zone a pet's egg spawns in: first biome-spawn egg with a live or limited biome.
+	 *
+	 * @return array{0: array<string, mixed>, 1: array<string, mixed>}|null [biome, egg]
+	 */
+	private static function zone_of( Dataset $ds, string $pet ): ?array {
+		foreach ( self::egg_index( $ds )['by_pet'][ $pet ] ?? array() as $egg_id ) {
+			$egg = $ds->get( $egg_id );
+			if ( ! $egg || 'biome_spawn' !== ( $egg['data']['obtain_method'] ?? '' ) ) {
+				continue;
+			}
+			foreach ( (array) ( $egg['data']['biome_ids'] ?? array() ) as $bid ) {
+				$bio = $ds->get( (string) $bid );
+				if ( $bio && in_array( $bio['status'], array( 'live', 'limited' ), true ) ) {
+					return array( $bio, $egg );
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Pets from a zone's biome-spawn eggs with a usable income, strongest first.
+	 *
+	 * @return array<string, array{record: array<string, mixed>, income: float, egg: array<string, mixed>}>
+	 */
+	public static function zone_pets( Dataset $ds, string $biome ): array {
+		$ranked = self::ranked_pets( $ds, null );
+		$out    = array();
+		foreach ( $ranked as $id => $p ) {
+			$z = self::zone_of( $ds, (string) $id );
+			if ( null !== $z && (string) $z[0]['id'] === $biome ) {
+				$out[ (string) $id ] = $p + array( 'egg' => $z[1] );
+			}
+		}
+		return $out;
+	}
+
+	/** The zone after this one by order, with a Speed requirement, or null. */
+	private static function next_zone( Dataset $ds, array $bio ): ?array {
+		$best = null;
+		foreach ( $ds->all( 'BIO', array( 'live' ) ) as $b ) {
+			if ( (int) ( $b['data']['order_index'] ?? 0 ) > (int) ( $bio['data']['order_index'] ?? 0 ) && is_numeric( $b['data']['unlock_speed_required'] ?? null )
+				&& ( null === $best || (int) $b['data']['order_index'] < (int) $best['data']['order_index'] ) ) {
+				$best = $b;
+			}
+		}
+		return $best;
+	}
+
+	/**
+	 * Egg ↔ pet links from the drop table, built once per request.
+	 *
+	 * @return array{by_pet: array<string, array<int, string>>}
+	 */
+	private static function egg_index( Dataset $ds ): array {
+		static $cache = array();
+		$key = spl_object_id( $ds );
+		if ( ! isset( $cache[ $key ] ) ) {
+			$by_pet = array();
+			foreach ( $ds->all( 'DRP' ) as $d ) {
+				$by_pet[ (string) $d['data']['pet_id'] ][] = (string) $d['data']['egg_id'];
+			}
+			$cache[ $key ] = array( 'by_pet' => $by_pet );
+		}
+		return $cache[ $key ];
 	}
 
 	/* ---------------------------------------------------------------- mutations */
@@ -296,7 +444,8 @@ final class Insights {
 			if ( null === $v ) {
 				continue;
 			}
-			$rows .= '<tr><th scope="row">' . Ui::link( $p['record'] ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, (float) $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td></tr>';
+			// The row names the mutated pet ("Golden Chicken") so the table reads as this mutation's own.
+			$rows .= '<tr><th scope="row">' . esc_html( $name ) . ' ' . Ui::link( $p['record'] ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, (float) $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td></tr>';
 			if ( ++$n >= self::MUT_TABLE_MAX ) {
 				break;
 			}
@@ -309,15 +458,73 @@ final class Insights {
 		if ( $n >= 2 ) {
 			/* translators: %s: mutation */
 			$cap  = sprintf( __( 'Income per second at base weight, without a mutation and with %s', 'rbx-data' ), $name );
-			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'No mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $name ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html( sprintf( /* translators: %s: mutation */ __( 'Pet with %s', 'rbx-data' ), $name ) ) . '</th><th scope="col">' . esc_html__( 'Without it', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'With it', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		}
 		return $out . self::source_note() . '</section>';
 	}
 
-	/* ---------------------------------------------------------------- crops (Grow a Garden games) */
+	/**
+	 * "What it is worth in plain pets" (UO-69): for the best pet of each zone, the mutated income
+	 * and the plain pet that earns closest to it. The multiplier differs per mutation, so each
+	 * mutation page gets its own pairs.
+	 */
+	private static function mutation_equivalents( Dataset $ds, array $rec ): string {
+		$mult = $ds->field_state( $rec, 'income_mult' )['value'] ?? null;
+		if ( ! is_numeric( $mult ) || (float) $mult <= 1 ) {
+			return '';
+		}
+		$name  = preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ) ?? (string) $rec['name'];
+		// Plain pets to match against: zone pets only, as the intro promises.
+		$plain = array_filter( self::ranked_pets( $ds, null ), static fn( $p ) => null !== self::zone_of( $ds, (string) $p['record']['id'] ) );
+		$rows  = '';
+		$n     = 0;
+		$first = '';
+		foreach ( $ds->all( 'BIO', array( 'live' ) ) as $bio ) {
+			$pets = self::zone_pets( $ds, (string) $bio['id'] );
+			if ( ! $pets ) {
+				continue;
+			}
+			$top = reset( $pets );
+			$v   = self::income( $ds, (string) $top['record']['id'], (string) $rec['id'], null );
+			if ( null === $v ) {
+				continue;
+			}
+			$near = null;
+			foreach ( $plain as $pid => $p ) {
+				if ( $pid !== (string) $top['record']['id'] && ( null === $near || abs( log( max( $p['income'], 1e-9 ) / $v ) ) < abs( log( max( $near['income'], 1e-9 ) / $v ) ) ) ) {
+					$near = $p;
+				}
+			}
+			// Only real matches: within a quarter either way, else the row says nothing useful.
+			if ( null === $near || abs( log( max( $near['income'], 1e-9 ) / $v ) ) > log( 1.25 ) ) {
+				continue;
+			}
+			$rows .= '<tr><th scope="row">' . esc_html( (string) $bio['name'] ) . '</th><td>' . esc_html( $name ) . ' ' . Ui::link( $top['record'] ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td>' . Ui::link( $near['record'] ) . ' (' . Ui::number( $ds, $near['income'], 'abbr' ) . ')</td></tr>';
+			if ( '' === $first ) {
+				$first = sprintf(
+					/* translators: 1: mutation, 2: pet link, 3: income, 4: plain pet link */
+					esc_html__( 'For example, a %1$s %2$s earns %3$s per second, about the same as a plain %4$s.', 'rbx-data' ),
+					esc_html( $name ),
+					Ui::link( $top['record'] ),
+					Ui::number( $ds, $v, 'abbr' ),
+					Ui::link( $near['record'] )
+				);
+			}
+			++$n;
+		}
+		if ( $n < 2 ) {
+			return '';
+		}
+		/* translators: %s: mutation */
+		$intro = sprintf( esc_html__( 'A mutation can make an early pet worth as much as a plain pet from a later zone. The table takes the best pet of each zone, adds %s, and finds the plain pet that earns closest to it.', 'rbx-data' ), esc_html( $name ) ) . ' ' . $first;
+		/* translators: %s: mutation */
+		$cap   = sprintf( __( 'Best pet of each zone with %s, and the plain pet it matches', 'rbx-data' ), $name );
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Zone', 'rbx-data' ) . '</th><th scope="col">' . esc_html( sprintf( /* translators: %s: mutation */ __( 'Best pet of the zone with %s', 'rbx-data' ), $name ) ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Earns about as much as', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		/* translators: %s: mutation */
+		return '<section class="rbx-equiv">' . Ui::h2( sprintf( __( 'What a %s pet is worth in plain pets', 'rbx-data' ), $name ), 'equivalents' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
+	}
 
-	/** Weight steps for the crop weight table, as multiples of the base weight. */
-	private const CROP_WEIGHT_STEPS = array( 1, 1.5, 2, 3, 5, 10 );
+	/* ---------------------------------------------------------------- crops (Grow a Garden games) */
 
 	/** Well-known crops used as examples on mutation pages when few crop pages are published. */
 	private const EXAMPLE_CROPS = array( 'carrot', 'strawberry', 'blueberry', 'tomato', 'corn', 'watermelon', 'pumpkin', 'apple', 'bamboo', 'coconut', 'dragon-fruit', 'mango', 'grape', 'mushroom', 'pepper', 'cacao', 'beanstalk', 'candy-blossom' );
@@ -458,6 +665,7 @@ final class Insights {
 		return 4;
 	}
 
+	/** One sentence instead of a table (UO-69); the calculator takes the player's own weight. */
 	private static function plant_weight( Dataset $ds, array $rec ): string {
 		$bw   = $rec['data']['base_weight_kg'] ?? null;
 		$base = self::crop_value( $ds, (string) $rec['id'] );
@@ -466,31 +674,32 @@ final class Insights {
 		}
 		$bw   = (float) $bw;
 		$name = (string) $rec['name'];
-		$rows = '';
 		// UO-28: print each weight with as many decimals as the base weight has (0.275 → 3) and
-		// compute at that printed weight, so the row matches the calculator at the same input.
-		$dp = self::decimals( $bw );
-		foreach ( self::CROP_WEIGHT_STEPS as $k ) {
-			$w = round( $bw * $k, $dp );
-			$v = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $w ) );
-			if ( null === $v ) {
-				return '';
-			}
-			$rows .= '<tr><th scope="row">' . Ui::number( $ds, $w, 'decimal(' . $dp . ')' ) . ' kg</th><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, round( $v / $base, 2 ), 'mult' ) . '</td></tr>';
+		// compute at that printed weight, so the numbers match the calculator at the same input.
+		$dp  = self::decimals( $bw );
+		$w2  = round( $bw * 2, $dp );
+		$w5  = round( $bw * 5, $dp );
+		$two = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $w2 ) );
+		$fiv = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $w5 ) );
+		if ( null === $two || null === $fiv ) {
+			return '';
 		}
-		$two   = self::crop_value( $ds, (string) $rec['id'], array( 'weight' => $bw * 2 ) );
-		$intro = sprintf(
-			/* translators: 1: crop, 2: base weight, 3: ratio */
-			esc_html__( 'Each %1$s fruit grows to its own weight around the base weight of %2$s kg. Value climbs faster than weight: a fruit twice as heavy is worth about %3$s times as much.', 'rbx-data' ),
+		$cur  = self::currency( $ds, $rec );
+		$text = sprintf(
+			/* translators: 1: crop, 2: base weight, 3: weight x2, 4: value at x2, 5: ratio x2, 6: weight x5, 7: value at x5, 8: currency */
+			esc_html__( 'Yes, and value climbs faster than weight. Around its base weight of %2$s kg a plain %1$s sells for the base value above; at %3$s kg it is worth %4$s %8$s (about %5$s times as much), and at %6$s kg %7$s %8$s.', 'rbx-data' ),
 			esc_html( $name ),
 			Ui::number( $ds, $bw, 'decimal(' . $dp . ')' ),
-			esc_html( self::ratio( (float) $two / $base ) )
+			Ui::number( $ds, $w2, 'decimal(' . $dp . ')' ),
+			Ui::number( $ds, $two, 'abbr' ),
+			esc_html( self::ratio( $two / $base ) ),
+			Ui::number( $ds, $w5, 'decimal(' . $dp . ')' ),
+			Ui::number( $ds, $fiv, 'abbr' ),
+			esc_html( $cur )
 		);
+		$calc = Item::calculator_link( $ds->game(), $rec );
 		/* translators: %s: crop */
-		$cap   = sprintf( __( 'Value of one %s with no mutation at different weights', 'rbx-data' ), $name );
-		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Weight', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Sell value', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Compared with base', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
-		/* translators: %s: crop */
-		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Is a heavier %s worth more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $intro . '</p>' . $table . '</section>';
+		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Is a heavier %s worth more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $text . '</p>' . ( '' !== $calc ? '<p>' . $calc . '</p>' : '' ) . '</section>';
 	}
 
 	private static function crop_mutation_effect( Dataset $ds, array $rec ): string {

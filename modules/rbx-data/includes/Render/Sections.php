@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sections {
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -89,6 +89,8 @@ final class Sections {
 					return self::updates( $game );
 				case 'tier_list':
 					return self::licensed( $game, self::tier_list( $game ) );
+				case 'tier_stages':
+					return self::licensed( $game, self::tier_stages( $game ) );
 				case 'hub_tiles':
 					return self::hub_tiles( $game );
 				case 'hub_glance':
@@ -581,6 +583,109 @@ final class Sections {
 			$out .= '</ul></section>';
 		}
 		return $out . '<p class="rbx-note">' . esc_html__( 'Ranked by base income from the community wiki; your best pet depends on your goal.', 'rbx-data' ) . '</p>';
+	}
+
+	/**
+	 * Tier list by stage (UO-70): the zones grouped by the Speed they need (stages from the game
+	 * config's tier_stages), the best pet of each zone, and a faster pick whose egg hatches in half
+	 * the time or less and that still earns at least a twentieth as much. Then the event zones. All from the dataset, so it follows every import.
+	 */
+	private static function tier_stages( Game $game ): string {
+		$stages = (array) ( $game->raw()['tier_stages'] ?? array() );
+		if ( ! $stages || null === $game->entity( 'BIO' ) ) {
+			return '';
+		}
+		$ds     = self::ds( $game );
+		$hatch  = static fn( array $e ): ?float => is_numeric( $e['data']['hatch_time_s'] ?? null ) && (float) $e['data']['hatch_time_s'] > 0 ? (float) $e['data']['hatch_time_s'] : null;
+		$groups = array();
+		foreach ( $ds->all( 'BIO', array( 'live' ) ) as $bio ) {
+			$speed = $bio['data']['unlock_speed_required'] ?? null;
+			if ( ! is_numeric( $speed ) ) {
+				continue;
+			}
+			foreach ( $stages as $i => $st ) {
+				if ( ! isset( $st['max_speed'] ) || (float) $speed < (float) $st['max_speed'] ) {
+					$groups[ $i ][] = $bio;
+					break;
+				}
+			}
+		}
+		$out = '';
+		foreach ( $stages as $i => $st ) {
+			if ( empty( $groups[ $i ] ) ) {
+				continue;
+			}
+			$rows = '';
+			$top  = null;
+			foreach ( $groups[ $i ] as $bio ) {
+				$pets = Insights::zone_pets( $ds, (string) $bio['id'] );
+				if ( ! $pets ) {
+					continue;
+				}
+				$best = reset( $pets );
+				$bh   = $hatch( $best['egg'] );
+				$fast = null;
+				foreach ( array_slice( $pets, 1, null, true ) as $p ) {
+					$h = $hatch( $p['egg'] );
+					if ( null !== $bh && null !== $h && $h * 2 <= $bh && $p['income'] * 20 >= $best['income'] ) {
+						$fast = $p;
+						break;
+					}
+				}
+				$top   = null === $top || $best['income'] > $top['income'] ? $best : $top;
+				$ids   = array( (string) $best['record']['id'] );
+				$cell  = static fn( array $p ) => Ui::link( $p['record'] ) . ' <span class="rbx-meta">' . Ui::number( $ds, $p['income'], 'abbr' ) . ( null !== $hatch( $p['egg'] ) ? ', ' . Ui::raw( $ds, array( 'type' => 'duration_s' ), $hatch( $p['egg'] ) ) : '' ) . '</span>';
+				if ( $fast ) {
+					$ids[] = (string) $fast['record']['id'];
+				}
+				self::show( $ids );
+				$speed = (float) $bio['data']['unlock_speed_required'];
+				$rows .= '<tr><th scope="row">' . esc_html( (string) $bio['name'] ) . '</th><td class="rbx-num-cell">' . ( $speed > 0 ? Ui::number( $ds, $speed, 'abbr' ) : esc_html__( 'Open from the start', 'rbx-data' ) ) . '</td><td>' . $cell( $best ) . '</td><td>' . ( $fast ? $cell( $fast ) : '' ) . '</td></tr>';
+			}
+			if ( '' === $rows ) {
+				continue;
+			}
+			$label = Lang::t( (string) ( $st['label__en'] ?? '' ) );
+			$slug  = sanitize_title( (string) ( $st['label__en'] ?? 'stage-' . $i ) );
+			$lead  = sprintf(
+				/* translators: 1: stage such as "Early game", 2: pet link */
+				esc_html__( 'Best pet you can hatch in the %1$s zones: %2$s.', 'rbx-data' ),
+				esc_html( function_exists( 'mb_strtolower' ) ? mb_strtolower( $label ) : strtolower( $label ) ),
+				Ui::link( $top['record'] )
+			);
+			$out .= '<section class="rbx-stage" aria-labelledby="stage-' . esc_attr( $slug ) . '"><h3 id="stage-' . esc_attr( $slug ) . '">' . esc_html( $label ) . '</h3><p>' . $lead . '</p>';
+			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( sprintf( /* translators: %s: stage */ __( 'Best pet of each %s zone', 'rbx-data' ), $label ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Zone', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Speed needed', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Best pet (income, hatch time)', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Faster pick (half the hatch time or less)', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div></section>';
+		}
+		// Event zones: the strongest pets whose eggs come from a limited zone.
+		foreach ( $ds->all( 'BIO', array( 'limited' ) ) as $bio ) {
+			$pets = array();
+			foreach ( $ds->all( 'EGG', array( 'live', 'limited' ) ) as $egg ) {
+				if ( ! in_array( (string) $bio['id'], (array) ( $egg['data']['biome_ids'] ?? array() ), true ) ) {
+					continue;
+				}
+				foreach ( $ds->children( 'DRP', 'egg_id', (string) $egg['id'] ) as $d ) {
+					$pet = $ds->get( (string) $d['data']['pet_id'] );
+					$st  = $pet ? $ds->field_state( $pet, 'base_income_per_s' ) : null;
+					if ( $pet && $st['calc_usable'] && is_numeric( $st['value'] ) ) {
+						$pets[ (string) $pet['id'] ] = array( 'record' => $pet, 'income' => (float) $st['value'] );
+					}
+				}
+			}
+			if ( count( $pets ) < 3 ) {
+				continue;
+			}
+			uasort( $pets, static fn( $a, $b ) => $b['income'] <=> $a['income'] );
+			$pets = array_slice( $pets, 0, 3, true );
+			self::show( array_keys( $pets ) );
+			$li = '';
+			foreach ( $pets as $p ) {
+				$li .= '<li>' . Ui::icon( $ds, $p['record'], 48 ) . Ui::link( $p['record'] ) . ' <span class="rbx-meta">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</span></li>';
+			}
+			$slug = 'stage-' . sanitize_title( (string) $bio['slug'] );
+			/* translators: %s: event zone */
+			$out .= '<section class="rbx-stage" aria-labelledby="' . esc_attr( $slug ) . '"><h3 id="' . esc_attr( $slug ) . '">' . esc_html( sprintf( __( 'Event: %s', 'rbx-data' ), (string) $bio['name'] ) ) . '</h3><p>' . esc_html__( 'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.', 'rbx-data' ) . '</p><ol class="rbx-top">' . $li . '</ol></section>';
+		}
+		return '' === $out ? '' : $out . '<p class="rbx-note">' . esc_html__( 'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.', 'rbx-data' ) . '</p>';
 	}
 
 	/** Hub tiles (UX-10): tools first, then sections, from menu_order; only existing Pages link. */

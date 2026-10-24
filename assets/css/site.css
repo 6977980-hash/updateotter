@@ -911,6 +911,14 @@ summary.rbx-chip {
 	text-align: end;
 	font-weight: 600;
 }
+.rbx-stats__src {
+	color: var(--text-muted);
+	font-size: var(--fs-sm);
+	margin: var(--sp-2) 0 0;
+}
+.rbx-stats__src .rbx-lv {
+	margin-inline-start: var(--sp-2);
+}
 .rbx-card__actions {
 	display: flex;
 	flex-wrap: wrap;

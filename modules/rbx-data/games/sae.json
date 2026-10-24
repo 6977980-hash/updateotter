@@ -16,6 +16,12 @@
   "index_community_data": true,
   "_owner_decision": "2026-10-23 Ali: launch the calculator on wiki data plus 1 in-game test (min_formula_tests, community_single_source_calc). Raise back to 3 tests and 2 sources once more screenshots arrive. 2026-10-23 Ali: no screenshot rule for indexing (index_community_data); pages index on wiki data once they have our own reviewed note.",
   "game_accent": "#0B6E5B",
+  "tier_stages": [
+    { "label__en": "Early game", "max_speed": 50000 },
+    { "label__en": "Mid game", "max_speed": 20000000 },
+    { "label__en": "Late game", "max_speed": 10000000000 },
+    { "label__en": "End game" }
+  ],
   "notifier": { "update_windows": [] },
   "menu_order": ["calculator", "pets", "eggs", "mutations", "codes", "updates", "tier-list"],
   "sections": {
