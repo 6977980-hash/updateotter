@@ -95,7 +95,7 @@ final class SetupScreen {
 					break;
 				case 'mutations':
 					$content = self::todo( 'Phase 1b: answer-first (CONT-24).' ) . self::block( 'stacking', $k ) . self::h2( 'All mutations', 'all-mutations' ) . self::block( 'mutations', $k ) . self::h2( 'Sizes', 'size-multipliers' ) . self::block( 'sizes', $k ) . self::h2( 'How mutations and sizes stack', 'stacking' ) . self::todo( 'Phase 1b: formula and a worked example with bound values.' ) . self::block( 'changes', $k );
-					$title   = $n . ' Mutations & Sizes';
+					$title   = $n . ' Mutations & Weight';
 					break;
 				case 'codes':
 					$title   = $n . ' Codes';

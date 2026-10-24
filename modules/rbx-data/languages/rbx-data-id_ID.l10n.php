@@ -181,4 +181,5 @@ return array( 'domain' => 'rbx-data', 'language' => 'id_ID', 'plural-forms' => '
 	'not confirmed yet' => 'belum dipastikan',
 	'removed' => 'dihapus',
 	'wiki data as of' => 'data wiki per',
+	'“%s” (Roblox group)' => '“%s” (grup Roblox)',
 ) );

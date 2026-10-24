@@ -486,18 +486,19 @@ final class Sections {
 		$dash = false;
 		$rows = '';
 		foreach ( $recs as $id => $r ) {
-			$how   = empty( $r['data']['obtain_method_text__en'] ) ? Ui::dash() : Ui::text( (string) $r['data']['obtain_method_text__en'] );
+			// CR-14: /id/ pages translate the texts and the update names through content/i18n/id.json.
+			$how   = empty( $r['data']['obtain_method_text__en'] ) ? Ui::dash() : Ui::text( Lang::t( (string) $r['data']['obtain_method_text__en'] ) );
 			$mult  = Ui::cell( $ds, $r, 'income_mult' );
 			$dash  = $dash || empty( $r['data']['obtain_method_text__en'] ) || str_contains( $mult, '—' );
 			$rows .= '<tr id="' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . Ui::link( $r ) . '</th>'
-				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'income_mult' ) ) . '">' . $mult . '</td>'
-				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '">' . $how . '</td>'
-				. ( $added ? '<td data-label="' . esc_attr( $game->label( 'MUT', 'added_in' ) ) . '">' . ( empty( $r['data']['added_in'] ) ? Ui::dash() : esc_html( (string) $r['data']['added_in'] ) ) . '</td>' : '' )
+				. '<td data-label="' . esc_attr( Lang::t( $game->label( 'MUT', 'income_mult' ) ) ) . '">' . $mult . '</td>'
+				. '<td data-label="' . esc_attr( Lang::t( $game->label( 'MUT', 'obtain_method_text__en' ) ) ) . '">' . $how . '</td>'
+				. ( $added ? '<td data-label="' . esc_attr( Lang::t( $game->label( 'MUT', 'added_in' ) ) ) . '">' . ( empty( $r['data']['added_in'] ) ? Ui::dash() : esc_html( Lang::t( (string) $r['data']['added_in'] ) ) ) . '</td>' : '' )
 				. ( $one ? '' : '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . $conf[ $id ] . '</td><td data-label="' . esc_attr__( 'Data as of', 'rbx-data' ) . '">' . Ui::date( $asof[ $id ] ) . '</td>' ) . '</tr>';
 		}
 		$legend = $one ? '<p class="rbx-legend">' . esc_html__( 'Confidence for every row:', 'rbx-data' ) . ' ' . reset( $conf ) . ( '' !== reset( $asof ) ? ' <span class="rbx-lv">' . esc_html__( 'Wiki data as of', 'rbx-data' ) . ' ' . Ui::date( reset( $asof ) ) . '</span>' : '' ) . '</p>' : '';
 		$note   = $dash ? '<p class="rbx-note">' . esc_html__( 'A dash means the community wiki does not list that value yet.', 'rbx-data' ) . '</p>' : '';
-		return $legend . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th>' . ( $added ? '<th scope="col">' . esc_html( $game->label( 'MUT', 'added_in' ) ) . '</th>' : '' ) . ( $one ? '' : '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th>' ) . '</tr></thead><tbody>' . $rows . '</tbody></table></div>' . $note . self::sources_line( $game, $recs );
+		return $legend . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( Lang::t( $game->label( 'MUT', 'income_mult' ) ) ) . '</th><th scope="col">' . esc_html( Lang::t( $game->label( 'MUT', 'obtain_method_text__en' ) ) ) . '</th>' . ( $added ? '<th scope="col">' . esc_html( Lang::t( $game->label( 'MUT', 'added_in' ) ) ) . '</th>' : '' ) . ( $one ? '' : '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th>' ) . '</tr></thead><tbody>' . $rows . '</tbody></table></div>' . $note . self::sources_line( $game, $recs );
 	}
 
 	private static function sizes( Game $game ): string {
@@ -812,7 +813,9 @@ final class Sections {
 		$rows = '';
 		$dev  = (string) ( $ds->meta( 'developer_name' ) ?? '' );
 		if ( '' !== $dev ) {
-			$rows .= '<tr><th scope="row">' . esc_html__( 'Developer', 'rbx-data' ) . '</th><td>' . esc_html( $dev ) . '</td></tr>';
+			// CR-16: quoted and marked as a Roblox group, so a name like "and Collect Rare Pets" reads as a name.
+			/* translators: %s: Roblox group name */
+			$rows .= '<tr><th scope="row">' . esc_html__( 'Developer', 'rbx-data' ) . '</th><td>' . esc_html( sprintf( __( '“%s” (Roblox group)', 'rbx-data' ), $dev ) ) . '</td></tr>';
 		}
 		if ( $ds->meta( 'release_date' ) ) {
 			$rows .= '<tr><th scope="row">' . esc_html__( 'Release date', 'rbx-data' ) . '</th><td>' . Ui::date( (string) $ds->meta( 'release_date' ) ) . '</td></tr>';

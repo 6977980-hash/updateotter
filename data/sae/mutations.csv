@@ -4,7 +4,7 @@ SAE-MUT-0001,silver,Silver,,pet,1.2,,,unknown,Random roll when an egg hatches.,,
 The boost is small: a Silver pet earns only a fifth more than a plain one. A heavier plain pet often beats a light Silver one, so compare the weight before you keep it.
 
 Silver is still nice on an early pet, but a Golden or Rainbow roll of the same pet is worth far more.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0002,bloom,Bloom,,pet,1.25,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event; also seen on random eggs in Admin Abuse events.,,,,"Bloom comes from the Sakura Incubator in the Cherry Blossom biome during the Cherry Blossom event. It is not a normal hatch roll, and the event is not active right now according to the community wiki.
+SAE-MUT-0002,bloom,Bloom,,pet,1.25,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event; also seen on random eggs in Admin Abuse events.,"Update 1 (Cherry Blossom, 22 Aug 2026)",,,"Bloom comes from the Sakura Incubator in the Cherry Blossom biome during the Cherry Blossom event. It is not a normal hatch roll, and the event is not active right now according to the community wiki.
 
 The boost is only a little above Silver. If you use the Sakura Incubator, the much stronger result is Spirit Bloom, which comes from the same machine.
 
@@ -14,17 +14,17 @@ SAE-MUT-0003,golden,Golden,,pet,2.5,,,unknown,Random roll when an egg hatches.,,
 It is the mutation we tested first in game: a Golden Chicken earned what our formula predicted.
 
 Golden is rarer than Silver but much easier to get than Rainbow, so it is the boost most players will see on their best pets. A Golden pet from a higher biome is usually worth more than a Rainbow pet from a lower one.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0004,spirit-bloom,Spirit Bloom,,pet,2.5,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event (rarer result than Bloom).,,,,"Spirit Bloom is the rare result of the Sakura Incubator in the Cherry Blossom biome. It gives the same boost as Golden, but you cannot roll it on a normal hatch.
+SAE-MUT-0004,spirit-bloom,Spirit Bloom,,pet,2.5,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event (rarer result than Bloom).,"Update 1 (Cherry Blossom, 22 Aug 2026)",,,"Spirit Bloom is the rare result of the Sakura Incubator in the Cherry Blossom biome. It gives the same boost as Golden, but you cannot roll it on a normal hatch.
 
 According to the community wiki, the incubator is charged with Sakura Crystals, and charging it to the maximum doubles the chance of Spirit Bloom.
 
 The event that runs the incubator is not active right now, so Spirit Bloom pets are limited. If you have one, it is as strong as a Golden version of the same pet.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0005,fractured,Fractured,,pet,2.75,,,unknown,"Mutation consumable used on an egg in your pen (about 10% success), or Rift Boss Mastery rewards.",,,,"Fractured is not a normal hatch roll. You get it by using a mutation consumable on an egg in your pen, which works only about one time in ten, or from Rift Boss Mastery rewards.
+SAE-MUT-0005,fractured,Fractured,,pet,2.75,,,unknown,"Mutation consumable used on an egg in your pen (about 10% success), or Rift Boss Mastery rewards.","Update 3 (Rifts, 5 Sep 2026)",,,"Fractured is not a normal hatch roll. You get it by using a mutation consumable on an egg in your pen, which works only about one time in ten, or from Rift Boss Mastery rewards.
 
 It is one of the strongest boosts, a little above Golden and tied with Scrambled.
 
 Because the consumable can fail, use it on an egg that is already heavy or rare. Putting it on a cheap egg wastes most of the value.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0006,scrambled,Scrambled,,pet,2.75,,,unknown,"Scrambled Mutation Consumable from Dr. Scramble's Experiment Shop, used on an egg (about 10% success).",,,,"Scrambled comes from a consumable sold in Dr. Scramble's Experiment Shop, which is in the Abyss Ocean. Used on an egg in your pen, it works about one time in ten.
+SAE-MUT-0006,scrambled,Scrambled,,pet,2.75,,,unknown,"Scrambled Mutation Consumable from Dr. Scramble's Experiment Shop, used on an egg (about 10% success).","Update 5 (Dr. Scramble, 19 Sep 2026)",,,"Scrambled comes from a consumable sold in Dr. Scramble's Experiment Shop, which is in the Abyss Ocean. Used on an egg in your pen, it works about one time in ten.
 
 Its boost is the same as Fractured and a little above Golden.
 
