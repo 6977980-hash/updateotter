@@ -77,18 +77,22 @@ final class Pages {
 		}
 	}
 
+	/**
+	 * GR-14: one "content changed" time per Page, UTC "Y-m-d H:i:s": the newest of the data it
+	 * shows, its last substantive edit and the last time its text changed in the repo. The visible
+	 * "Updated" date, JSON-LD, article:modified_time, the sitemap and Last-Modified all read it.
+	 */
 	public static function refresh( \WP_Post $post ): void {
+		$ed  = max( (string) get_post_meta( $post->ID, '_rbx_last_substantive', true ), (string) get_post_meta( $post->ID, \RBX\Data\Content\BundledPages::CHANGED, true ) );
 		if ( ! has_block( 'rbx/data-section', $post ) && ! has_shortcode( $post->post_content, 'rbx_section' ) ) {
-			$edit = (string) get_post_meta( $post->ID, '_rbx_last_substantive', true );
-			update_post_meta( $post->ID, '_rbx_last_changed', '' !== $edit ? substr( $edit, 0, 10 ) : substr( $post->post_date_gmt, 0, 10 ) );
+			update_post_meta( $post->ID, '_rbx_last_changed', '' !== $ed ? $ed : (string) $post->post_date_gmt );
 			delete_post_meta( $post->ID, '_rbx_page_last_verified' );
 			return;
 		}
 		$ids = self::shown_ids( $post );
 		$lc  = (string) Changelog::last_changed( $ids );
-		$ed  = (string) get_post_meta( $post->ID, '_rbx_last_substantive', true );
 		$max = max( $lc, $ed, '' === $lc && '' === $ed ? (string) $post->post_date_gmt : '' );
-		update_post_meta( $post->ID, '_rbx_last_changed', substr( $max, 0, 10 ) );
+		update_post_meta( $post->ID, '_rbx_last_changed', $max );
 		$min = '';
 		$game = Breadcrumbs::game_for( $post );
 		if ( $game ) {

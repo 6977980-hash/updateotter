@@ -57,7 +57,7 @@ final class Update {
 		foreach ( $rows as $r ) {
 			if ( 'create' === $r['change_kind'] ) {
 				$created[ $r['record_id'] ] = true;
-			} elseif ( ! in_array( $r['field'], Changelog::NOT_SUBSTANTIVE, true ) && ! str_starts_with( (string) $r['field'], 'notes_' ) ) {
+			} elseif ( Ui::public_change( $ds, $r ) ) {
 				$changed[] = $r;
 			}
 		}

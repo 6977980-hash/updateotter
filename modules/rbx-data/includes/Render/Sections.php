@@ -165,13 +165,19 @@ final class Sections {
 		return Repository::dataset( $game );
 	}
 
-	/** Newest last_verified among records (for count lines). */
-	private static function newest_verified( array $recs ): string {
-		$max = '';
+	/**
+	 * Oldest last_verified among records (for count lines): the same date the page's trust strip
+	 * shows as "Wiki data as of", so the header and the list caption agree (GR-14).
+	 */
+	private static function oldest_verified( array $recs ): string {
+		$min = '';
 		foreach ( $recs as $r ) {
-			$max = max( $max, (string) ( $r['data']['last_verified'] ?? '' ) );
+			$lv = (string) ( $r['data']['last_verified'] ?? '' );
+			if ( '' !== $lv && ( '' === $min || $lv < $min ) ) {
+				$min = $lv;
+			}
 		}
-		return $max;
+		return $min;
 	}
 
 	/** "{n} pets, wiki data as of {date}" (UX-08, UO-01). */
@@ -181,7 +187,7 @@ final class Sections {
 		}
 		$recs = self::ds( $game )->all( $entity, array( 'live', 'limited' ) );
 		$n    = count( $recs );
-		$lv   = self::newest_verified( $recs );
+		$lv   = self::oldest_verified( $recs );
 		$txt  = sprintf( '%s %s', number_format_i18n( $n ), strtolower( $game->entity_label( $entity, 1 !== $n ) ) );
 		return '<p class="rbx-count">' . esc_html( $txt ) . ( '' !== $lv ? ', ' . esc_html__( 'wiki data as of', 'rbx-data' ) . ' ' . Ui::date( $lv ) : '' ) . '</p>';
 	}
@@ -199,7 +205,8 @@ final class Sections {
 		$fields = array();
 		$facets = array();
 		foreach ( (array) $def['fields'] as $f => $fd ) {
-			if ( ! empty( $fd['list'] ) ) {
+			// A column no item has a value for is left out (GR-11).
+			if ( ! empty( $fd['list'] ) && self::ds( $game )->field_has_values( $entity, $f ) ) {
 				$fields[ $f ] = $fd;
 			}
 			if ( ! empty( $fd['facet'] ) ) {
@@ -231,6 +238,7 @@ final class Sections {
 		}
 
 		$body       = '';
+		$dash       = false;
 		$facet_vals = array();
 		foreach ( $recs as $id => $r ) {
 			$attrs = ' data-name="' . esc_attr( strtolower( $r['name'] . ' ' . ( $r['data']['aliases'] ?? '' ) ) ) . '"';
@@ -250,14 +258,17 @@ final class Sections {
 				$st   = $ds->field_state( $r, $f );
 				// Every known number sorts; only conflicting reports are left out (UO-27: all data is wiki data).
 				$sort = is_numeric( $st['value'] ) && 'disputed' !== $st['state'] ? ' data-sort="' . esc_attr( (string) $st['value'] ) . '"' : '';
-				$row .= '<td data-label="' . esc_attr( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '"' . $sort . '>' . Ui::value( $ds, $r, $f, false ) . '</td>';
+				$cell = Ui::cell( $ds, $r, $f );
+				$dash = $dash || str_contains( $cell, '—' );
+				$row .= '<td data-label="' . esc_attr( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '"' . $sort . '>' . $cell . '</td>';
 			}
 			if ( 'PET' === $entity ) {
 				$eggs = array();
 				foreach ( $ds->children( 'DRP', 'pet_id', (string) $id ) as $d ) {
 					$eggs[] = Ui::link( $ds->get( (string) $d['data']['egg_id'] ) );
 				}
-				$row .= '<td data-label="' . esc_attr__( 'Source egg', 'rbx-data' ) . '">' . ( $eggs ? implode( ', ', array_unique( $eggs ) ) : '<span class="rbx-v--unknown">' . esc_html__( 'Not confirmed yet', 'rbx-data' ) . '</span>' ) . '</td>';
+				$dash = $dash || ! $eggs;
+				$row .= '<td data-label="' . esc_attr__( 'Source egg', 'rbx-data' ) . '">' . ( $eggs ? implode( ', ', array_unique( $eggs ) ) : Ui::dash() ) . '</td>';
 			}
 			if ( 'EGG' === $entity ) {
 				$row .= '<td data-label="' . esc_attr__( 'Pets', 'rbx-data' ) . '">' . esc_html( number_format_i18n( count( $ds->children( 'DRP', 'egg_id', (string) $id ) ) ) ) . '</td>';
@@ -308,7 +319,8 @@ final class Sections {
 		}
 		self::enqueue_list_js();
 		$top = '<a class="rbx-backtop" href="#top" hidden data-rbx-backtop>' . esc_html__( 'Back to top', 'rbx-data' ) . '</a>';
-		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . $top . '</div>' . self::sources_line( $game, $recs );
+		$note = $dash ? '<p class="rbx-note">' . esc_html__( 'A dash means the community wiki does not list that value yet.', 'rbx-data' ) . '</p>' : '';
+		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . $top . '</div>' . $note . self::sources_line( $game, $recs );
 	}
 
 	/**
@@ -372,8 +384,8 @@ final class Sections {
 		$st = array(
 			'state'             => null === ( $r['data']['source_type'] ?? null ) ? 'unknown' : ( 'community' === $r['data']['source_type'] ? 'community' : 'verified' ),
 			'mechanic_ok'       => true,
-			'source_type'       => $r['data']['source_type'] ?? null,
-			'source_url'        => null, // One "Sources" line per table instead (UO-24), see sources_line().
+			'source_type'       => null, // One "Sources" line per table instead (UO-24, GR-26), see sources_line().
+			'source_url'        => null,
 			'evidence_media_id' => null,
 		);
 		$st['label'] = Dataset::state_label( $st['state'] );
@@ -403,16 +415,28 @@ final class Sections {
 		$txt = (string) ( $m['data']['definition__en'] ?? $m['data']['description__en'] ?? '' );
 		$out = '' !== $txt ? wpautop( Ui::text( $txt ) ) : '';
 		if ( 'confirmed' !== ( $m['data']['status'] ?? '' ) ) {
-			$out .= '<p class="rbx-note">' . self::mechanic_chip( $m ) . ' ' . esc_html__( 'This is not confirmed yet. We will update it once we test it in the game.', 'rbx-data' ) . '</p>';
+			$out .= '<p class="rbx-note">' . self::mechanic_chip( $m ) . ' ' . ( self::mechanic_tested( $m ) || 'partially_confirmed' !== ( $m['data']['status'] ?? '' )
+				? esc_html__( 'This is not confirmed yet. We will update it once we test it in the game.', 'rbx-data' )
+				: esc_html__( 'The community wiki gives this rule. We have not tested it in the game ourselves.', 'rbx-data' ) ) . '</p>';
 		}
 		self::show( array( (string) $m['id'] ) );
 		return $out;
 	}
 
-	/** Badge for a mechanic that is not fully confirmed (UO-07). */
+	/** A mechanic has an in-game test when it has a screenshot of a reading (GR-03). */
+	private static function mechanic_tested( array $m ): bool {
+		return 'in_game' === ( $m['data']['source_type'] ?? '' ) && ! empty( $m['data']['evidence_media_id'] );
+	}
+
+	/**
+	 * Badge for a mechanic that is not fully confirmed (UO-07). "Partly tested" only with an
+	 * in-game reading behind it (GR-03); a rule taken from the wiki says so.
+	 */
 	private static function mechanic_chip( array $m ): string {
-		$partly = 'partially_confirmed' === ( $m['data']['status'] ?? '' );
-		return '<span class="rbx-chip rbx-chip--warning">' . esc_html( $partly ? __( 'Partly tested in game', 'rbx-data' ) : __( 'Not tested in game yet', 'rbx-data' ) ) . '</span>';
+		if ( 'partially_confirmed' !== ( $m['data']['status'] ?? '' ) ) {
+			return '<span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested in game yet', 'rbx-data' ) . '</span>';
+		}
+		return '<span class="rbx-chip rbx-chip--warning">' . esc_html( self::mechanic_tested( $m ) ? __( 'Partly tested in game', 'rbx-data' ) : __( 'Wiki rule, not tested by us', 'rbx-data' ) ) . '</span>';
 	}
 
 	/** Mutation table with an id anchor per row (CONT-24, REV C-39). */
@@ -428,16 +452,31 @@ final class Sections {
 		self::show( array_keys( $recs ) );
 		// "Added in" column only for games that track it (GR-05).
 		$added = null !== $game->field( 'MUT', 'added_in' );
-		$rows  = '';
-		foreach ( $recs as $r ) {
-			$rows .= '<tr id="' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . Ui::link( $r ) . '</th>'
-				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'income_mult' ) ) . '">' . Ui::value( $ds, $r, 'income_mult', false ) . '</td>'
-				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '">' . ( empty( $r['data']['obtain_method_text__en'] ) ? '<span class="rbx-v--unknown">' . esc_html__( 'Not confirmed yet', 'rbx-data' ) . '</span>' : Ui::text( (string) $r['data']['obtain_method_text__en'] ) ) . '</td>'
-				. ( $added ? '<td data-label="' . esc_attr( $game->label( 'MUT', 'added_in' ) ) . '">' . ( empty( $r['data']['added_in'] ) ? '—' : esc_html( (string) $r['data']['added_in'] ) ) . '</td>' : '' )
-				. '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . Ui::chip( $ds->field_state( $r, 'income_mult' ), $ds ) . '</td>'
-				. '<td data-label="' . esc_attr__( 'Data as of', 'rbx-data' ) . '">' . Ui::date( (string) ( $r['data']['last_verified'] ?? '' ) ) . '</td></tr>';
+		// GR-26: when every row has the same confidence and date, one line above the table says so
+		// instead of a chip and a wiki link on every row (196 chips on the GAG mutations page).
+		$conf = array();
+		$asof = array();
+		foreach ( $recs as $id => $r ) {
+			$st          = $ds->field_state( $r, 'income_mult' );
+			$conf[ $id ] = Ui::chip( array( 'source_type' => null, 'source_url' => null ) + $st );
+			$asof[ $id ] = (string) ( $r['data']['last_verified'] ?? '' );
 		}
-		return '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th>' . ( $added ? '<th scope="col">' . esc_html( $game->label( 'MUT', 'added_in' ) ) . '</th>' : '' ) . '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		$one  = 1 === count( array_unique( $conf ) ) && 1 === count( array_unique( $asof ) );
+		$dash = false;
+		$rows = '';
+		foreach ( $recs as $id => $r ) {
+			$how   = empty( $r['data']['obtain_method_text__en'] ) ? Ui::dash() : Ui::text( (string) $r['data']['obtain_method_text__en'] );
+			$mult  = Ui::cell( $ds, $r, 'income_mult' );
+			$dash  = $dash || empty( $r['data']['obtain_method_text__en'] ) || str_contains( $mult, '—' );
+			$rows .= '<tr id="' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . Ui::link( $r ) . '</th>'
+				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'income_mult' ) ) . '">' . $mult . '</td>'
+				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '">' . $how . '</td>'
+				. ( $added ? '<td data-label="' . esc_attr( $game->label( 'MUT', 'added_in' ) ) . '">' . ( empty( $r['data']['added_in'] ) ? Ui::dash() : esc_html( (string) $r['data']['added_in'] ) ) . '</td>' : '' )
+				. ( $one ? '' : '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . $conf[ $id ] . '</td><td data-label="' . esc_attr__( 'Data as of', 'rbx-data' ) . '">' . Ui::date( $asof[ $id ] ) . '</td>' ) . '</tr>';
+		}
+		$legend = $one ? '<p class="rbx-legend">' . esc_html__( 'Confidence for every row:', 'rbx-data' ) . ' ' . reset( $conf ) . ( '' !== reset( $asof ) ? ' <span class="rbx-lv">' . esc_html__( 'Wiki data as of', 'rbx-data' ) . ' ' . Ui::date( reset( $asof ) ) . '</span>' : '' ) . '</p>' : '';
+		$note   = $dash ? '<p class="rbx-note">' . esc_html__( 'A dash means the community wiki does not list that value yet.', 'rbx-data' ) . '</p>' : '';
+		return $legend . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th>' . ( $added ? '<th scope="col">' . esc_html( $game->label( 'MUT', 'added_in' ) ) . '</th>' : '' ) . ( $one ? '' : '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th>' ) . '</tr></thead><tbody>' . $rows . '</tbody></table></div>' . $note . self::sources_line( $game, $recs );
 	}
 
 	private static function sizes( Game $game ): string {

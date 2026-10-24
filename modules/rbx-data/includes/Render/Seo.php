@@ -46,6 +46,7 @@ final class Seo {
 		add_filter( 'wp_sitemaps_posts_query_args', array( self::class, 'core_sitemap_query' ), 10, 2 );
 		add_filter( 'wp_sitemaps_posts_entry', array( self::class, 'core_sitemap_entry' ), 10, 2 );
 		add_action( 'template_redirect', array( self::class, 'sitemap_index_redirect' ), 1 );
+		add_action( 'template_redirect', array( self::class, 'last_modified_header' ), 20 );
 	}
 
 	/**
@@ -570,10 +571,7 @@ final class Seo {
 			return $node;
 		}
 		if ( $c['post'] ) {
-			$lc = (string) get_post_meta( $c['post']->ID, '_rbx_last_changed', true );
-			if ( '' !== $lc ) {
-				$node['dateModified'] = $lc;
-			}
+			$node['dateModified'] = self::modified( $c['post'] );
 		}
 		$game = $c['game'];
 		$hub  = $game ? Breadcrumbs::page_url( $game->folder() ) : '';
@@ -681,7 +679,7 @@ final class Seo {
 				'@id'              => $url . '#article',
 				'headline'         => Update::heading( $game, $c['rec'] ),
 				'datePublished'    => get_post_time( 'c', true, $post ),
-				'dateModified'     => (string) get_post_meta( $post->ID, '_rbx_last_changed', true ),
+				'dateModified'     => self::modified( $post ),
 				'mainEntityOfPage' => array( '@id' => $url . '#webpage' ),
 				'publisher'        => array( '@id' => home_url( '/#organization' ) ),
 			);
@@ -715,7 +713,7 @@ final class Seo {
 				'@id'              => $url . '#article',
 				'headline'         => html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' ),
 				'datePublished'    => get_post_time( 'c', true, $post ) ?: get_post_time( 'c', false, $post ),
-				'dateModified'     => get_post_modified_time( 'c', true, $post ) ?: get_post_modified_time( 'c', false, $post ),
+				'dateModified'     => self::modified( $post ),
 				'mainEntityOfPage' => array( '@id' => $url . '#webpage' ),
 				'publisher'        => array( '@id' => home_url( '/#organization' ) ),
 			);
@@ -850,10 +848,7 @@ final class Seo {
 		if ( 'page' === $obj->post_type && ( ( 'report' === $obj->post_name && 0 === (int) $obj->post_parent ) || in_array( (int) $obj->ID, self::empty_update_pages(), true ) ) ) {
 			return false;
 		}
-		$lc = (string) get_post_meta( $obj->ID, '_rbx_last_changed', true );
-		if ( '' !== $lc ) {
-			$url['mod'] = $lc . 'T00:00:00+00:00';
-		}
+		$url['mod'] = self::modified( $obj );
 		return $url;
 	}
 
@@ -907,11 +902,36 @@ final class Seo {
 	 * @return array<string, string>
 	 */
 	public static function core_sitemap_entry( array $entry, \WP_Post $post ): array {
-		$lc = (string) get_post_meta( $post->ID, '_rbx_last_changed', true );
-		if ( '' !== $lc ) {
-			$entry['lastmod'] = $lc . 'T00:00:00+00:00';
-		}
+		$entry['lastmod'] = self::modified( $post );
 		return $entry;
+	}
+
+	/**
+	 * The page's one "content changed" time as ISO 8601 (GR-14): `_rbx_last_changed` (UTC), else
+	 * the post's modified time. Older values stored as a bare date count from midnight UTC.
+	 */
+	public static function modified( \WP_Post $post ): string {
+		$lc = (string) get_post_meta( $post->ID, '_rbx_last_changed', true );
+		$ts = '' !== $lc ? strtotime( ( 10 === strlen( $lc ) ? $lc . ' 00:00:00' : $lc ) . ' UTC' ) : false;
+		if ( false === $ts ) {
+			$ts = strtotime( $post->post_modified_gmt . ' UTC' );
+		}
+		return false === $ts ? '' : gmdate( 'c', $ts );
+	}
+
+	/** `Last-Modified` from the same time (GR-14, GR-23), on single pages for visitors. */
+	public static function last_modified_header(): void {
+		if ( headers_sent() || is_user_logged_in() || ! is_singular() ) {
+			return;
+		}
+		$post = get_queried_object();
+		if ( ! $post instanceof \WP_Post || 'publish' !== $post->post_status ) {
+			return;
+		}
+		$iso = self::modified( $post );
+		if ( '' !== $iso ) {
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', (int) strtotime( $iso ) ) . ' GMT' );
+		}
 	}
 
 	/** /sitemap_index.xml (the address in the spec) goes to the core index when Rank Math's sitemap is off. */
@@ -1041,7 +1061,7 @@ final class Seo {
 			echo '<meta property="og:locale:alternate" content="' . ( Lang::is_id() ? 'en_US' : 'id_ID' ) . "\">\n";
 		}
 		if ( 'article' === $type && $c['post'] ) {
-			echo '<meta property="article:modified_time" content="' . esc_attr( (string) get_post_modified_time( 'c', true, $c['post'] ) ) . "\">\n";
+			echo '<meta property="article:modified_time" content="' . esc_attr( self::modified( $c['post'] ) ) . "\">\n";
 		}
 		$tw = array(
 			'twitter:card'        => 'summary_large_image',

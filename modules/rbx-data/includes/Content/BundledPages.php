@@ -32,6 +32,9 @@ final class BundledPages {
 	public const OPTION = 'rbx_bundled_pages';
 	public const META   = '_rbx_bundled_hash';
 
+	/** UTC time the Page's readable text last changed through a sync (GR-14). */
+	public const CHANGED = '_rbx_content_changed';
+
 	public static function boot(): void {
 		add_action( 'init', array( self::class, 'maybe_schedule' ), 21 );
 		add_action( self::HOOK, array( self::class, 'sync' ) );
@@ -148,6 +151,12 @@ final class BundledPages {
 		return $page instanceof \WP_Post ? $page : 'page not created';
 	}
 
+	/** Hash of what a reader sees: the text without markup, so a class or comment change is not an edit. */
+	public static function text_hash( string $content ): string {
+		$t = html_entity_decode( wp_strip_all_tags( (string) preg_replace( '/<!--.*?-->/s', ' ', $content ) ), ENT_QUOTES, 'UTF-8' );
+		return substr( hash( 'sha256', trim( (string) preg_replace( '/\s+/u', ' ', $t ) ) ), 0, 16 );
+	}
+
 	/** Content hash used to spot hand edits. */
 	private static function content_hash( string $content ): string {
 		return substr( hash( 'sha256', str_replace( "\r\n", "\n", trim( $content ) ) ), 0, 16 );
@@ -194,6 +203,8 @@ final class BundledPages {
 				$skipped[ $path ] = 'edited in WordPress after the last sync; not overwritten';
 				continue;
 			}
+			$same_text = self::text_hash( (string) $page->post_content ) === self::text_hash( $new );
+			$old_mod   = array( $page->post_modified, $page->post_modified_gmt );
 			// Trusted repo markup: skip the kses pass a cron request (no user) would apply.
 			kses_remove_filters();
 			$r = wp_update_post(
@@ -209,8 +220,20 @@ final class BundledPages {
 				ErrorLog::add( 'content', 'Bundled page ' . $path . ': ' . $r->get_error_message() );
 				continue;
 			}
+			if ( $same_text && '' !== trim( (string) $page->post_content ) ) {
+				// GR-14: a markup-only change (a class, a block comment) is not an edit, so the deploy
+				// keeps the old modified time.
+				global $wpdb;
+				$wpdb->update( $wpdb->posts, array( 'post_modified' => $old_mod[0], 'post_modified_gmt' => $old_mod[1] ), array( 'ID' => $page->ID ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				clean_post_cache( $page->ID );
+			} else {
+				update_post_meta( $page->ID, self::CHANGED, gmdate( 'Y-m-d H:i:s' ) );
+			}
 			$saved = get_post( $page->ID );
 			update_post_meta( $page->ID, self::META, self::content_hash( (string) ( $saved ? $saved->post_content : $new ) ) );
+			if ( $saved instanceof \WP_Post && class_exists( '\RBX\Data\Render\Pages' ) ) {
+				\RBX\Data\Render\Pages::refresh( $saved ); // save_post ran before the new time was stored.
+			}
 			$written[] = $path;
 		}
 		$s = array(

@@ -26,6 +26,13 @@ final class Insights {
 	private const MUT_TABLE_MAX = 20;
 
 	public static function render( Dataset $ds, array $rec ): string {
+		// GR-26: one source line for all the blocks, not one under each.
+		$html = self::blocks( $ds, $rec );
+		$note = self::source_note();
+		return str_contains( $html, $note ) ? str_replace( $note, '', $html ) . $note : $html;
+	}
+
+	private static function blocks( Dataset $ds, array $rec ): string {
 		switch ( (string) $rec['entity'] ) {
 			case 'PET':
 				return self::event_guide( $ds, $rec ) . self::pet_glance( $ds, $rec ) . self::pet_zone( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
@@ -71,21 +78,29 @@ final class Insights {
 					esc_html( $name ),
 					esc_html( number_format_i18n( count( $same ) ) ),
 					esc_html( (string) $rar['name'] ),
-					esc_html( count( $same ) === (int) $pos + 1 ? __( 'the lowest', 'rbx-data' ) : self::nth( (int) $pos + 1, __( 'highest', 'rbx-data' ) ) )
-				);
-				$top = array_key_first( $same );
+					esc_html( self::rank( (int) $pos + 1, count( $same ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) )
+					);
+					$top = array_key_first( $same );
 				// Event and shop pets can sit far above the rest of a rarity; skip silly ratios.
 				if ( $top !== $rec['id'] && (float) $same[ $top ]['income'] / $income <= 50 ) {
 					$tr      = $same[ $top ];
 					$ratio   = (float) $tr['income'] / $income;
-					$facts[] = sprintf(
-						/* translators: 1: strongest pet link, 2: rarity, 3: ratio, 4: pet */
-						esc_html__( 'The strongest %2$s pet, %1$s, earns about %3$s times as much as the %4$s.', 'rbx-data' ),
-						Ui::link( $tr['record'] ),
-						esc_html( (string) $rar['name'] ),
-						esc_html( self::ratio( $ratio ) ),
-						esc_html( $name )
-					);
+					$facts[] = self::same( $ratio )
+						? sprintf(
+							/* translators: 1: strongest pet link, 2: rarity, 3: pet */
+							esc_html__( 'The strongest %2$s pet, %1$s, earns the same as the %3$s.', 'rbx-data' ),
+							Ui::link( $tr['record'] ),
+							esc_html( (string) $rar['name'] ),
+							esc_html( $name )
+						)
+						: sprintf(
+							/* translators: 1: strongest pet link, 2: rarity, 3: ratio, 4: pet */
+							esc_html__( 'The strongest %2$s pet, %1$s, earns about %3$s times as much as the %4$s.', 'rbx-data' ),
+							Ui::link( $tr['record'] ),
+							esc_html( (string) $rar['name'] ),
+							esc_html( self::ratio( $ratio ) ),
+							esc_html( $name )
+						);
 				}
 			}
 			$all = self::ranked_pets( $ds, null );
@@ -94,12 +109,19 @@ final class Insights {
 				$facts[] = count( $all ) === (int) $pos + 1 && $pos > 0
 					/* translators: %s: count */
 					? sprintf( esc_html__( 'It has the lowest base income of all %s pets with a known income.', 'rbx-data' ), esc_html( number_format_i18n( count( $all ) ) ) )
-					: sprintf(
-						/* translators: 1: ordinal, 2: count */
-						esc_html__( 'Across all %2$s pets with a known income it ranks %1$s.', 'rbx-data' ),
-						esc_html( self::ordinal( (int) $pos + 1 ) ),
-						esc_html( number_format_i18n( count( $all ) ) )
-					);
+					: ( (int) $pos + 1 > count( $all ) / 2
+						? sprintf(
+							/* translators: 1: ordinal, 2: count */
+							esc_html__( 'Across all %2$s pets with a known income it ranks %1$s from the bottom.', 'rbx-data' ),
+							esc_html( self::ordinal( count( $all ) - (int) $pos ) ),
+							esc_html( number_format_i18n( count( $all ) ) )
+						)
+						: sprintf(
+							/* translators: 1: ordinal, 2: count */
+							esc_html__( 'Across all %2$s pets with a known income it ranks %1$s.', 'rbx-data' ),
+							esc_html( self::ordinal( (int) $pos + 1 ) ),
+							esc_html( number_format_i18n( count( $all ) ) )
+						) );
 			}
 			$facts[] = sprintf(
 				/* translators: 1: pet, 2: per minute, 3: per hour */
@@ -190,8 +212,8 @@ final class Insights {
 		$answer = is_numeric( $bw ) && (float) $bw > 0
 			? sprintf(
 				/* translators: 1: pet, 2: game, 3: income per second, 4: income per hour, 5: base weight */
-				esc_html__( 'A %1$s in %2$s earns %3$s Cash per second (%4$s per hour) at its base weight of %5$s kg with no mutation.', 'rbx-data' ),
-				esc_html( $name ),
+				esc_html__( '%1$s in %2$s earns %3$s Cash per second (%4$s per hour) at its base weight of %5$s kg with no mutation.', 'rbx-data' ),
+				esc_html( self::a( $name, true ) ),
 				esc_html( $ds->game()->name() ),
 				Ui::number( $ds, $base, 'abbr' ),
 				Ui::number( $ds, $base * 3600, 'abbr' ),
@@ -199,25 +221,25 @@ final class Insights {
 			)
 			: sprintf(
 				/* translators: 1: pet, 2: game, 3: income per second, 4: income per hour */
-				esc_html__( 'A %1$s in %2$s earns %3$s Cash per second (%4$s per hour) at its base weight with no mutation.', 'rbx-data' ),
-				esc_html( $name ),
+				esc_html__( '%1$s in %2$s earns %3$s Cash per second (%4$s per hour) at its base weight with no mutation.', 'rbx-data' ),
+				esc_html( self::a( $name, true ) ),
 				esc_html( $ds->game()->name() ),
 				Ui::number( $ds, $base, 'abbr' ),
 				Ui::number( $ds, $base * 3600, 'abbr' )
 			);
 		// UO-23: the answer with its unit comes first, then how mutations change it.
 		$intro = $answer . ' ' . sprintf(
-			/* translators: 1: pet, 2: best mutation name, 3: income */
-			esc_html__( 'A mutation multiplies it, so a %2$s %1$s at the same weight earns %3$s per second, the most of any mutation in our list.', 'rbx-data' ),
+			/* translators: 1: pet, 2: best mutation name with "a" or "an", 3: income */
+			esc_html__( 'A mutation multiplies it, so %2$s %1$s at the same weight earns %3$s per second, the most of any mutation in our list.', 'rbx-data' ),
 			esc_html( $name ),
-			esc_html( (string) $best[0]['name'] ),
+			esc_html( self::a( (string) $best[0]['name'] ) ),
 			Ui::number( $ds, $best[1], 'abbr' )
 		);
 		/* translators: %s: pet */
 		$cap   = sprintf( __( 'Income of one %s at its base weight, by mutation', 'rbx-data' ), $name );
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Version', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Multiplier', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per hour', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: pet */
-		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much does a %s make?', 'rbx-data' ), $name ), 'income' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
+		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much does %s make?', 'rbx-data' ), self::a( $name ) ), 'income' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
 	}
 
 	/**
@@ -239,8 +261,8 @@ final class Insights {
 		}
 		$text = sprintf(
 			/* translators: 1: pet, 2: base weight, 3: weight x2, 4: income at x2, 5: weight x10, 6: income at x10, 7: ratio at x10 */
-			esc_html__( 'Yes, but not in step with the weight. A %1$s at its base weight of %2$s kg is the plain income above; at %3$s kg it earns %4$s per second, and at %5$s kg %6$s, about %7$s times the base, not ten.', 'rbx-data' ),
-			esc_html( $name ),
+			esc_html__( 'Yes, but not in step with the weight. %1$s at its base weight of %2$s kg is the plain income above; at %3$s kg it earns %4$s per second, and at %5$s kg %6$s, about %7$s times the base, not ten.', 'rbx-data' ),
+			esc_html( self::a( $name, true ) ),
 			Ui::number( $ds, $bw, 'abbr' ),
 			Ui::number( $ds, $bw * 2, 'abbr' ),
 			Ui::number( $ds, $two, 'abbr' ),
@@ -248,10 +270,28 @@ final class Insights {
 			Ui::number( $ds, $ten, 'abbr' ),
 			esc_html( self::ratio( $ten / $base ) )
 		);
-		$chip = 'confirmed' !== $ds->mechanic_status( 'weight_scaling' ) ? ' <span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Partly tested in game', 'rbx-data' ) . '</span>' : '';
+		$chip = 'confirmed' !== $ds->mechanic_status( 'weight_scaling' ) ? ' ' . self::weight_chip( $ds, $rec ) : '';
 		$calc = Item::calculator_link( $ds->game(), $rec );
 		/* translators: %s: pet */
 		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $text . $chip . '</p>' . ( '' !== $calc ? '<p>' . $calc . '</p>' : '' ) . '</section>';
+	}
+
+	/**
+	 * GR-03: "Partly tested" only on a pet with an in-game reading, naming the weight it was read
+	 * at; the figures for other pets and weights come from the wiki rule alone.
+	 */
+	private static function weight_chip( Dataset $ds, array $rec ): string {
+		$kg = array();
+		foreach ( $ds->tests_on( $rec ) as $in ) {
+			if ( is_numeric( $in['weight'] ?? null ) ) {
+				$kg[] = Ui::number( $ds, (float) $in['weight'], 'abbr' ) . ' kg';
+			}
+		}
+		if ( ! $kg ) {
+			return '<span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Wiki rule, not tested by us', 'rbx-data' ) . '</span>';
+		}
+		/* translators: %s: weights such as "26 kg" */
+		return '<span class="rbx-chip rbx-chip--warning">' . sprintf( esc_html__( 'Partly tested in game (one reading at %s)', 'rbx-data' ), implode( ', ', array_unique( $kg ) ) ) . '</span>';
 	}
 
 	/**
@@ -278,34 +318,51 @@ final class Insights {
 			/* translators: 1: pet, 2: zone, 3: count */
 			? sprintf( esc_html__( 'The %1$s earns the most of the %3$s pets whose eggs spawn in %2$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ) )
 			/* translators: 1: pet, 2: zone, 3: count, 4: ordinal */
-			: sprintf( esc_html__( 'Of the %3$s pets whose eggs spawn in %2$s, the %1$s earns %4$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ), esc_html( count( $pets ) === $pos + 1 ? __( 'the least', 'rbx-data' ) : self::nth( $pos + 1, __( 'most', 'rbx-data' ) ) ) );
+			: sprintf( esc_html__( 'Of the %3$s pets whose eggs spawn in %2$s, the %1$s earns %4$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ),	esc_html( self::rank( $pos + 1, count( $pets ), __( 'most', 'rbx-data' ), __( 'least', 'rbx-data' ) ) ) );
 		$hatch = static fn( array $e ): ?float => is_numeric( $e['data']['hatch_time_s'] ?? null ) && (float) $e['data']['hatch_time_s'] > 0 ? (float) $e['data']['hatch_time_s'] : null;
 		$mine  = $hatch( $egg );
 		if ( $pos > 0 ) {
 			$up      = $pets[ $ids[ $pos - 1 ] ];
 			$uh      = $hatch( $up['egg'] );
-			$line    = sprintf(
-				/* translators: 1: stronger pet link, 2: ratio, 3: pet */
-				esc_html__( 'The next step up in the same zone is %1$s, which earns about %2$s times as much as the %3$s', 'rbx-data' ),
-				Ui::link( $up['record'] ),
-				esc_html( self::ratio( $up['income'] / $base ) ),
-				esc_html( $name )
-			);
+			$line    = self::same( $up['income'] / $base )
+				? sprintf(
+					/* translators: 1: pet link, 2: pet */
+					esc_html__( 'The next pet up in the same zone, %1$s, earns the same as the %2$s', 'rbx-data' ),
+					Ui::link( $up['record'] ),
+					esc_html( $name )
+				)
+				: sprintf(
+					/* translators: 1: stronger pet link, 2: ratio, 3: pet */
+					esc_html__( 'The next step up in the same zone is %1$s, which earns about %2$s times as much as the %3$s', 'rbx-data' ),
+					Ui::link( $up['record'] ),
+					esc_html( self::ratio( $up['income'] / $base ) ),
+					esc_html( $name )
+				);
 			if ( null !== $uh && null !== $mine ) {
-				/* translators: 1: duration, 2: duration */
-				$line .= sprintf( esc_html__( '; its egg takes %1$s to hatch instead of %2$s', 'rbx-data' ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $uh ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $mine ) );
+				$line .= abs( $uh - $mine ) < 0.5
+					/* translators: %s: duration */
+					? sprintf( esc_html__( '; its egg takes the same time to hatch, %s', 'rbx-data' ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $uh ) )
+					/* translators: 1: duration, 2: duration */
+					: sprintf( esc_html__( '; its egg takes %1$s to hatch instead of %2$s', 'rbx-data' ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $uh ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $mine ) );
 			}
 			$facts[] = $line . '.';
 		}
 		if ( $pos + 1 < count( $ids ) ) {
 			$down    = $pets[ $ids[ $pos + 1 ] ];
-			$facts[] = sprintf(
-				/* translators: 1: pet, 2: ratio, 3: weaker pet link */
-				esc_html__( 'Worth replacing? A %1$s earns about %2$s times as much as %3$s, the next pet down in this zone, so it is an upgrade over that pet and everything below it.', 'rbx-data' ),
-				esc_html( $name ),
-				esc_html( self::ratio( $base / max( $down['income'], 1e-9 ) ) ),
-				Ui::link( $down['record'] )
-			);
+			$facts[] = self::same( $base / max( $down['income'], 1e-9 ) )
+				? sprintf(
+					/* translators: 1: pet, 2: same-income pet link */
+					esc_html__( 'Worth replacing? The %1$s earns the same as %2$s, the next pet in this zone, so swapping one for the other gains nothing.', 'rbx-data' ),
+					esc_html( $name ),
+					Ui::link( $down['record'] )
+				)
+				: sprintf(
+					/* translators: 1: pet with "A" or "An", 2: ratio, 3: weaker pet link */
+					esc_html__( 'Worth replacing? %1$s earns about %2$s times as much as %3$s, the next pet down in this zone, so it is an upgrade over that pet and everything below it.', 'rbx-data' ),
+					esc_html( self::a( $name, true ) ),
+					esc_html( self::ratio( $base / max( $down['income'], 1e-9 ) ) ),
+					Ui::link( $down['record'] )
+				);
 		}
 		$speed = $bio['data']['unlock_speed_required'] ?? null;
 		$next  = self::next_zone( $ds, $bio );
@@ -325,7 +382,7 @@ final class Insights {
 		foreach ( $pets as $id => $p ) {
 			$me    = $id === (string) $rec['id'];
 			$h     = $hatch( $p['egg'] );
-			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' . ( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : '' ) . '</td><td class="rbx-num-cell">' . ( $me ? '' : Ui::number( $ds, round( $p['income'] / $base, 2 ), 'mult' ) ) . '</td></tr>';
+			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' .	( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : Ui::dash() ) . '</td><td class="rbx-num-cell">' . ( $me ? Ui::dash() : self::times( $ds, $p['income'] / $base ) ) . '</td></tr>';
 		}
 		$li = '';
 		foreach ( $facts as $f ) {
@@ -433,21 +490,21 @@ final class Insights {
 				esc_html__( '%1$s multiplies a pet\'s income by %2$s. That makes it %3$s of the %4$s mutations in our list.', 'rbx-data' ),
 				esc_html( $name ),
 				Ui::number( $ds, $mult, 'mult' ),
-				esc_html( self::nth( (int) $pos + 1, __( 'strongest', 'rbx-data' ) ) ),
+				esc_html( self::rank( (int) $pos + 1, count( $muts ), __( 'strongest', 'rbx-data' ), __( 'weakest', 'rbx-data' ) ) ),
 				esc_html( number_format_i18n( count( $muts ) ) )
-			);
-			if ( $ties ) {
+				);
+				if ( $ties ) {
 				/* translators: %s: mutation links */
 				$facts[] = sprintf( esc_html__( 'It gives the same boost as %s.', 'rbx-data' ), implode( ', ', $ties ) );
 			}
 			$top = $muts[ $order[0] ] ?? null;
-			if ( $top && $top['record']['id'] !== $rec['id'] ) {
+			if ( $top && $top['record']['id'] !== $rec['id'] && ! self::same( $top['mult'] / $mult ) ) {
 				$facts[] = sprintf(
-					/* translators: 1: top mutation link, 2: ratio, 3: mutation */
-					esc_html__( 'The strongest one, %1$s, gives about %2$s times the income of a %3$s pet.', 'rbx-data' ),
+					/* translators: 1: top mutation link, 2: ratio, 3: mutation with "a" or "an" */
+					esc_html__( 'The strongest one, %1$s, gives about %2$s times the income of %3$s pet.', 'rbx-data' ),
 					Ui::link( $top['record'] ),
 					esc_html( self::ratio( $top['mult'] / $mult ) ),
-					esc_html( $name )
+					esc_html( self::a( $name ) )
 				);
 			}
 		}
@@ -520,8 +577,8 @@ final class Insights {
 			if ( '' === $first ) {
 				$first = sprintf(
 					/* translators: 1: mutation, 2: pet link, 3: income, 4: plain pet link */
-					esc_html__( 'For example, a %1$s %2$s earns %3$s per second, about the same as a plain %4$s.', 'rbx-data' ),
-					esc_html( $name ),
+					esc_html__( 'For example, %1$s %2$s earns %3$s per second, about the same as a plain %4$s.', 'rbx-data' ),
+					esc_html( self::a( $name ) ),
 					Ui::link( $top['record'] ),
 					Ui::number( $ds, $v, 'abbr' ),
 					Ui::link( $near['record'] )
@@ -538,7 +595,7 @@ final class Insights {
 		$cap   = sprintf( __( 'Best pet of each zone with %s, and the plain pet it matches', 'rbx-data' ), $name );
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Zone', 'rbx-data' ) . '</th><th scope="col">' . esc_html( sprintf( /* translators: %s: mutation */ __( 'Best pet of the zone with %s', 'rbx-data' ), $name ) ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Earns about as much as', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: mutation */
-		return '<section class="rbx-equiv">' . Ui::h2( sprintf( __( 'What a %s pet is worth in plain pets', 'rbx-data' ), $name ), 'equivalents' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
+		return '<section class="rbx-equiv">' .	Ui::h2( sprintf( __( 'What %s pet is worth in plain pets', 'rbx-data' ), self::a( $name ) ), 'equivalents' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
 	}
 
 	/* ---------------------------------------------------------------- crops (Grow a Garden games) */
@@ -569,7 +626,7 @@ final class Insights {
 						esc_html( $name ),
 						esc_html( number_format_i18n( count( $same ) ) ),
 						esc_html( (string) $rar['name'] ),
-						esc_html( count( $same ) === (int) $pos + 1 ? __( 'the lowest', 'rbx-data' ) : self::nth( (int) $pos + 1, __( 'highest', 'rbx-data' ) ) )
+						esc_html( self::rank( (int) $pos + 1, count( $same ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) )
 					);
 				}
 			}
@@ -591,7 +648,7 @@ final class Insights {
 			$facts[] = sprintf( esc_html__( 'Harvested %s fruit never decays, so it keeps its full value until you sell it.', 'rbx-data' ), esc_html( $name ) );
 		} elseif ( is_numeric( $rec['data']['prime_time_s'] ?? null ) && (float) $rec['data']['prime_time_s'] > 0 ) {
 			/* translators: 1: crop, 2: duration */
-			$facts[] = sprintf( esc_html__( 'A harvested %1$s stays fresh for %2$s, then slowly loses value as it decays, unless it has a mutation.', 'rbx-data' ), esc_html( $name ), Ui::raw( $ds, array( 'type' => 'duration_s' ), (float) $rec['data']['prime_time_s'] ) );
+			$facts[] = sprintf(	esc_html__( 'A harvested %1$s stays fresh for %2$s, then slowly loses value as it decays, unless it has a mutation.', 'rbx-data' ), esc_html( $name ), Ui::raw( $ds, array( 'type' => 'duration_s' ), (float) $rec['data']['prime_time_s'] ) );
 		}
 		if ( array_key_exists( 'obtainable_now', $rec['data'] ) && empty( $rec['data']['obtainable_now'] ) && null !== $rec['data']['obtainable_now'] ) {
 			$facts[] = esc_html__( 'The community wiki lists it as not obtainable right now; it came from an event, pack or limited shop.', 'rbx-data' );
@@ -644,14 +701,15 @@ final class Insights {
 				return '';
 			}
 			$intro = sprintf(
-				/* translators: 1: crop, 2: best mutation, 3: value, 4: currency */
-				esc_html__( 'A %1$s can carry one mutation at a time. The strongest in our list, %2$s, makes a base-weight %1$s worth %3$s %4$s.', 'rbx-data' ),
+				/* translators: 1: crop, 2: best mutation, 3: value, 4: currency, 5: crop with "A" or "An" */
+				esc_html__( '%5$s can carry one mutation at a time. The strongest in our list, %2$s, makes a base-weight %1$s worth %3$s %4$s.', 'rbx-data' ),
 				esc_html( $name ),
 				esc_html( (string) $best[0]['name'] ),
 				Ui::number( $ds, $best[1], 'abbr' ),
-				esc_html( $cur )
-			);
-			/* translators: 1: crop, 2: currency */
+				esc_html( $cur ),
+				esc_html( self::a( $name, true ) )
+				);
+				/* translators: 1: crop, 2: currency */
 			$cap  = sprintf( __( 'Value of one fresh %1$s at its base weight, by mutation (%2$s)', 'rbx-data' ), $name, $cur );
 			$head = '<th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th>';
 		}
@@ -661,15 +719,15 @@ final class Insights {
 		// UO-23: the answer with its unit comes first.
 		$intro = sprintf(
 			/* translators: 1: crop, 2: game, 3: value, 4: currency */
-			esc_html__( 'A %1$s in %2$s sells for %3$s %4$s at its base weight with no mutation.', 'rbx-data' ),
-			esc_html( $name ),
+			esc_html__( '%1$s in %2$s sells for %3$s %4$s at its base weight with no mutation.', 'rbx-data' ),
+			esc_html( self::a( $name, true ) ),
 			esc_html( $game->name() ),
 			Ui::number( $ds, $base, 'abbr' ),
 			esc_html( $cur )
 		) . ' ' . $intro;
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr>' . $head . '<th scope="col">' . esc_html__( 'Multiplier', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Sell value', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: crop */
-		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much is a %s worth?', 'rbx-data' ), $name ), 'value' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
+		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much is %s worth?', 'rbx-data' ), self::a( $name ) ), 'value' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
 	}
 
 	/** Decimals needed to show a base weight exactly: 2 to 4 (0.4 → 2, 0.275 → 3). */
@@ -893,7 +951,7 @@ final class Insights {
 	/* ---------------------------------------------------------------- helpers */
 
 	private static function source_note(): string {
-		return '<p class="rbx-note">' . esc_html__( 'Worked out with our calculator formula from community wiki values (Source: community wiki).', 'rbx-data' ) . '</p>';
+		return '<p class="rbx-note">' . esc_html__( 'The numbers in the sections above are worked out with our calculator formula from community wiki values.', 'rbx-data' ) . '</p>';
 	}
 
 	private static function formula_key( Dataset $ds ): ?string {
@@ -982,6 +1040,42 @@ final class Insights {
 		}
 		uasort( $out, static fn( $a, $b ) => ( $a['mult'] <=> $b['mult'] ) ?: strcmp( (string) $a['record']['name'], (string) $b['record']['name'] ) );
 		return $out;
+	}
+
+	/**
+	 * Rank wording (GR-10): "the highest", "the 2nd highest", and from the bottom half "the 2nd
+	 * lowest" instead of "the 30th highest" of 31.
+	 */
+	private static function rank( int $pos, int $count, string $top, string $bottom ): string {
+		if ( $pos === $count && $count > 1 ) {
+			return self::nth( 1, $bottom );
+		}
+		return $pos > $count / 2 && $count > 3 ? self::nth( $count - $pos + 1, $bottom ) : self::nth( $pos, $top );
+	}
+
+	/** Two amounts that round to the same "about N times" are "the same" (GR-10). */
+	private static function same( float $r ): bool {
+		return $r > 0 && abs( $r - 1 ) < 0.05;
+	}
+
+	/** "×0.09", or "under ×0.01" instead of a bare "×0" (GR-10). */
+	private static function times( Dataset $ds, float $r ): string {
+		if ( $r > 0 && $r < 0.01 ) {
+			/* translators: %s: multiplier such as ×0.01 */
+			return sprintf( esc_html__( 'under %s', 'rbx-data' ), Ui::number( $ds, 0.01, 'mult' ) );
+		}
+		return Ui::number( $ds, round( $r, 2 ), 'mult' );
+	}
+
+	/**
+	 * Name with "a" or "an" (GR-10: "A ArchAngel"). Judged by sound for the usual exceptions
+	 * ("a Unicorn", "an Hour"); $cap starts the sentence.
+	 */
+	private static function a( string $name, bool $cap = false ): string {
+		$an = (bool) preg_match( '/^[aeiou]/i', $name ) && ! preg_match( '/^(uni|use|usu|uto|eu|one\b|once)/i', $name );
+		$an = $an || (bool) preg_match( '/^(hour|honest|honou?r|heir)/i', $name );
+		$w  = $an ? 'an' : 'a';
+		return ( $cap ? ucfirst( $w ) : $w ) . ' ' . $name;
 	}
 
 	/** "the highest", "the 2nd highest", ... */

@@ -234,6 +234,7 @@ final class Guides {
 			array( 'ID' => $page->ID )
 		);
 		clean_post_cache( $page->ID );
+		update_post_meta( $page->ID, BundledPages::CHANGED, $gmt );
 		wp_publish_post( $page->ID );
 	}
 
