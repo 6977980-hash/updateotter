@@ -28,7 +28,7 @@ final class Insights {
 	public static function render( Dataset $ds, array $rec ): string {
 		switch ( (string) $rec['entity'] ) {
 			case 'PET':
-				return self::pet_glance( $ds, $rec ) . self::pet_zone( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
+				return self::event_guide( $ds, $rec ) . self::pet_glance( $ds, $rec ) . self::pet_zone( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
 			case 'MUT':
 				return $ds->game()->entity( 'PLT' ) ? self::crop_mutation_effect( $ds, $rec ) : self::mutation_effect( $ds, $rec ) . self::mutation_equivalents( $ds, $rec );
 			case 'PLT':
@@ -38,6 +38,21 @@ final class Insights {
 	}
 
 	/* ---------------------------------------------------------------- pets */
+
+	/** "Part of the … event" line linking an event pet to its guide (GR-19). */
+	private static function event_guide( Dataset $ds, array $rec ): string {
+		$home = self::zone_of( $ds, (string) $rec['id'] );
+		$path = null === $home ? '' : trim( (string) ( $home[0]['data']['guide_path'] ?? '' ) );
+		if ( '' === $path ) {
+			return '';
+		}
+		return '<p class="rbx-note">' . sprintf(
+			/* translators: 1: pet, 2: guide link */
+			esc_html__( 'The %1$s is part of a limited event. Times, eggs and the best pets are in our %2$s.', 'rbx-data' ),
+			esc_html( (string) $rec['name'] ),
+			'<a href="' . esc_url( home_url( $path ) ) . '">' . esc_html__( 'event guide', 'rbx-data' ) . '</a>'
+		) . '</p>';
+	}
 
 	private static function pet_glance( Dataset $ds, array $rec ): string {
 		$name  = (string) $rec['name'];
@@ -331,12 +346,14 @@ final class Insights {
 	private static function zone_of( Dataset $ds, string $pet ): ?array {
 		foreach ( self::egg_index( $ds )['by_pet'][ $pet ] ?? array() as $egg_id ) {
 			$egg = $ds->get( $egg_id );
-			if ( ! $egg || 'biome_spawn' !== ( $egg['data']['obtain_method'] ?? '' ) ) {
+			$how = (string) ( $egg['data']['obtain_method'] ?? '' );
+			if ( ! $egg || ! in_array( $how, array( 'biome_spawn', 'event' ), true ) ) {
 				continue;
 			}
 			foreach ( (array) ( $egg['data']['biome_ids'] ?? array() ) as $bid ) {
 				$bio = $ds->get( (string) $bid );
-				if ( $bio && in_array( $bio['status'], array( 'live', 'limited' ), true ) ) {
+				// Event eggs count only for an event zone (GR-06).
+				if ( $bio && ( 'event' === $how ? 'limited' === $bio['status'] : in_array( $bio['status'], array( 'live', 'limited' ), true ) ) ) {
 					return array( $bio, $egg );
 				}
 			}

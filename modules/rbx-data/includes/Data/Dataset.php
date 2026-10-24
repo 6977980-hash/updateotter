@@ -277,6 +277,10 @@ final class Dataset {
 			}
 		}
 		$out['label']              = self::state_label( $out['state'], (bool) $out['mechanic_ok'] );
+		// Community values from a site other than the wiki say so (GR-05).
+		if ( 'community' === $out['state'] && $out['mechanic_ok'] && ! empty( $out['source_url'] ) && ! str_contains( (string) wp_parse_url( (string) $out['source_url'], PHP_URL_HOST ), 'fandom.com' ) ) {
+			$out['label'] = __( 'Source: community site', 'rbx-data' );
+		}
 		$this->state_cache[ $ck ] = $out;
 		return $out;
 	}

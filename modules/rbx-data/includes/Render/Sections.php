@@ -426,15 +426,18 @@ final class Sections {
 			return '<p class="rbx-empty">' . esc_html__( 'No mutations are listed yet. We add them only after checking them in the game.', 'rbx-data' ) . '</p>';
 		}
 		self::show( array_keys( $recs ) );
-		$rows = '';
+		// "Added in" column only for games that track it (GR-05).
+		$added = null !== $game->field( 'MUT', 'added_in' );
+		$rows  = '';
 		foreach ( $recs as $r ) {
 			$rows .= '<tr id="' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . Ui::link( $r ) . '</th>'
 				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'income_mult' ) ) . '">' . Ui::value( $ds, $r, 'income_mult', false ) . '</td>'
 				. '<td data-label="' . esc_attr( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '">' . ( empty( $r['data']['obtain_method_text__en'] ) ? '<span class="rbx-v--unknown">' . esc_html__( 'Not confirmed yet', 'rbx-data' ) . '</span>' : Ui::text( (string) $r['data']['obtain_method_text__en'] ) ) . '</td>'
+				. ( $added ? '<td data-label="' . esc_attr( $game->label( 'MUT', 'added_in' ) ) . '">' . ( empty( $r['data']['added_in'] ) ? '—' : esc_html( (string) $r['data']['added_in'] ) ) . '</td>' : '' )
 				. '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . Ui::chip( $ds->field_state( $r, 'income_mult' ), $ds ) . '</td>'
 				. '<td data-label="' . esc_attr__( 'Data as of', 'rbx-data' ) . '">' . Ui::date( (string) ( $r['data']['last_verified'] ?? '' ) ) . '</td></tr>';
 		}
-		return '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th><th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		return '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( $game->entity_label( 'MUT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mutation', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'income_mult' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'MUT', 'obtain_method_text__en' ) ) . '</th>' . ( $added ? '<th scope="col">' . esc_html( $game->label( 'MUT', 'added_in' ) ) . '</th>' : '' ) . '<th scope="col">' . esc_html__( 'Confidence', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Data as of', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 	}
 
 	private static function sizes( Game $game ): string {
@@ -462,10 +465,18 @@ final class Sections {
 		$expired = array_filter( $codes, static fn( $c ) => 'expired' === ( $c['data']['code_status'] ?? '' ) && in_array( $c['status'], array( 'live', 'removed_from_game' ), true ) );
 		$reported = array_filter( $codes, static fn( $c ) => 'unverified' === ( $c['data']['code_status'] ?? '' ) && 'live' === $c['status'] );
 		$last     = CheckLog::last_checked( $game );
+		// Say "community wiki" only when every reported code comes from it (GR-07).
+		$wiki = ! array_filter( $reported, static fn( $c ) => ! str_contains( (string) ( $c['data']['source_url'] ?? '' ), 'fandom.com' ) );
 		self::show( array_keys( $active + $expired + $reported ) );
 		$out = '<div class="rbx-codes-status" role="region" aria-label="' . esc_attr__( 'Code status', 'rbx-data' ) . '">';
 		if ( ! $active && $reported ) {
-			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No codes tested by us yet', 'rbx-data' ) . '</strong></p><p>' . esc_html( sprintf( /* translators: %s: number */ _n( '%s code is reported as working on the community wiki. We have not redeemed it ourselves, so it may not work.', '%s codes are reported as working on the community wiki. We have not redeemed them ourselves, so some may not work.', count( $reported ), 'rbx-data' ), number_format_i18n( count( $reported ) ) ) ) . '</p>';
+			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No codes tested by us yet', 'rbx-data' ) . '</strong></p><p>' . esc_html(
+				$wiki
+					/* translators: %s: number */
+					? sprintf( _n( '%s code is reported as working on the community wiki. We have not redeemed it ourselves, so it may not work.', '%s codes are reported as working on the community wiki. We have not redeemed them ourselves, so some may not work.', count( $reported ), 'rbx-data' ), number_format_i18n( count( $reported ) ) )
+					/* translators: %s: number */
+					: sprintf( _n( '%s code is reported as working by community code lists. We have not redeemed it ourselves, so it may not work.', '%s codes are reported as working by community code lists. We have not redeemed them ourselves, so some may not work.', count( $reported ), 'rbx-data' ), number_format_i18n( count( $reported ) ) )
+			) . '</p>';
 		} elseif ( ! $active ) {
 			/* translators: %s: game name */
 			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No working codes right now', 'rbx-data' ) . '</strong></p><p>' . sprintf( esc_html__( 'There are no %s codes right now.', 'rbx-data' ), esc_html( $game->name() ) ) . ( '' !== $last ? ' ' . esc_html__( 'We last checked on', 'rbx-data' ) . ' ' . Ui::date( $last ) . '.' : '' ) . '</p>';
@@ -550,7 +561,8 @@ final class Sections {
 		self::show( array_keys( $upds ) );
 		$out .= '<ol class="rbx-updates" reversed>';
 		foreach ( $upds as $u ) {
-			$out .= '<li class="rbx-update-card"><h3>' . Ui::link( $u ) . '</h3><p class="rbx-meta">' . Ui::date( (string) ( $u['data']['release_date'] ?? '' ) ) . '</p>' . ( ! empty( $u['data']['summary__en'] ) ? '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $u['data']['summary__en'] ), 40 ) ) . '</p>' : '' ) . '</li>';
+			$guide = trim( (string) ( $u['data']['guide_path'] ?? '' ) );
+			$out  .= '<li class="rbx-update-card"><h3>' . Ui::link( $u, '', false ) . '</h3><p class="rbx-meta">' . Ui::date( (string) ( $u['data']['release_date'] ?? '' ) ) . ( '' !== $guide ? ' · <a href="' . esc_url( home_url( $guide ) ) . '">' . esc_html__( 'Event guide', 'rbx-data' ) . '</a>' : '' ) . '</p>' . ( ! empty( $u['data']['summary__en'] ) ? '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $u['data']['summary__en'] ), 40 ) ) . '</p>' : '' ) . '</li>';
 		}
 		return $out . '</ol>';
 	}
@@ -685,7 +697,7 @@ final class Sections {
 			}
 			$slug = 'stage-' . sanitize_title( (string) $bio['slug'] );
 			/* translators: %s: event zone */
-			$out .= '<section class="rbx-stage" aria-labelledby="' . esc_attr( $slug ) . '"><h3 id="' . esc_attr( $slug ) . '">' . esc_html( sprintf( __( 'Event: %s', 'rbx-data' ), (string) $bio['name'] ) ) . '</h3><p>' . esc_html__( 'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.', 'rbx-data' ) . '</p><ol class="rbx-top">' . $li . '</ol></section>';
+			$out .= '<section class="rbx-stage" aria-labelledby="' . esc_attr( $slug ) . '"><h3 id="' . esc_attr( $slug ) . '">' . esc_html( sprintf( __( 'Event: %s', 'rbx-data' ), (string) $bio['name'] ) ) . '</h3><p>' . esc_html__( 'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.', 'rbx-data' ) . ( '' !== trim( (string) ( $bio['data']['guide_path'] ?? '' ) ) ? ' <a href="' . esc_url( home_url( (string) $bio['data']['guide_path'] ) ) . '">' . esc_html__( 'Read the event guide', 'rbx-data' ) . '</a>.' : '' ) . '</p><ol class="rbx-top">' . $li . '</ol></section>';
 		}
 		return '' === $out ? '' : $out . '<p class="rbx-note">' . esc_html__( 'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.', 'rbx-data' ) . '</p>';
 	}

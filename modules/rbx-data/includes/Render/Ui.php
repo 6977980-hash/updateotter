@@ -86,12 +86,17 @@ final class Ui {
 	 *
 	 * @param array<string, mixed>|null $rec Record.
 	 */
-	public static function link( ?array $rec, string $class = '' ): string {
+	public static function link( ?array $rec, string $class = '', bool $guide = true ): string {
 		if ( null === $rec ) {
 			return '';
 		}
 		$name = 'UPD' === $rec['entity'] ? (string) ( $rec['data']['title__en'] ?? $rec['name'] ) : (string) $rec['name'];
 		$pid  = (int) ( $rec['post_id'] ?? 0 );
+		// An event update points at its guide, the page worth indexing (GR-19).
+		$path = 'UPD' === $rec['entity'] && $guide ? trim( (string) ( $rec['data']['guide_path'] ?? '' ) ) : '';
+		if ( '' !== $path ) {
+			return '<a href="' . esc_url( home_url( $path ) ) . '"' . ( '' !== $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . '>' . esc_html( $name ) . '</a>';
+		}
 		if ( $pid && 'publish' === get_post_status( $pid ) ) {
 			return '<a href="' . esc_url( (string) get_permalink( $pid ) ) . '"' . ( '' !== $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . '>' . esc_html( $name ) . '</a>';
 		}
