@@ -83,12 +83,16 @@ final class Media {
 		if ( ! $id ) {
 			return '';
 		}
+		// UO-57: small list icons load lazily at their shown size (40 px), and no icon takes
+		// fetchpriority=high from WordPress, because the LCP on these pages is text.
+		$icon = $size < 96;
 		$attr = array(
-			'class'    => $class,
-			'alt'      => $alt,
-			'decoding' => 'async',
-			'loading'  => $lazy ? 'lazy' : 'eager',
-			'sizes'    => $size . 'px',
+			'class'         => $class,
+			'alt'           => $alt,
+			'decoding'      => 'async',
+			'loading'       => $lazy || $icon ? 'lazy' : 'eager',
+			'sizes'         => ( $icon ? min( $size, 40 ) : $size ) . 'px',
+			'fetchpriority' => $size <= 96 ? 'low' : 'auto',
 		);
 		$name = $size <= 96 ? 'rbx-icon' : ( $size <= 256 ? 'rbx-card' : 'large' );
 		$html = wp_get_attachment_image( $id, has_image_size( $name ) ? $name : 'medium', false, $attr );

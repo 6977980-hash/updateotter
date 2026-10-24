@@ -78,6 +78,18 @@ remove_action( 'template_redirect', 'wp_shortlink_header', 11 );
 // A mistyped or missing URL is a 404, never a 301 to the nearest slug of another game (UO-15).
 add_filter( 'do_redirect_guess_404_permalink', '__return_false' );
 
+// UO-57: new image sizes (item icons and screenshots) are saved as WebP when the server can write it.
+add_filter(
+	'image_editor_output_format',
+	static function ( array $formats ): array {
+		if ( wp_image_editor_supports( array( 'mime_type' => 'image/webp' ) ) ) {
+			$formats['image/jpeg'] = 'image/webp';
+			$formats['image/png']  = 'image/webp';
+		}
+		return $formats;
+	}
+);
+
 /**
  * Archives are not pages of this site (UO-14): category, tag, date and author archives, post type
  * archives and the blog index (where /?post_type=rbx_pet lands) are real 404s, not soft ones.

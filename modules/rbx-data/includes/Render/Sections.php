@@ -297,6 +297,11 @@ final class Sections {
 		$legend = $one_conf ? '<p class="rbx-legend">' . esc_html__( 'Confidence for every row:', 'rbx-data' ) . ' ' . reset( $conf ) . '</p>' : '';
 		$table  = $legend . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html( Lang::t( $label ) ) . '</caption><thead><tr>' . $head . '</tr></thead><tbody>' . $body . '</tbody></table></div>';
 		$empty = '<p class="rbx-empty" hidden data-rbx-empty>' . esc_html__( 'No results. Try fewer filters.', 'rbx-data' ) . ' <a href="' . esc_url( home_url( '/report/' ) ) . '">' . esc_html__( 'Report a missing item', 'rbx-data' ) . '</a></p>';
+		// UO-55: after a filter or sort, long lists show the first 100 matches and this button.
+		if ( count( $recs ) > 100 ) {
+			/* translators: {n}: number of matching rows, filled in by list.js */
+			$empty .= '<p class="rbx-more" hidden><button type="button" class="button-secondary" data-rbx-more data-template="' . esc_attr__( 'Show all {n}', 'rbx-data' ) . '"></button></p>';
+		}
 		self::enqueue_list_js();
 		$top = '<a class="rbx-backtop" href="#top" hidden data-rbx-backtop>' . esc_html__( 'Back to top', 'rbx-data' ) . '</a>';
 		return '<div class="rbx-list" data-rbx-list data-entity="' . esc_attr( strtolower( $entity ) ) . '">' . $controls . $table . $empty . $top . '</div>' . self::sources_line( $game, $recs );

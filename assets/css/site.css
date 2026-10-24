@@ -844,6 +844,10 @@ summary.rbx-chip {
 	color: var(--text-muted);
 	margin: 0;
 }
+.rbx-more {
+	margin: var(--sp-3) 0;
+	text-align: center;
+}
 .rbx-empty {
 	padding: var(--sp-4);
 	background: var(--surface);
@@ -969,6 +973,16 @@ summary.rbx-chip {
 }
 .rbx-list__controls[hidden] {
 	display: none;
+}
+/* UO-55: with JS on, the controls take their space from the first paint (hidden until list.js runs). */
+.js .rbx-list__controls[hidden] {
+	display: grid;
+	visibility: hidden;
+}
+/* UO-55: phone cards off screen skip layout and paint until scrolled near. */
+.rbx-table--list tbody tr {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 88px;
 }
 .rbx-search,
 .rbx-sort {

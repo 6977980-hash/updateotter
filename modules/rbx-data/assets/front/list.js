@@ -10,7 +10,6 @@ lists.forEach( ( list, n ) => {
 	const controls = list.querySelector( '[data-rbx-controls]' );
 	const tbody = list.querySelector( 'tbody' );
 	const rows = Array.from( tbody.rows );
-	const original = rows.slice();
 	const q = list.querySelector( '[data-rbx-q]' );
 	const sort = list.querySelector( '[data-rbx-sort]' );
 	const removedBtn = list.querySelector( '[data-rbx-removed]' );
@@ -53,39 +52,99 @@ lists.forEach( ( list, n ) => {
 		};
 	}
 
+	// UO-55: row data is read once; a filter tap only flips rows whose state changes, and rows
+	// move only when the sort changes (re-appending 600+ rows on every tap was the slow part).
+	const meta = rows.map( ( r ) => {
+		const f = {};
+		for ( const a of r.attributes ) {
+			if ( a.name.startsWith( 'data-f-' ) ) {
+				f[ a.name.slice( 7 ) ] = a.value.split( ' ' );
+			}
+		}
+		return { r, name: r.dataset.name || '', f, removed: r.hasAttribute( 'data-removed' ), shown: ! r.hidden };
+	} );
+	const totalAll = meta.length;
+	const totalLive = meta.filter( ( m ) => ! m.removed ).length;
+	const sortVals = {};
+	let lastSort = '';
+
+	function sortValues( key ) {
+		if ( ! sortVals[ key ] ) {
+			const idx = Array.from( list.querySelectorAll( 'thead th' ) ).findIndex( ( th ) => th.dataset.sortKey === key );
+			sortVals[ key ] = new Map( rows.map( ( r ) => {
+				const c = r.cells[ idx ];
+				return [ r, c && c.dataset.sort !== undefined ? parseFloat( c.dataset.sort ) : -Infinity ];
+			} ) );
+		}
+		return sortVals[ key ];
+	}
+
+	const LIMIT = 100;
+	const more = list.querySelector( '[data-rbx-more]' );
+	let limited = false;
+	let expanded = false;
+	let order = meta;
+	if ( more ) {
+		more.addEventListener( 'click', () => {
+			const before = order.filter( ( m ) => m.shown ).length;
+			expanded = true;
+			apply( false );
+			// Focus moves to the first row that just appeared, since the button hides itself.
+			const next = order.filter( ( m ) => m.shown )[ before ];
+			const link = next && next.r.querySelector( 'a' );
+			if ( link ) {
+				link.focus();
+			}
+		} );
+	}
+
 	function apply( write ) {
 		const s = state();
+		if ( write ) {
+			// The full server-rendered list shows until the first change; then long results are capped.
+			limited = true;
+			expanded = false;
+		}
+		if ( s.sort !== lastSort ) {
+			order = meta.slice();
+			if ( s.sort === 'name-asc' ) {
+				order.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+			} else if ( s.sort ) {
+				const v = sortValues( s.sort.replace( /-desc$/, '' ) );
+				order.sort( ( a, b ) => v.get( b.r ) - v.get( a.r ) );
+			}
+			const frag = document.createDocumentFragment();
+			order.forEach( ( m ) => frag.appendChild( m.r ) );
+			tbody.appendChild( frag );
+			lastSort = s.sort;
+		}
+		const cap = limited && ! expanded ? LIMIT : Infinity;
 		let shown = 0;
-		rows.forEach( ( r ) => {
-			let ok = ! s.q || ( r.dataset.name || '' ).includes( s.q );
+		order.forEach( ( m ) => {
+			let ok = ! s.q || m.name.includes( s.q );
 			for ( const f in s.facets ) {
-				const have = ( r.getAttribute( 'data-f-' + f ) || '' ).split( ' ' );
+				const have = m.f[ f ] || [];
 				ok = ok && s.facets[ f ].some( ( v ) => have.includes( v ) );
 			}
-			if ( r.hasAttribute( 'data-removed' ) && ! s.removed ) {
+			if ( m.removed && ! s.removed ) {
 				ok = false;
 			}
-			r.hidden = ! ok;
 			shown += ok ? 1 : 0;
+			const vis = ok && shown <= cap;
+			if ( vis !== m.shown ) {
+				m.r.hidden = ! vis;
+				m.shown = vis;
+			}
 		} );
-		let order = original.slice();
-		if ( s.sort === 'name-asc' ) {
-			order.sort( ( a, b ) => ( a.dataset.name || '' ).localeCompare( b.dataset.name || '' ) );
-		} else if ( s.sort ) {
-			const key = s.sort.replace( /-desc$/, '' );
-			const idx = Array.from( list.querySelectorAll( 'thead th' ) ).findIndex( ( th ) => th.dataset.sortKey === key );
-			const val = ( r ) => {
-				const c = r.cells[ idx ];
-				return c && c.dataset.sort !== undefined ? parseFloat( c.dataset.sort ) : -Infinity;
-			};
-			order.sort( ( a, b ) => val( b ) - val( a ) );
+		if ( more ) {
+			more.parentElement.hidden = shown <= cap;
+			more.textContent = ( more.dataset.template || '{n}' ).replace( '{n}', new Intl.NumberFormat( document.documentElement.lang || 'en' ).format( shown ) );
 		}
-		order.forEach( ( r ) => tbody.appendChild( r ) );
 		empty.hidden = shown > 0;
 		const active = s.q || Object.keys( s.facets ).length || s.sort || s.removed;
 		clear.hidden = ! active;
 		const nf = new Intl.NumberFormat( document.documentElement.lang || 'en' );
-		status.textContent = active ? ( status.dataset.template || '{shown} / {total}' ).replace( '{shown}', nf.format( shown ) ).replace( '{total}', nf.format( rows.filter( ( r ) => s.removed || ! r.hasAttribute( 'data-removed' ) ).length ) ) : '';
+		status.textContent = active ? ( status.dataset.template || '{shown} / {total}' ).replace( '{shown}', nf.format( shown ) ).replace( '{total}', nf.format( s.removed ? totalAll : totalLive ) ) : '';
 		if ( filterCount ) {
 			const nFacets = Object.values( s.facets ).reduce( ( a, v ) => a + v.length, 0 );
 			filterCount.textContent = nFacets ? '(' + nFacets + ')' : '';
