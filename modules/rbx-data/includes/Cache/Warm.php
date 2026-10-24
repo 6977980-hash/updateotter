@@ -125,12 +125,20 @@ final class Warm {
 				'order'       => 'ASC',
 			)
 		);
+		$list = array();
 		foreach ( $pages as $p ) {
 			if ( in_array( (int) $p->ID, $skip, true ) || ( 'report' === $p->post_name && 0 === (int) $p->post_parent ) ) {
 				continue;
 			}
-			$urls[] = (string) get_permalink( $p );
+			$list[] = (string) get_permalink( $p );
 		}
+		// Hubs and tools before deeper pages, English before the /id/ twins.
+		$rank = static function ( string $u ): int {
+			$path = trim( (string) wp_parse_url( $u, PHP_URL_PATH ), '/' );
+			return ( str_starts_with( $path . '/', \RBX\Data\Content\Lang::ID . '/' ) ? 10 : 0 ) + substr_count( $path, '/' );
+		};
+		usort( $list, static fn( string $a, string $b ): int => $rank( $a ) <=> $rank( $b ) );
+		$urls = array_merge( $urls, $list );
 		$items = get_posts(
 			array(
 				'post_type'   => \RBX\Data\Plugin::post_types(),

@@ -837,7 +837,6 @@ a.rbx-chip {
 	flex: 0 0 auto;
 	line-height: 0;
 	vertical-align: middle;
-	container-type: inline-size;
 }
 .rbx-ph-wrap::before,
 .rbx-ph-wrap[data-r]::after {
@@ -852,7 +851,7 @@ a.rbx-chip {
 	inset: 0 0 8% 0;
 	display: grid;
 	place-items: center;
-	font-size: 46cqw;
+	font-size: calc(var(--ph, var(--ph-size, 48px)) * 0.46);
 	color: var(--text);
 }
 .rbx-ph-wrap[data-r]::after {
@@ -863,7 +862,7 @@ a.rbx-chip {
 	height: 35.4%;
 	display: grid;
 	place-items: center;
-	font-size: 23cqw;
+	font-size: calc(var(--ph, var(--ph-size, 48px)) * 0.23);
 	color: var(--ph-ink, #fff);
 }
 .rbx-icon-img {
@@ -920,6 +919,9 @@ a.rbx-chip {
 .rbx-card__icon img {
 	width: 96px;
 	height: 96px;
+}
+.rbx-card__icon .rbx-ph-wrap {
+	--ph: 96px;
 }
 .rbx-card__chips {
 	display: flex;
@@ -1148,6 +1150,9 @@ a.rbx-chip {
 .rbx-related__item img {
 	width: 48px;
 	height: 48px;
+}
+.rbx-related__item .rbx-ph-wrap {
+	--ph: 48px;
 }
 .rbx-game-cards {
 	grid-template-columns: 1fr;
@@ -1437,6 +1442,9 @@ a.rbx-chip {
 	.rbx-card__icon img {
 		width: 128px;
 		height: 128px;
+	}
+	.rbx-card__icon .rbx-ph-wrap {
+		--ph: 128px;
 	}
 	.rbx-grid {
 		grid-template-columns: repeat(4, minmax(0, 1fr));

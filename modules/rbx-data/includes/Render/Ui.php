@@ -498,8 +498,9 @@ final class Ui {
 			$rgb    = array_map( 'hexdec', str_split( substr( $hex, 1 ), 2 ) );
 			$ink    = ( 0.299 * $rgb[0] + 0.587 * $rgb[1] + 0.114 * $rgb[2] ) > 150 ? '#111111' : '#ffffff';
 			$badge  = '<rect x="58" y="4" width="34" height="34" rx="8" fill="' . esc_attr( $hex ) . '" stroke="#111111" stroke-opacity=".35" stroke-width="2"/>';
-			$attrs .= ' data-r="' . esc_attr( mb_strtoupper( mb_substr( $rarity, 0, 1 ) ) ) . '" style="--ph-ink:' . $ink . '"';
+			$attrs .= ' data-r="' . esc_attr( mb_strtoupper( mb_substr( $rarity, 0, 1 ) ) ) . '"';
 		}
+		$attrs .= ' style="--ph-size:' . $size . 'px' . ( isset( $ink ) ? ';--ph-ink:' . $ink : '' ) . '"';
 		return '<span class="rbx-ph-wrap" aria-hidden="true"' . $attrs . '><svg class="rbx-ph" width="' . $size . '" height="' . $size . '" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><rect width="96" height="96" rx="12" class="rbx-ph__bg"/><rect y="88" width="96" height="8" fill="' . esc_attr( $bar ) . '"/>' . $badge . '</svg></span>';
 	}
 

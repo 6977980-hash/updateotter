@@ -65,14 +65,15 @@ final class Seo {
 	 * /page/N/ on a page that has no pages answers 404 instead of a copy of the page.
 	 */
 	public static function clean_urls(): void {
-		if ( is_admin() || 'GET' !== ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+		if ( is_admin() || ! in_array( $_SERVER['REQUEST_METHOD'] ?? 'GET', array( 'GET', 'HEAD' ), true ) ) {
 			return;
 		}
 		$uri  = (string) ( $_SERVER['REQUEST_URI'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		$path = (string) wp_parse_url( $uri, PHP_URL_PATH );
 		if ( '' !== $path && strtolower( $path ) !== $path && ! str_contains( $path, '/wp-' ) ) {
 			$query = (string) wp_parse_url( $uri, PHP_URL_QUERY );
-			wp_safe_redirect( home_url( strtolower( $path ) ) . ( '' !== $query ? '?' . $query : '' ), 301 );
+			$origin = (string) preg_replace( '#^(https?://[^/]+).*$#', '$1', home_url() );
+			wp_safe_redirect( $origin . strtolower( $path ) . ( '' !== $query ? '?' . $query : '' ), 301 );
 			exit;
 		}
 		$post = get_queried_object();
