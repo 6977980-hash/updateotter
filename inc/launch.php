@@ -41,7 +41,7 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live', 'search_index', 'purge', 'llms', 'indexnow' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'search_index', 'purge', 'llms', 'favicon', 'indexnow' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
@@ -172,6 +172,20 @@ add_action(
 			if ( class_exists( '\RBX\Data\Index\Llms' ) ) {
 				\RBX\Data\Index\Llms::flush();
 			}
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		if ( isset( $todo['favicon'] ) ) {
+			// The server answers /favicon.ico itself (static 404) before WordPress runs, so the theme's copy goes into the site root.
+			$src  = get_template_directory() . '/root-files/favicon.ico';
+			$dest = ABSPATH . 'favicon.ico';
+			if ( is_readable( $src ) && ( ! is_readable( $dest ) || md5_file( $src ) !== md5_file( $dest ) ) ) {
+				copy( $src, $dest ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_copy
+			}
+			$state['favicon'] = array(
+				'id'     => $todo['favicon'],
+				'at'     => gmdate( 'Y-m-d H:i:s' ),
+				'copied' => is_readable( $dest ) && md5_file( $src ) === md5_file( $dest ),
+			);
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
 		if ( isset( $todo['indexnow'] ) && class_exists( '\RBX\Data\Index\IndexNow' ) && \RBX\Data\Index\IndexNow::enabled() ) {
