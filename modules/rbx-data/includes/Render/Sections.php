@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sections {
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -95,6 +95,8 @@ final class Sections {
 					return self::hub_tiles( $game );
 				case 'hub_glance':
 					return self::hub_glance( $game );
+				case 'reference_note':
+					return self::reference_note( $game );
 				case 'glossary':
 					return self::glossary( $game );
 				case 'biomes':
@@ -686,6 +688,24 @@ final class Sections {
 			$out .= '<section class="rbx-stage" aria-labelledby="' . esc_attr( $slug ) . '"><h3 id="' . esc_attr( $slug ) . '">' . esc_html( sprintf( __( 'Event: %s', 'rbx-data' ), (string) $bio['name'] ) ) . '</h3><p>' . esc_html__( 'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.', 'rbx-data' ) . '</p><ol class="rbx-top">' . $li . '</ol></section>';
 		}
 		return '' === $out ? '' : $out . '<p class="rbx-note">' . esc_html__( 'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.', 'rbx-data' ) . '</p>';
+	}
+
+	/**
+	 * "Reference" note for games that get no weekly checks (UO-71, Ali 2026-10-24): the game config
+	 * sets "reference": true, and the date is the newest wiki date in the dataset.
+	 */
+	private static function reference_note( Game $game ): string {
+		if ( empty( $game->raw()['reference'] ) ) {
+			return '';
+		}
+		$newest = '';
+		foreach ( self::ds( $game )->records() as $r ) {
+			$d = (string) ( $r['data']['last_verified'] ?? '' );
+			$newest = $d > $newest ? $d : $newest;
+		}
+		/* translators: %s: date */
+		$when = '' !== $newest ? ' ' . sprintf( esc_html__( 'Data last refreshed %s.', 'rbx-data' ), Ui::date( substr( $newest, 0, 10 ) ) ) : '';
+		return '<p class="rbx-note rbx-note--reference" role="note"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Reference', 'rbx-data' ) . '</span> ' . esc_html__( 'We keep this game as a reference and do not re-check it after every update.', 'rbx-data' ) . $when . '</p>';
 	}
 
 	/** Hub tiles (UX-10): tools first, then sections, from menu_order; only existing Pages link. */
