@@ -64,6 +64,7 @@ final class Plugin {
 		Render\Pages::boot();
 		Render\Report::boot();
 		Reports\Endpoint::boot();
+		Reports\Votes::boot();
 		Rest\Routes::boot();
 		Import\Bundled::boot();
 		Cache\Warm::boot();

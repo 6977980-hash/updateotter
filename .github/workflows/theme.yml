@@ -31,5 +31,7 @@ jobs:
         run: RBX_DATA_DIR=modules/rbx-data node --test modules/rbx-tools/tests/parity.test.mjs
       - name: Report form personal-data check
         run: php modules/rbx-data/tests/report-pii.test.php
+      - name: Players confirm vote rule
+        run: php modules/rbx-data/tests/votes.test.php
       - name: No eval or innerHTML in calculator JS
         run: "! grep -rnE 'eval\\(|new Function|innerHTML' modules/rbx-tools/assets/js"

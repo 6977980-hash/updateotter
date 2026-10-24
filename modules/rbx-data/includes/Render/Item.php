@@ -216,6 +216,9 @@ final class Item {
 		$out .= Ui::trust_strip( $game, (string) get_post_meta( $c['post_id'], '_rbx_last_changed', true ), self::page_last_verified( $c['post_id'] ) );
 		$out .= Ui::license_line( $game );
 		$calc = self::calculator_link( $game, $rec );
+		if ( '' !== $rows ) {
+			$out .= Ui::vote_box( $game, $rec );
+		}
 		$out .= '<div class="rbx-card__actions">' . $calc . Ui::report_button( $game, array( 'record_id' => (string) $rec['id'] ) ) . '</div>';
 		return $out . '</section>';
 	}

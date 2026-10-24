@@ -281,6 +281,21 @@ a.rbx-chip {
 	display: inline-flex;
 	margin: 0;
 }
+.rbx-vote {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--sp-2);
+	margin-top: var(--sp-4);
+}
+.rbx-vote__q {
+	margin: 0;
+	flex-basis: 100%;
+}
+.rbx-vote .rbx-live {
+	flex-basis: 100%;
+	margin: 0;
+}
 .rbx-dispute ul {
 	margin: var(--sp-2) 0 0;
 	padding-inline-start: var(--sp-5);

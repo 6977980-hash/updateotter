@@ -228,8 +228,18 @@ final class Ui {
 	 */
 	public static function chip( array $st, ?Dataset $ds = null ): string {
 		$tone = 'verified' === $st['state'] && $st['mechanic_ok'] ? 'success' : 'warning';
-		$out  = '<span class="rbx-chip rbx-chip--' . esc_attr( $tone ) . '">' . esc_html( (string) $st['label'] ) . '</span>';
-		$src  = self::source_link( $st['source_type'] ?? null, $st['source_url'] ?? null, $st['evidence_media_id'] ?? null, $ds );
+		// A wiki value that two sources or players back up is not a warning any more, but it is
+		// not our own in-game check either: a plain chip.
+		$plain = 'community' === $st['state'] && ( ! empty( $st['sources'] ) || ! empty( $st['players'] ) );
+		$out   = '<span class="rbx-chip' . ( $plain ? '' : ' rbx-chip--' . esc_attr( $tone ) ) . '">' . esc_html( (string) $st['label'] ) . '</span>';
+		if ( count( (array) ( $st['sources'] ?? array() ) ) >= 2 ) {
+			// "Matches 2 sources" links both.
+			foreach ( $st['sources'] as $s ) {
+				$out .= ' ' . self::source_link( $s['source_type'] ?? null, $s['source_url'] ?? null, null, $ds );
+			}
+			return $out;
+		}
+		$src = self::source_link( $st['source_type'] ?? null, $st['source_url'] ?? null, $st['evidence_media_id'] ?? null, $ds );
 		return '' === $src ? $out : $out . ' ' . $src;
 	}
 
@@ -423,6 +433,29 @@ final class Ui {
 			$hidden .= '<input type="hidden" name="' . esc_attr( $k ) . '" value="' . esc_attr( $v ) . '">';
 		}
 		return '<form class="rbx-report-form-btn" action="' . esc_url( home_url( '/report/' ) ) . '" method="get">' . $hidden . '<button type="submit" class="rbx-report-btn button-secondary" data-rbx-report data-game="' . esc_attr( $game->key() ) . '" data-record="' . esc_attr( $ctx['record_id'] ?? '' ) . '" data-field="' . esc_attr( $ctx['field'] ?? '' ) . '" data-value="' . esc_attr( $ctx['value'] ?? '' ) . '" data-version="' . esc_attr( Repository::version( $game ) ) . '"><svg class="rbx-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>' . esc_html__( 'Report a wrong value', 'rbx-data' ) . '</button></form>';
+	}
+
+	/**
+	 * "Do these numbers match your game? Yes / No" on an item card. Yes counts towards "Players
+	 * confirm"; No also opens the report form. Without JS both post to admin-post.php.
+	 *
+	 * @param array<string, mixed> $rec Record.
+	 */
+	public static function vote_box( Game $game, array $rec ): string {
+		$p   = 'rbx-vote-' . strtolower( (string) $rec['id'] );
+		$out = '<form class="rbx-vote" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" data-endpoint="' . esc_url( rest_url( 'rbx/v1/vote' ) ) . '" data-thanks="' . esc_attr( \RBX\Data\Reports\Votes::thanks() ) . '" data-error="' . esc_attr__( 'Could not send. Check your connection and try again.', 'rbx-data' ) . '" aria-labelledby="' . esc_attr( $p ) . '">'
+			. '<input type="hidden" name="action" value="rbx_vote">'
+			. '<input type="hidden" name="game" value="' . esc_attr( $game->key() ) . '">'
+			. '<input type="hidden" name="record_id" value="' . esc_attr( (string) $rec['id'] ) . '">'
+			. '<input type="hidden" name="page_url" value="' . esc_attr( (string) get_permalink() ) . '">'
+			. '<input type="hidden" name="t" value="' . esc_attr( (string) ( time() * 1000 ) ) . '">'
+			. '<p class="rbx-hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'
+			. '<p id="' . esc_attr( $p ) . '" class="rbx-vote__q">' . esc_html__( 'Do these numbers match your game?', 'rbx-data' ) . '</p>'
+			. '<button type="submit" name="answer" value="yes" class="rbx-report-btn">' . esc_html__( 'Yes', 'rbx-data' ) . '</button>'
+			. '<button type="submit" name="answer" value="no" class="rbx-report-btn">' . esc_html__( 'No', 'rbx-data' ) . '</button>'
+			. '<p class="rbx-live" role="status"></p></form>';
+		wp_enqueue_script_module( 'rbx-data-vote', RBX_DATA_URL . 'assets/front/vote.js', array(), self::asset_ver( 'assets/front/vote.js' ) );
+		return $out;
 	}
 
 	/** Byline: "By {Author}" plus " · Checked by {Reviewer}" when a different person (CONT-41, REV C-38). */
