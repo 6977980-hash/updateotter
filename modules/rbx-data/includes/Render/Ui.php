@@ -181,6 +181,30 @@ final class Ui {
 	}
 
 	/**
+	 * Table cell value (GR-10, GR-11): like value() without chips, but an empty cell is a dash
+	 * (the table note says what it means), and a price the item has none of says "Not sold" when
+	 * the item comes from somewhere else (a quest, a gamepass).
+	 *
+	 * @param array<string, mixed> $rec Record.
+	 */
+	public static function cell( Dataset $ds, array $rec, string $field ): string {
+		$st = $ds->field_state( $rec, $field );
+		if ( 'disputed' === $st['state'] || ( 'unknown' !== $st['state'] && null !== $st['value'] ) ) {
+			return self::value( $ds, $rec, $field, false );
+		}
+		$def = $ds->game()->field( (string) $rec['entity'], $field ) ?? array();
+		if ( ! empty( $def['currency_field'] ) && in_array( $field, array( 'price', 'cost' ), true ) && '' !== trim( (string) ( $rec['data']['obtain_method_text__en'] ?? '' ) ) ) {
+			return '<span class="rbx-v rbx-v--unknown">' . esc_html__( 'Not sold', 'rbx-data' ) . '</span>';
+		}
+		return self::dash();
+	}
+
+	/** Empty cell: a dash for the eye, words for screen readers. */
+	public static function dash(): string {
+		return '<span class="rbx-v rbx-v--unknown"><span aria-hidden="true">—</span><span class="screen-reader-text">' . esc_html__( 'Not listed', 'rbx-data' ) . '</span></span>';
+	}
+
+	/**
 	 * State chip plus source chip.
 	 *
 	 * @param array<string, mixed> $st Field state.
@@ -207,7 +231,7 @@ final class Ui {
 
 	/** Source chip: in_game opens the evidence screenshot, official/community link out (UX-42). */
 	public static function source_link( ?string $type, ?string $url, ?string $media_id, ?Dataset $ds = null ): string {
-		$label = Dataset::source_label( $type );
+		$label = Dataset::source_label( $type, $url );
 		if ( '' === $label ) {
 			return '';
 		}
@@ -294,10 +318,7 @@ final class Ui {
 		if ( ! $ids ) {
 			return '';
 		}
-		$rows = array_filter(
-			Changelog::for_records( $ids, $limit * 4 ),
-			static fn( $r ) => ! in_array( $r['field'], Changelog::NOT_SUBSTANTIVE, true ) && ! str_ends_with( (string) $r['field'], '__en' ) && ! str_starts_with( (string) $r['field'], 'notes_' )
-		);
+		$rows = array_filter( Changelog::for_records( $ids, $limit * 4 ), static fn( $r ) => self::public_change( $ds, $r ) );
 		$rows = array_slice( array_values( $rows ), 0, $limit );
 		if ( ! $rows ) {
 			return '';
@@ -311,6 +332,26 @@ final class Ui {
 		return $out . '</ul>' . ( '' !== $all ? '<p><a href="' . esc_url( $all ) . '">' . esc_html__( 'All updates and changes', 'rbx-data' ) . '</a></p>' : '' ) . '</section>';
 	}
 
+	/**
+	 * Whether a changelog row is a change to game data that readers should see (GR-13): new items,
+	 * and fields the game config lists that are not internal, editorial, opinion or translated
+	 * text. Notes, tier reasons and Indonesian copy stay out of the public history.
+	 *
+	 * @param array<string, mixed> $r Changelog row.
+	 */
+	public static function public_change( Dataset $ds, array $r ): bool {
+		if ( 'create' === $r['change_kind'] ) {
+			return true;
+		}
+		$field = (string) $r['field'];
+		if ( in_array( $field, Changelog::NOT_SUBSTANTIVE, true ) || str_starts_with( $field, 'notes_' ) || preg_match( '/__[a-z]{2}$/', $field ) ) {
+			return false;
+		}
+		$rec = $ds->get( (string) $r['record_id'] );
+		$def = $rec ? $ds->game()->field( (string) $rec['entity'], $field ) : null;
+		return null !== $def && empty( $def['internal'] ) && empty( $def['editorial'] ) && empty( $def['opinion'] ) && ! in_array( (string) ( $def['type'] ?? '' ), array( 'text', 'json' ), true );
+	}
+
 	/** @param array<string, mixed> $r Changelog row. */
 	public static function change_line( Dataset $ds, array $r ): string {
 		$rec   = $ds->get( (string) $r['record_id'] );
@@ -318,8 +359,9 @@ final class Ui {
 		$date  = self::date( substr( (string) $r['changed_at'], 0, 10 ) );
 		$why   = ! empty( $r['is_correction'] ) ? __( 'Correction', 'rbx-data' ) : ( ! empty( $r['update_id'] ) ? __( 'Game update', 'rbx-data' ) : ( 'rollback' === $r['change_kind'] ? __( 'Reverted', 'rbx-data' ) : __( 'Data change', 'rbx-data' ) ) );
 		if ( 'create' === $r['change_kind'] ) {
+			// The day the item came into our data, not the day it came into the game (GR-14).
 			/* translators: %s: item name */
-			return $date . ': ' . sprintf( esc_html__( '%s added', 'rbx-data' ), $name );
+			return $date . ': ' . sprintf( esc_html__( '%s added to UpdateOtter', 'rbx-data' ), $name );
 		}
 		$game = $ds->game();
 		$def  = $rec ? ( $game->field( (string) $rec['entity'], (string) $r['field'] ) ?? array() ) : array();

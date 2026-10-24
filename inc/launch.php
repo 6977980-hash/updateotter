@@ -18,6 +18,9 @@
  *   the answer code in the step state (audit UO-22).
  * - `search_index`: rebuilds the header search index file once (audit UO-31), for changes to
  *   what goes into it that come with code rather than with a data import.
+ * - `dates`: recomputes every page's "content changed" time once (GR-14), for changes to how
+ *   that time is worked out. A Page with no text-change time yet gets its modified time. Runs
+ *   before `purge`, so the purged pages show the new dates.
  *
  * A step runs once per id, on the first request after the deploy. Turning the lock back on in
  * RBX Data → Setup is not undone by a later request. Status: GET /wp-json/rbx/v1/launch.
@@ -42,12 +45,40 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live', 'search_index', 'purge', 'llms', 'favicon', 'indexnow' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'search_index', 'dates', 'purge', 'llms', 'favicon', 'indexnow' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
 	}
 	return $out;
+}
+
+/**
+ * GR-14: re-runs the gate dates for item pages and the page dates for every game's Pages.
+ *
+ * @return array{games: int, seeded: int}
+ */
+function updateotter_launch_dates(): array {
+	$seeded = 0;
+	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => -1 ) ) as $page ) {
+		if ( '' === (string) get_post_meta( $page->ID, \RBX\Data\Content\BundledPages::CHANGED, true ) ) {
+			update_post_meta( $page->ID, \RBX\Data\Content\BundledPages::CHANGED, $page->post_modified_gmt );
+			++$seeded;
+		}
+	}
+	$games = 0;
+	foreach ( \RBX\Data\Config\Loader::games() as $game ) {
+		\RBX\Data\Gate\Runner::run( $game );
+		++$games;
+	}
+	// Every Page, including /id/ twins and pages outside a game folder.
+	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => -1 ) ) as $page ) {
+		\RBX\Data\Render\Pages::refresh( $page );
+	}
+	return array(
+		'games'  => $games,
+		'seeded' => $seeded,
+	);
 }
 
 /** @return array<string, mixed> */
@@ -150,6 +181,13 @@ add_action(
 				'at'   => gmdate( 'Y-m-d H:i:s' ),
 				'file' => \RBX\Data\Export\SearchIndex::write(),
 			);
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		if ( isset( $todo['dates'] ) && class_exists( '\RBX\Data\Gate\Runner' ) ) {
+			$state['dates'] = array(
+				'id' => $todo['dates'],
+				'at' => gmdate( 'Y-m-d H:i:s' ),
+			) + updateotter_launch_dates();
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
 		if ( isset( $todo['purge'] ) ) {

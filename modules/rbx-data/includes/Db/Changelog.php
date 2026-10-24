@@ -142,6 +142,8 @@ final class Changelog {
 		} else {
 			$sql .= ' AND field NOT IN (' . implode( ',', array_fill( 0, count( self::NOT_SUBSTANTIVE ), '%s' ) ) . ')';
 			$args = array_merge( $args, self::NOT_SUBSTANTIVE );
+			// Translated copy (tier_rationale__id) does not change the English page (GR-14).
+			$sql .= " AND SUBSTR(field, -4) <> '__id'";
 		}
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
 		$v = $wpdb->get_var( $wpdb->prepare( $sql, $args ) );

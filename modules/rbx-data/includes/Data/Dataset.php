@@ -200,6 +200,45 @@ final class Dataset {
 		return true;
 	}
 
+	/**
+	 * Whether any public record of the entity has a value for the field (GR-11): a stat or column
+	 * that is empty for every item is hidden instead of saying "Not confirmed yet" on every row.
+	 */
+	public function field_has_values( string $entity, string $field ): bool {
+		$ck = 'has|' . $entity . '|' . $field;
+		if ( ! isset( $this->state_cache[ $ck ] ) ) {
+			$this->state_cache[ $ck ] = array( 'has' => false );
+			foreach ( $this->all( $entity ) as $r ) {
+				$st = $this->field_state( $r, $field );
+				if ( 'disputed' === $st['state'] || ( null !== $st['value'] && 'unknown' !== $st['state'] ) ) {
+					$this->state_cache[ $ck ] = array( 'has' => true );
+					break;
+				}
+			}
+		}
+		return $this->state_cache[ $ck ]['has'];
+	}
+
+	/**
+	 * In-game formula tests for one record (GR-03): live TST rows whose inputs name the record's
+	 * slug and that have a screenshot. Only these let a page say "Partly tested in game".
+	 *
+	 * @return array<int, array<string, mixed>> Test inputs.
+	 */
+	public function tests_on( array $rec ): array {
+		$out = array();
+		foreach ( $this->all( 'TST', null ) as $t ) {
+			$in = $t['data']['inputs'] ?? null;
+			if ( 'live' !== ( $t['data']['status'] ?? '' ) || empty( $t['data']['evidence_media_id'] ) || ! is_array( $in ) ) {
+				continue;
+			}
+			if ( in_array( (string) ( $rec['slug'] ?? '' ), array_map( 'strval', array_values( $in ) ), true ) ) {
+				$out[] = $in;
+			}
+		}
+		return $out;
+	}
+
 	/** @return array<int, array<string, mixed>> MED records depicting a record, newest first. */
 	public function media_for( string $record_id ): array {
 		$out = array();
@@ -338,14 +377,15 @@ final class Dataset {
 		return __( 'Not confirmed yet', 'rbx-data' );
 	}
 
-	public static function source_label( ?string $source_type ): string {
+	/** Source chip text; a community value links to the page it came from (GR-26). */
+	public static function source_label( ?string $source_type, ?string $url = null ): string {
 		switch ( $source_type ) {
 			case 'in_game':
 				return __( 'Verified in game', 'rbx-data' );
 			case 'official':
 				return __( 'Official patch notes', 'rbx-data' );
 			case 'community':
-				return __( 'Community report', 'rbx-data' );
+				return null !== $url && '' !== $url && ! str_contains( (string) wp_parse_url( $url, PHP_URL_HOST ), 'fandom.com' ) ? __( 'Source page', 'rbx-data' ) : __( 'Wiki page', 'rbx-data' );
 		}
 		return '';
 	}

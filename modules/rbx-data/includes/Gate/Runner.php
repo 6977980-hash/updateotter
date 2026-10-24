@@ -76,7 +76,8 @@ final class Runner {
 	}
 
 	/**
-	 * CONT-36: max(changed_at of displayed data, last substantive editorial edit), as Y-m-d.
+	 * CONT-36: max(changed_at of displayed data, last substantive editorial edit), as a UTC
+	 * "Y-m-d H:i:s" time (GR-14: the sitemap, JSON-LD and Last-Modified need the time too).
 	 *
 	 * @param array<string, mixed> $rec Record.
 	 */
@@ -92,7 +93,6 @@ final class Runner {
 		}
 		$data = Changelog::last_changed( $ids );
 		$edit = $post_id ? (string) get_post_meta( $post_id, '_rbx_last_substantive', true ) : '';
-		$max  = max( (string) $data, $edit );
-		return '' === $max ? '' : substr( $max, 0, 10 );
+		return max( (string) $data, $edit );
 	}
 }

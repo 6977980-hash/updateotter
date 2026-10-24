@@ -80,8 +80,10 @@ final class Item {
 		$out .= (string) apply_filters( 'rbx_data_item_after_card', '', $game, $rec, $ds );
 		$out .= self::screenshots( $ds, $rec );
 		$out .= self::where_to_get( $ds, $rec );
-		$out .= Insights::render( $ds, $rec );
+		$ins  = Insights::render( $ds, $rec );
+		$out .= $ins;
 		$out .= self::notes( $ds, $rec, $editorial );
+		$out .= self::how_made( $ds, $rec, $pid, '' !== $ins );
 		$out .= self::comparison( $ds, $rec );
 		$out .= self::aliases( $rec );
 		ob_start();
@@ -163,7 +165,8 @@ final class Item {
 				continue;
 			}
 			$st = $ds->field_state( $rec, $f );
-			if ( 'unknown' === $st['state'] && empty( $def['required_for_index'] ) && empty( $def['compare'] ) ) {
+			// GR-11: an empty stat is shown only when it matters for this item; one no item has is hidden.
+			if ( 'unknown' === $st['state'] && ( ( empty( $def['required_for_index'] ) && empty( $def['compare'] ) ) || ! $ds->field_has_values( (string) $rec['entity'], $f ) ) ) {
 				continue;
 			}
 			$known   = 'unknown' !== $st['state'] && 'disputed' !== $st['state'] && null !== $st['value'];
@@ -261,7 +264,7 @@ final class Item {
 				$line = '<strong>' . esc_html( Ui::enum_label( (string) $s['data']['source_kind'] ) ) . '</strong>' . ( $ref ? ': ' . Ui::link( $ref ) : '' );
 				if ( $ref && 'EGG' === $ref['entity'] ) {
 					foreach ( $ds->children( 'DRP', 'egg_id', (string) $ref['id'] ) as $d ) {
-						if ( $d['data']['pet_id'] === $rec['id'] ) {
+						if ( $d['data']['pet_id'] === $rec['id'] && self::odds_known( $ds ) ) {
 							$line .= ', ' . self::odds( $ds, $d );
 						}
 					}
@@ -274,13 +277,19 @@ final class Item {
 		} elseif ( 'EGG' === $rec['entity'] ) {
 			$drops = $ds->children( 'DRP', 'egg_id', (string) $rec['id'] );
 			if ( $drops ) {
+				// GR-11: no odds column while no egg has odds, and no condition column while no drop has one.
+				$odds = self::odds_known( $ds );
+				$cond = (bool) array_filter( $drops, static fn( $d ) => '' !== trim( (string) ( $d['data']['condition_text__en'] ?? '' ) ) );
 				$rows = '';
 				foreach ( $drops as $d ) {
 					$pet   = $ds->get( (string) $d['data']['pet_id'] );
-					$rows .= '<tr><th scope="row">' . Ui::link( $pet ) . '</th><td>' . self::odds( $ds, $d ) . '</td><td>' . ( isset( $d['data']['condition_text__en'] ) ? Ui::text( (string) $d['data']['condition_text__en'] ) : '' ) . '</td></tr>';
+					$rows .= '<tr><th scope="row">' . Ui::link( $pet ) . '</th>' . ( $odds ? '<td>' . self::odds( $ds, $d ) . '</td>' : '' ) . ( $cond ? '<td>' . ( '' !== trim( (string) ( $d['data']['condition_text__en'] ?? '' ) ) ? Ui::text( (string) $d['data']['condition_text__en'] ) : Ui::dash() ) . '</td>' : '' ) . '</tr>';
 				}
-				$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html__( 'Pets that can hatch from this egg', 'rbx-data' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Chance', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Condition', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+				$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html__( 'Pets that can hatch from this egg', 'rbx-data' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th>' . ( $odds ? '<th scope="col">' . esc_html__( 'Chance', 'rbx-data' ) . '</th>' : '' ) . ( $cond ? '<th scope="col">' . esc_html__( 'Condition', 'rbx-data' ) . '</th>' : '' ) . '</tr></thead><tbody>' . $rows . '</tbody></table></div>';
 				$out   = '<section class="rbx-where">' . Ui::h2( __( 'What hatches from it', 'rbx-data' ), 'what-hatches' ) . $table;
+				if ( ! $odds ) {
+					$out .= '<p class="rbx-note">' . esc_html__( 'The hatch chances for these pets are not published yet.', 'rbx-data' ) . '</p>';
+				}
 				return $out . '</section>';
 			}
 		} elseif ( 'MUT' === $rec['entity'] && ! empty( $rec['data']['obtain_method_text__en'] ) ) {
@@ -290,6 +299,23 @@ final class Item {
 			return '';
 		}
 		return '<section class="rbx-where">' . Ui::h2( __( 'How to get it', 'rbx-data' ), 'how-to-get' ) . '<ul>' . $li . '</ul></section>';
+	}
+
+	/** Whether any egg drop of the game has official or observed odds (GR-11). */
+	private static function odds_known( Dataset $ds ): bool {
+		static $known = array();
+		$k = spl_object_id( $ds );
+		if ( ! isset( $known[ $k ] ) ) {
+			$known[ $k ] = false;
+			foreach ( $ds->all( 'DRP' ) as $d ) {
+				$st = $ds->field_state( $d, 'chance_prob' );
+				if ( ( 'verified' === $st['state'] && 'official' === $st['source_type'] && is_numeric( $st['value'] ) ) || ( is_numeric( $d['data']['observed_rate'] ?? null ) && (int) ( $d['data']['sample_size'] ?? 0 ) > 0 ) ) {
+					$known[ $k ] = true;
+					break;
+				}
+			}
+		}
+		return $known[ $k ];
 	}
 
 	/**
@@ -320,6 +346,36 @@ final class Item {
 			$out .= wpautop( Ui::text( $notes ) );
 		}
 		return $out . $editorial . '</section>';
+	}
+
+	/**
+	 * "How this page was made" (GR-16): where the numbers come from, and whether the notes were
+	 * drafted with AI help and reviewed, in the words the methodology page uses.
+	 */
+	private static function how_made( Dataset $ds, array $rec, int $pid, bool $worked ): string {
+		$parts = array(
+			$worked
+				? esc_html__( 'The stats come from the community wiki, and the tables are worked out from them with our calculator formula.', 'rbx-data' )
+				: esc_html__( 'The stats come from the community wiki.', 'rbx-data' ),
+		);
+		if ( array_filter( $ds->media_for( (string) $rec['id'] ), static fn( $m ) => 'own_screenshot' === ( $m['data']['image_source'] ?? '' ) ) ) {
+			$parts[] = esc_html__( 'The screenshot is our own, taken in the game.', 'rbx-data' );
+		}
+		if ( '' !== trim( (string) ( $rec['data']['notes__en'] ?? '' ) ) ) {
+			$by     = strtolower( trim( (string) ( $rec['data']['notes_reviewed_by'] ?? '' ) ) );
+			$on     = (string) ( $rec['data']['notes_reviewed_on'] ?? '' );
+			$author = Ui::author( $pid );
+			if ( '' !== $by && in_array( $by, Ui::reviewer_ids(), true ) && $author ) {
+				$parts[] = '' !== $on
+					/* translators: 1: reviewer name, 2: date */
+					? sprintf( esc_html__( 'The notes were drafted with AI help from that data, then reviewed and edited by %1$s on %2$s.', 'rbx-data' ), esc_html( $author['name'] ), Ui::date( $on ) )
+					/* translators: %s: reviewer name */
+					: sprintf( esc_html__( 'The notes were drafted with AI help from that data, then reviewed and edited by %s.', 'rbx-data' ), esc_html( $author['name'] ) );
+			} else {
+				$parts[] = esc_html__( 'The notes were drafted with AI help from that data and have not been reviewed yet.', 'rbx-data' );
+			}
+		}
+		return '<p class="rbx-how-made"><strong>' . esc_html__( 'How this page was made:', 'rbx-data' ) . '</strong> ' . implode( ' ', $parts ) . ' <a href="' . esc_url( home_url( '/methodology/#ai' ) ) . '">' . esc_html__( 'How we work', 'rbx-data' ) . '</a></p>';
 	}
 
 	/** Sibling comparison (DATA-22b block 3): deterministic nearest by stat; hidden below 2 siblings. */
@@ -376,7 +432,7 @@ final class Item {
 				$ids = array_merge( $ids, array_keys( $ds->children( $rel[0], $rel[1], (string) $rec['id'] ) ) );
 			}
 		}
-		$rows = array_filter( Changelog::for_records( $ids, 60 ), static fn( $r ) => ! in_array( $r['field'], Changelog::NOT_SUBSTANTIVE, true ) && ! str_starts_with( (string) $r['field'], 'notes_' ) );
+		$rows = array_filter( Changelog::for_records( $ids, 60 ), static fn( $r ) => Ui::public_change( $ds, $r ) );
 		if ( ! $rows ) {
 			return '';
 		}
