@@ -5,9 +5,10 @@
     "meta_missing": "The wiki gives no reliable update schedule (and for GAG2 no clear release date), so the hub leaves those facts out.",
     "meta_provenance": "calc_defaults is our own editorial choice, not a game fact.",
     "outlier": "Event, pack and limited crops sit far above or below shop crops of the same rarity; values match the wiki crop data module.",
-    "rarity_order": "Crop rarity in this game does not track sell value closely (event and limited crops); values match the wiki crop data module."
+    "rarity_order": "Crop rarity in this game does not track sell value closely (event and limited crops); values match the wiki crop data module.",
+    "large_change": "GR-07 (2026-10-24): RDCAward, torigate and BEANORLEAVE10 moved from expired to unverified ('Reported working, not tested by us'), because PCGamesN (26 Sep 2026) lists them as active while the wiki lists them as expired."
   },
-  "large": [],
+  "large": ["GAG-COD-0002", "GAG-COD-0003", "GAG-COD-0004"],
   "corrections": [],
   "missing": {}
 }

@@ -55,7 +55,8 @@
         "unlock_requirement_text__en": { "type": "text", "label__en": "How to unlock" },
         "unlock_speed_required": { "type": "decimal", "label__en": "Speed needed", "requires_mechanics": ["speed_requirement"], "display_format": "abbr" },
         "unlock_cost": { "type": "decimal", "label__en": "Unlock cost", "currency_field": "unlock_currency_id", "display_format": "abbr" },
-        "unlock_currency_id": { "type": "ref", "target": "CUR", "label__en": "Unlock currency" }
+        "unlock_currency_id": { "type": "ref", "target": "CUR", "label__en": "Unlock currency" },
+        "guide_path": { "type": "string", "label__en": "Event guide", "internal": true }
       }
     },
     "EGG": {
@@ -133,6 +134,7 @@
         "stack_group": { "type": "string", "label__en": "Stack group" },
         "stack_rule": { "type": "enum", "enum": ["multiply", "add_bonus", "max_only", "exclusive", "unknown"], "label__en": "How it stacks", "requires_mechanics": ["mutation_stacking"] },
         "obtain_method_text__en": { "type": "text", "label__en": "How to get", "required_for_index": true, "list": true },
+        "added_in": { "type": "string", "label__en": "Added in", "list": true },
         "visual_color_hex": { "type": "string", "label__en": "Colour", "pattern": "^#[0-9A-Fa-f]{6}$" },
         "chance_prob": { "type": "prob", "label__en": "Chance", "display_format": "prob" },
         "notes__en": { "type": "text", "label__en": "Our notes", "editorial": true },
@@ -234,7 +236,8 @@
         "roblox_updated_at": { "type": "datetime", "label__en": "Roblox update time" },
         "official_source_url": { "type": "url", "label__en": "Official notes" },
         "summary__en": { "type": "text", "label__en": "Summary", "required_for_index": true, "editorial": true },
-        "affected_record_ids": { "type": "ref_list", "target": "*", "label__en": "Affected items" }
+        "affected_record_ids": { "type": "ref_list", "target": "*", "label__en": "Affected items" },
+        "guide_path": { "type": "string", "label__en": "Event guide", "internal": true }
       },
       "slug_pattern": "^\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(-[a-z0-9]+)*$",
       "require_screenshot_for_index": false

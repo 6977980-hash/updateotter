@@ -213,6 +213,10 @@ final class Calculator {
 				$target = (string) $d['target'];
 				$groups = array();
 				foreach ( $ds->all( $target ) as $rid => $r ) {
+					// A mutation with no known multiplier (disputed) is left out (GR-05).
+					if ( 'MUT' === $r['entity'] && null !== $ds->game()->field( 'MUT', 'income_mult' ) && ! is_numeric( $r['data']['income_mult'] ?? null ) ) {
+						continue;
+					}
 					$g              = ! empty( $d['group_by'] ) ? (string) ( $r['data'][ $d['group_by'] ] ?? '' ) : '';
 					$groups[ $g ][] = $r;
 					if ( $rid === $value ) {

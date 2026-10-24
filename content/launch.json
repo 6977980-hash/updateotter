@@ -1,7 +1,7 @@
 {
   "publish": "2026-10-23-halloween-guide",
   "go_live": "2026-10-23-launch",
-  "purge": "2026-10-24-guide-queue",
+  "purge": "2026-10-24-google-review-a1",
   "llms": "2026-10-23-remove-hostinger-llms",
   "favicon": "2026-10-24-root-favicon",
   "indexnow": "2026-10-23-first-ping",

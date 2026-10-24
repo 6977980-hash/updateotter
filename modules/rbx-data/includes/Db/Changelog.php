@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 final class Changelog {
 
 	/** Fields whose change never moves `last_changed` (DATA-31, CONT-37). */
-	public const NOT_SUBSTANTIVE = array( 'last_verified', 'verified_by', 'source_note', 'notes_reviewed_by', 'notes_reviewed_on', 'slug_history', 'evidence_media_id', 'source_url', 'source_type' );
+	public const NOT_SUBSTANTIVE = array( 'last_verified', 'verified_by', 'source_note', 'notes_reviewed_by', 'notes_reviewed_on', 'slug_history', 'evidence_media_id', 'source_url', 'source_type', 'guide_path' );
 
 	public static function table(): string {
 		return Schema::table( 'rbx_changelog' );

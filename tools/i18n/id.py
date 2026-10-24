@@ -146,6 +146,11 @@ RBX_DATA = {
     'Wiki data as of': 'Data wiki per',
     'Verified': 'Sudah dicek',
     'Source: community wiki': 'Sumber: wiki komunitas',
+    'Source: community site': 'Sumber: situs komunitas',
+    'Event guide': 'Panduan event',
+    'Read the event guide': 'Baca panduan event',
+    'event guide': 'panduan event',
+    'The %1$s is part of a limited event. Times, eggs and the best pets are in our %2$s.': '%1$s adalah bagian dari event terbatas. Waktu, egg, dan pet terbaik ada di %2$s kami.',
     'Verified in game': 'Dicek di game',
     'Official patch notes': 'Catatan update resmi',
     'Community report': 'Laporan komunitas',
@@ -154,6 +159,8 @@ RBX_DATA = {
     # _n() strings: Indonesian has one plural form.
     '%s code is reported as working on the community wiki. We have not redeemed it ourselves, so it may not work.':
         '%s kode dilaporkan berfungsi di wiki komunitas. Kami belum menukarnya sendiri, jadi bisa saja tidak berfungsi.',
+    '%s code is reported as working by community code lists. We have not redeemed it ourselves, so it may not work.':
+        '%s kode dilaporkan berfungsi oleh daftar kode komunitas. Kami belum menukarnya sendiri, jadi bisa saja tidak berfungsi.',
     'Working codes: %s': 'Kode yang berfungsi: %s',
     'Filters': 'Filter',
     'Confidence for every row:': 'Tingkat keyakinan untuk semua baris:',

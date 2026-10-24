@@ -1,41 +1,53 @@
-id,slug,name,aliases,applies_to,income_mult,other_effect_text__en,stack_group,stack_rule,obtain_method_text__en,visual_color_hex,chance_prob,notes__en,notes_reviewed_by,notes_reviewed_on,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
-SAE-MUT-0001,silver,Silver,,pet,1.2,,,unknown,Random roll when an egg hatches.,#C0C0C0,0.06,"Silver is the most common colour mutation you can roll when an egg hatches, and the weakest. The community wiki puts its roll weight at about six in a hundred hatches.
+id,slug,name,aliases,applies_to,income_mult,other_effect_text__en,stack_group,stack_rule,obtain_method_text__en,added_in,visual_color_hex,chance_prob,notes__en,notes_reviewed_by,notes_reviewed_on,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+SAE-MUT-0001,silver,Silver,,pet,1.2,,,unknown,Random roll when an egg hatches.,,#C0C0C0,0.06,"Silver is the most common colour mutation you can roll when an egg hatches, and the weakest. The community wiki puts its roll weight at about six in a hundred hatches.
 
 The boost is small: a Silver pet earns only a fifth more than a plain one. A heavier plain pet often beats a light Silver one, so compare the weight before you keep it.
 
 Silver is still nice on an early pet, but a Golden or Rainbow roll of the same pet is worth far more.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0002,bloom,Bloom,,pet,1.25,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event; also seen on random eggs in Admin Abuse events.,,,"Bloom comes from the Sakura Incubator in the Cherry Blossom biome during the Cherry Blossom event. It is not a normal hatch roll, and the event is not active right now according to the community wiki.
+SAE-MUT-0002,bloom,Bloom,,pet,1.25,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event; also seen on random eggs in Admin Abuse events.,,,,"Bloom comes from the Sakura Incubator in the Cherry Blossom biome during the Cherry Blossom event. It is not a normal hatch roll, and the event is not active right now according to the community wiki.
 
 The boost is only a little above Silver. If you use the Sakura Incubator, the much stronger result is Spirit Bloom, which comes from the same machine.
 
 Bloom has also been seen on random eggs during Admin Abuse events.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0003,golden,Golden,,pet,2.5,,,unknown,Random roll when an egg hatches.,#FFD700,0.04,"Golden is a random roll when an egg hatches and gives a pet two and a half times its normal income. The community wiki puts its roll weight at about four in a hundred hatches.
+SAE-MUT-0003,golden,Golden,,pet,2.5,,,unknown,Random roll when an egg hatches.,,#FFD700,0.04,"Golden is a random roll when an egg hatches and gives a pet two and a half times its normal income. The community wiki puts its roll weight at about four in a hundred hatches.
 
 It is the mutation we tested first in game: a Golden Chicken earned what our formula predicted.
 
 Golden is rarer than Silver but much easier to get than Rainbow, so it is the boost most players will see on their best pets. A Golden pet from a higher biome is usually worth more than a Rainbow pet from a lower one.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0004,spirit-bloom,Spirit Bloom,,pet,2.5,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event (rarer result than Bloom).,,,"Spirit Bloom is the rare result of the Sakura Incubator in the Cherry Blossom biome. It gives the same boost as Golden, but you cannot roll it on a normal hatch.
+SAE-MUT-0004,spirit-bloom,Spirit Bloom,,pet,2.5,,,unknown,Sakura Incubator in Cherry Blossom during the Cherry Blossom event (rarer result than Bloom).,,,,"Spirit Bloom is the rare result of the Sakura Incubator in the Cherry Blossom biome. It gives the same boost as Golden, but you cannot roll it on a normal hatch.
 
 According to the community wiki, the incubator is charged with Sakura Crystals, and charging it to the maximum doubles the chance of Spirit Bloom.
 
 The event that runs the incubator is not active right now, so Spirit Bloom pets are limited. If you have one, it is as strong as a Golden version of the same pet.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0005,fractured,Fractured,,pet,2.75,,,unknown,"Mutation consumable used on an egg in your pen (about 10% success), or Rift Boss Mastery rewards.",,,"Fractured is not a normal hatch roll. You get it by using a mutation consumable on an egg in your pen, which works only about one time in ten, or from Rift Boss Mastery rewards.
+SAE-MUT-0005,fractured,Fractured,,pet,2.75,,,unknown,"Mutation consumable used on an egg in your pen (about 10% success), or Rift Boss Mastery rewards.",,,,"Fractured is not a normal hatch roll. You get it by using a mutation consumable on an egg in your pen, which works only about one time in ten, or from Rift Boss Mastery rewards.
 
 It is one of the strongest boosts, a little above Golden and tied with Scrambled.
 
 Because the consumable can fail, use it on an egg that is already heavy or rare. Putting it on a cheap egg wastes most of the value.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0006,scrambled,Scrambled,,pet,2.75,,,unknown,"Scrambled Mutation Consumable from Dr. Scramble's Experiment Shop, used on an egg (about 10% success).",,,"Scrambled comes from a consumable sold in Dr. Scramble's Experiment Shop, which is in the Abyss Ocean. Used on an egg in your pen, it works about one time in ten.
+SAE-MUT-0006,scrambled,Scrambled,,pet,2.75,,,unknown,"Scrambled Mutation Consumable from Dr. Scramble's Experiment Shop, used on an egg (about 10% success).",,,,"Scrambled comes from a consumable sold in Dr. Scramble's Experiment Shop, which is in the Abyss Ocean. Used on an egg in your pen, it works about one time in ten.
 
 Its boost is the same as Fractured and a little above Golden.
 
 As with Fractured, save the consumable for a heavy or rare egg, so a lucky result is worth the risk.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0007,parasite,Parasite,,pet,3,,,unknown,Hatching a Parasite Egg from the Hungry Monster feeding event.,,,"Parasite comes only from the Parasite Egg, which you get during the Hungry Monster feeding event. It cannot be rolled on a normal hatch.
+SAE-MUT-0007,parasite,Parasite,,pet,3,,,unknown,Hatching a Parasite Egg from the Hungry Monster feeding event.,,,,"Parasite comes only from the Parasite Egg, which you get during the Hungry Monster feeding event. It cannot be rolled on a normal hatch.
 
 It is the second-strongest boost in our list, behind only Rainbow.
 
 Because it is tied to an event, Parasite pets are limited. If you have one, check it in the calculator against a Golden or Rainbow version of a better pet before you replace it.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
-SAE-MUT-0008,rainbow,Rainbow,,pet,3.5,,,unknown,Very rare random roll when an egg hatches.,,0.01,"Rainbow is the strongest colour mutation in the game. A Rainbow pet earns three and a half times as much as a plain one.
+SAE-MUT-0008,rainbow,Rainbow,,pet,3.5,,,unknown,Very rare random roll when an egg hatches.,,,0.01,"Rainbow is the strongest colour mutation in the game. A Rainbow pet earns three and a half times as much as a plain one.
 
 It is a very rare roll when an egg hatches: the community wiki puts its roll weight at about one in a hundred hatches, a quarter of Golden's.
 
 Rainbow is the top result for any pet, but rarity matters more than mutation. A plain pet from a much higher biome can still outearn a Rainbow pet from a low one, which the tables on this page show.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Mutations,,Multiplier from the wiki mutations table,2026-10-23,claude,,,,
+SAE-MUT-0009,enchanted,Enchanted,,pet,2.75,,,unknown,"Enchanted Essence, made at the Mutation Shrine in the Enchanted Forest's big tree from four kinds of butterflies (caught with the tree's net), then used on an egg.","Update 7 (Enchanted Forest, 3 Oct 2026)",,,"Enchanted came with the Enchanted Forest update. Instead of rolling it on a hatch, you make Enchanted Essence from butterflies and put it on an egg.
+
+The game does not show its multiplier. A community site measured about 2.75 times in game, the same as Fractured and Scrambled. We have not tested it ourselves.",,,live,community,https://eggipedia.com/mutations,,Multiplier measured in game by eggipedia.com (8 Oct 2026); how to get it from eggipedia.com and stealanegg.app/updates; not in the community wiki table yet,2026-10-24,claude,,,,
+SAE-MUT-0010,nitro,Nitro,,pet,2.75,,,unknown,"Nitro Mutation consumable from the Nitro Race shop, bought with race Trophies, then used on an egg (about 10% success per try).","Update 8 (Mounts, 10 Oct 2026)",,,"Nitro came with the Mounts update and its Nitro Race. You win Trophies in the race, which runs about every half hour, and spend them on the Nitro consumable.
+
+Like Fractured and Scrambled it can fail, so save it for a heavy or rare egg. Community sites list it at about 2.75 times; one site says the multiplier is not settled yet.",,,live,community,https://eggipedia.com/mutations,,Multiplier and success chance from eggipedia.com; shop and race details from stealanegg.app/updates; not in the community wiki table yet,2026-10-24,claude,,,,
+SAE-MUT-0011,spectral,Spectral,,pet,2.75,,,unknown,"Spectral Mutation consumable from the Soul Extractor at the end of the Phantom Express, paid with Souls (reported at 500 Souls, earlier 1,000), then used on an egg (about 25% success).","Update 9 (Halloween Dimension, 17 Oct 2026)",,,"Spectral is the Halloween event's mutation. You need the Phantom Express Ticket from Echo's quest, ride the train, catch spirits for Souls and trade them at the Soul Extractor.
+
+Community guides list it at about 2.75 times with a one-in-four chance to stick. It is tied to the event, so it may leave the game when the event ends.",,,limited,community,https://stealanegg.app/updates,,"How to get it and Soul price from stealanegg.app/updates; multiplier and success chance from community guides (fandomwire.com, bloxodes.com); not in the community wiki table yet",2026-10-24,claude,,,,
+SAE-MUT-0012,luminous,Luminous,,pet,,,,unknown,"Reported from the Luminous Egg offer of the Angels vs Demons update. Some guides list it at ×10, but sources disagree and the community wiki lists Luminous pets as separate pets, not as a mutation, so we leave the multiplier blank.","Update 4 (Angels vs Demons, 12 Sep 2026)",,,"Luminous is disputed. A few guides list it as the strongest mutation at ten times, from a Luminous Egg with a very small chance. Others do not list it at all.
+
+The community wiki has Luminous pets, such as the Luminous Cthulhu, as their own pets with their own income. Until we can check it, we show no multiplier and the calculator does not use it.",,,limited,community,https://allthings.how/steal-an-egg-mutations-every-multiplier-and-how-to-get-them/,,x10 reported by allthings.how and holdtoreset.com; not in the community wiki table or eggipedia.com; disputed,2026-10-24,claude,,,,
