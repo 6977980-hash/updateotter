@@ -16,6 +16,8 @@
   "min_formula_tests": 1,
   "community_single_source_calc": true,
   "index_community_data": true,
+  "reference": true,
+  "_reference_decision": "2026-10-24 Ali (UO-71): Steal an Egg is the one live game with weekly checks; this game is reference only (hub shows a Reference note, no new content).",
   "wiki_formula_ok": true,
   "_owner_decision": "2026-10-23 Ali: build the lean Grow a Garden section now (\"next phase\"), on community wiki data like SAE. No in-game checks are asked of Ali, so the calculator formula runs on the wiki's published price formula (wiki_formula_ok: tests without screenshots, mechanics may be partially_confirmed) and every value shows 'Source: community wiki'. Pages index once they have our own reviewed note.",
   "game_accent": "#C2185B",
