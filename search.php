@@ -28,10 +28,32 @@ $updateotter_q = get_search_query();
 	</h1>
 	<?php get_search_form(); ?>
 	<?php
-	if ( have_posts() ) :
+	// CR-19: no results for a typo ("pheonix") or an Indonesian word ("kode"): search the fixed words.
+	$updateotter_query = $GLOBALS['wp_query'];
+	$updateotter_fixed = '';
+	if ( ! have_posts() && '' !== $updateotter_q && class_exists( '\RBX\Data\Export\SearchIndex' ) ) {
+		$updateotter_fixed = \RBX\Data\Export\SearchIndex::suggest( $updateotter_q );
+		if ( '' !== $updateotter_fixed ) {
+			$updateotter_alt = new WP_Query(
+				array(
+					's'              => $updateotter_fixed,
+					'post__not_in'   => (array) $updateotter_query->get( 'post__not_in' ),
+					'posts_per_page' => (int) get_option( 'posts_per_page' ),
+					'no_found_rows'  => true,
+				)
+			);
+			if ( $updateotter_alt->have_posts() ) {
+				$updateotter_query = $updateotter_alt;
+				echo '<p class="rbx-note">' . esc_html( sprintf( /* translators: 1: what the visitor typed, 2: fixed search words */ __( 'No results for "%1$s". Showing results for "%2$s".', 'updateotter' ), $updateotter_q, $updateotter_fixed ) ) . '</p>';
+			} else {
+				$updateotter_fixed = '';
+			}
+		}
+	}
+	if ( $updateotter_query->have_posts() ) :
 		$updateotter_groups = array();
-		while ( have_posts() ) :
-			the_post();
+		while ( $updateotter_query->have_posts() ) :
+			$updateotter_query->the_post();
 			$updateotter_g = class_exists( '\RBX\Data\Render\Breadcrumbs' ) ? \RBX\Data\Render\Breadcrumbs::game_for( get_post() ) : null;
 			$updateotter_groups[ $updateotter_g ? $updateotter_g->name() : __( 'Site', 'updateotter' ) ][] = get_post();
 		endwhile;
@@ -45,7 +67,10 @@ $updateotter_q = get_search_query();
 		</ul>
 			<?php
 		endforeach;
-		the_posts_pagination();
+		if ( '' === $updateotter_fixed ) {
+			the_posts_pagination();
+		}
+		wp_reset_postdata();
 	else :
 		?>
 		<p class="rbx-empty">

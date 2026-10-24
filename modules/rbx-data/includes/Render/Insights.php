@@ -77,7 +77,7 @@ final class Insights {
 					esc_html( $name ),
 					esc_html( number_format_i18n( count( $same ) ) ),
 					esc_html( (string) $rar['name'] ),
-					esc_html( self::rank( (int) $pos + 1, count( $same ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) )
+					esc_html( self::rank( self::place( $same, (string) $rec['id'], 'income' ), count( $same ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) )
 					);
 					$top = array_key_first( $same );
 				// Event and shop pets can sit far above the rest of a rarity; skip silly ratios.
@@ -103,22 +103,27 @@ final class Insights {
 				}
 			}
 			$all = self::ranked_pets( $ds, null );
-			$pos = array_search( (string) $rec['id'], array_keys( $all ), true );
-			if ( false !== $pos ) {
-				$facts[] = count( $all ) === (int) $pos + 1 && $pos > 0
-					/* translators: %s: count */
-					? sprintf( esc_html__( 'It has the lowest base income of all %s pets with a known income.', 'rbx-data' ), esc_html( number_format_i18n( count( $all ) ) ) )
-					: ( (int) $pos + 1 > count( $all ) / 2
+			if ( isset( $all[ (string) $rec['id'] ] ) ) {
+				// CR-01: pets with the same base income share a place ("joint 8th").
+				[ $hi, $lo, $tied ] = self::place( $all, (string) $rec['id'], 'income' );
+				$joint              = $tied > 1;
+				$facts[]            = 1 === $lo && $hi > 1
+					? ( $joint
+						/* translators: %s: count */
+						? sprintf( esc_html__( 'It shares the lowest base income of all %s pets with a known income.', 'rbx-data' ), esc_html( number_format_i18n( count( $all ) ) ) )
+						/* translators: %s: count */
+						: sprintf( esc_html__( 'It has the lowest base income of all %s pets with a known income.', 'rbx-data' ), esc_html( number_format_i18n( count( $all ) ) ) ) )
+					: ( $hi > count( $all ) / 2
 						? sprintf(
 							/* translators: 1: ordinal, 2: count */
 							esc_html__( 'Across all %2$s pets with a known income it ranks %1$s from the bottom.', 'rbx-data' ),
-							esc_html( self::ordinal( count( $all ) - (int) $pos ) ),
+							esc_html( self::ordinal( $lo, $joint ) ),
 							esc_html( number_format_i18n( count( $all ) ) )
 						)
 						: sprintf(
 							/* translators: 1: ordinal, 2: count */
 							esc_html__( 'Across all %2$s pets with a known income it ranks %1$s.', 'rbx-data' ),
-							esc_html( self::ordinal( (int) $pos + 1 ) ),
+							esc_html( self::ordinal( $hi, $joint ) ),
 							esc_html( number_format_i18n( count( $all ) ) )
 						) );
 			}
@@ -317,11 +322,12 @@ final class Insights {
 		}
 		$name  = (string) $rec['name'];
 		$facts = array();
-		$facts[] = 0 === $pos
+		$zone_at = self::place( $pets, (string) $rec['id'], 'income' );
+		$facts[] = 0 === $pos && 1 === $zone_at[2]
 			/* translators: 1: pet, 2: zone, 3: count */
 			? sprintf( esc_html__( 'The %1$s earns the most of the %3$s pets whose eggs spawn in %2$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ) )
 			/* translators: 1: pet, 2: zone, 3: count, 4: ordinal */
-			: sprintf( esc_html__( 'Of the %3$s pets whose eggs spawn in %2$s, the %1$s earns %4$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ),	esc_html( self::rank( $pos + 1, count( $pets ), __( 'most', 'rbx-data' ), __( 'least', 'rbx-data' ) ) ) );
+			: sprintf( esc_html__( 'Of the %3$s pets whose eggs spawn in %2$s, the %1$s earns %4$s.', 'rbx-data' ), esc_html( $name ), esc_html( (string) $bio['name'] ), esc_html( number_format_i18n( count( $pets ) ) ),	esc_html( self::rank( $zone_at, count( $pets ), __( 'most', 'rbx-data' ), __( 'least', 'rbx-data' ) ) ) );
 		$hatch = static fn( array $e ): ?float => is_numeric( $e['data']['hatch_time_s'] ?? null ) && (float) $e['data']['hatch_time_s'] > 0 ? (float) $e['data']['hatch_time_s'] : null;
 		$mine  = $hatch( $egg );
 		if ( $pos > 0 ) {
@@ -385,7 +391,7 @@ final class Insights {
 		foreach ( $pets as $id => $p ) {
 			$me    = $id === (string) $rec['id'];
 			$h     = $hatch( $p['egg'] );
-			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' .	( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : Ui::dash() ) . '</td><td class="rbx-num-cell">' . ( $me ? Ui::dash() : self::times( $ds, $p['income'] / $base ) ) . '</td></tr>';
+			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' .	( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : Ui::dash() ) . '</td><td class="rbx-num-cell">' . ( $me ? esc_html__( 'this pet', 'rbx-data' ) : self::times( $ds, $p['income'] / $base ) ) . '</td></tr>';
 		}
 		$li = '';
 		foreach ( $facts as $f ) {
@@ -493,7 +499,7 @@ final class Insights {
 				esc_html__( '%1$s multiplies a pet\'s income by %2$s. That makes it %3$s of the %4$s mutations in our list.', 'rbx-data' ),
 				esc_html( $name ),
 				Ui::number( $ds, $mult, 'mult' ),
-				esc_html( self::rank( (int) $pos + 1, count( $muts ), __( 'strongest', 'rbx-data' ), __( 'weakest', 'rbx-data' ) ) ),
+				esc_html( self::rank( self::place( $muts, (string) $rec['id'], 'mult' ), count( $muts ), __( 'strongest', 'rbx-data' ), __( 'weakest', 'rbx-data' ) ) ),
 				esc_html( number_format_i18n( count( $muts ) ) )
 				);
 				if ( $ties ) {
@@ -629,7 +635,7 @@ final class Insights {
 						esc_html( $name ),
 						esc_html( number_format_i18n( count( $same ) ) ),
 						esc_html( (string) $rar['name'] ),
-						esc_html( self::rank( (int) $pos + 1, count( $same ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) )
+						esc_html( self::rank( self::place( $same, (string) $rec['id'], 'value' ), count( $same ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) )
 					);
 				}
 			}
@@ -1046,14 +1052,43 @@ final class Insights {
 	}
 
 	/**
-	 * Rank wording (GR-10): "the highest", "the 2nd highest", and from the bottom half "the 2nd
-	 * lowest" instead of "the 30th highest" of 31.
+	 * Place of an item in a list sorted strongest first (CR-01): items with the same value share
+	 * a place, so two pets on 5B both rank 8th.
+	 *
+	 * @param array<string, array<string, mixed>> $list Ranked list.
+	 * @return array{0: int, 1: int, 2: int} [place from the top, place from the bottom, items sharing it]
 	 */
-	private static function rank( int $pos, int $count, string $top, string $bottom ): string {
-		if ( $pos === $count && $count > 1 ) {
-			return self::nth( 1, $bottom );
+	private static function place( array $list, string $id, string $key ): array {
+		$v    = (float) $list[ $id ][ $key ];
+		$hi   = 1;
+		$lo   = 1;
+		$tied = 0;
+		foreach ( $list as $o ) {
+			$w = (float) $o[ $key ];
+			if ( abs( $w - $v ) <= 1e-9 * max( abs( $w ), abs( $v ), 1e-12 ) ) {
+				++$tied;
+			} elseif ( $w > $v ) {
+				++$hi;
+			} else {
+				++$lo;
+			}
 		}
-		return $pos > $count / 2 && $count > 3 ? self::nth( $count - $pos + 1, $bottom ) : self::nth( $pos, $top );
+		return array( $hi, $lo, $tied );
+	}
+
+	/**
+	 * Rank wording (GR-10): "the highest", "the 2nd highest", and from the bottom half "the 2nd
+	 * lowest" instead of "the 30th highest" of 31. Shared places read "the joint 8th highest" (CR-01).
+	 *
+	 * @param array{0: int, 1: int, 2: int} $place From place().
+	 */
+	private static function rank( array $place, int $count, string $top, string $bottom ): string {
+		[ $hi, $lo, $tied ] = $place;
+		$joint              = $tied > 1;
+		if ( 1 === $lo && $hi > 1 ) {
+			return self::nth( 1, $bottom, $joint );
+		}
+		return $hi > $count / 2 && $count > 3 ? self::nth( $lo, $bottom, $joint ) : self::nth( $hi, $top, $joint );
 	}
 
 	/** Two amounts that round to the same "about N times" are "the same" (GR-10). */
@@ -1082,17 +1117,20 @@ final class Insights {
 	}
 
 	/** "the highest", "the 2nd highest", ... */
-	private static function nth( int $n, string $word ): string {
-		/* translators: %s: superlative such as "highest" */
-		return 1 === $n ? sprintf( __( 'the %s', 'rbx-data' ), $word ) : sprintf( /* translators: 1: ordinal, 2: superlative */ __( 'the %1$s %2$s', 'rbx-data' ), self::ordinal( $n ), $word );
+	private static function nth( int $n, string $word, bool $joint = false ): string {
+		if ( 1 === $n ) {
+			/* translators: %s: superlative such as "highest" */
+			return $joint ? sprintf( __( 'the joint %s', 'rbx-data' ), $word ) : sprintf( __( 'the %s', 'rbx-data' ), $word );
+		}
+		return sprintf( /* translators: 1: ordinal, 2: superlative */ __( 'the %1$s %2$s', 'rbx-data' ), self::ordinal( $n, $joint ), $word );
 	}
 
-	private static function ordinal( int $n ): string {
-		$v = $n % 100;
-		if ( $v >= 11 && $v <= 13 ) {
-			return $n . 'th';
-		}
-		return $n . ( array( 1 => 'st', 2 => 'nd', 3 => 'rd' )[ $n % 10 ] ?? 'th' );
+	/** "8th", or "joint 8th" for a shared place (CR-01). */
+	private static function ordinal( int $n, bool $joint = false ): string {
+		$v   = $n % 100;
+		$suf = $v >= 11 && $v <= 13 ? 'th' : ( array( 1 => 'st', 2 => 'nd', 3 => 'rd' )[ $n % 10 ] ?? 'th' );
+		/* translators: %s: ordinal such as "8th" */
+		return $joint ? sprintf( __( 'joint %s', 'rbx-data' ), $n . $suf ) : $n . $suf;
 	}
 
 	private static function ratio( float $r ): string {

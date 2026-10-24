@@ -27,6 +27,7 @@ return array( 'domain' => 'updateotter', 'language' => 'id_ID', 'plural-forms' =
 	'Legal' => 'Legal',
 	'Light' => 'Terang',
 	'Menu' => 'Menu',
+	'No results for "%1$s". Showing results for "%2$s".' => 'Tidak ada hasil untuk "%1$s". Menampilkan hasil untuk "%2$s".',
 	'No results for "%s".' => 'Tidak ada hasil untuk "%s".',
 	'No results for "%s". Press Enter to search all pages.' => 'Tidak ada hasil untuk "%s". Tekan Enter untuk mencari di semua halaman.',
 	'Nothing here yet.' => 'Belum ada isinya.',

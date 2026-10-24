@@ -139,11 +139,13 @@ final class Calculator {
 				/* translators: %s: dataset version */
 				: sprintf( esc_html__( 'Data version %s', 'rbx-tools' ), esc_html( $manifest['version'] ) ) );
 		// Date of our latest in-game formula check (a live test row with a screenshot), when there is one.
+		// CR-20: this line goes after the "Source: community wiki" note, so the wiki label sits with
+		// the wiki data line and the in-game check is not read as wiki-sourced.
 		$checked = self::checked_date( $ds );
-		if ( '' !== $checked && ! $mini ) {
+		$tested  = '' !== $checked && ! $mini
 			/* translators: %s: date */
-			$meta .= '</p><p class="rbx-calc__meta">' . sprintf( esc_html__( 'Formula last checked in game: %s', 'rbx-tools' ), self::time_tag( $checked ) );
-		}
+			? '<p class="rbx-calc__meta">' . sprintf( esc_html__( 'Formula last checked in game: %s', 'rbx-tools' ), self::time_tag( $checked ) ) . '</p>'
+			: '';
 
 		// UO-41: the full calculator sits under the page H1 with the same words, so only the mini
 		// calculator on item pages gets its own heading.
@@ -160,6 +162,7 @@ final class Calculator {
 			. ( ! $mini && $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Source: community wiki.', 'rbx-tools' ) . '</strong> ' . ( $game->wiki_formula_ok()
 				? esc_html__( 'The values and the formula come from the community wiki. We have not tested them in the game ourselves yet.', 'rbx-tools' )
 				: esc_html__( 'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.', 'rbx-tools' ) ) . '</p>' : '' )
+			. $tested
 			. '<p class="rbx-calc__notice" role="alert" hidden data-rbx-notice></p>'
 			// The load-error box is built by calculator.js only when loading fails, so text-only readers never see it.
 			. '</div>'
@@ -384,6 +387,8 @@ final class Calculator {
 			'badNumber'   => __( 'A number in this link could not be read, so the default is shown.', 'rbx-tools' ),
 			'noWeight'    => __( 'The weight effect is not known for this pick, so the result uses the base weight.', 'rbx-tools' ),
 			'find'        => __( 'Type to find', 'rbx-tools' ),
+			/* translators: %s: what the visitor typed */
+			'noMatch'     => __( 'Nothing called "%s" in this list. Check the spelling or pick from the list below.', 'rbx-tools' ),
 			'loadError'   => __( 'The live calculator could not load. The example result shown is correct for the default inputs.', 'rbx-tools' ),
 			'retry'       => __( 'Try again', 'rbx-tools' ),
 		);
