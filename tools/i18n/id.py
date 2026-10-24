@@ -162,6 +162,7 @@ RBX_DATA = {
     'Wiki rule, not tested by us': 'Aturan wiki, belum kami tes',
     'Matches 2 sources': 'Sama di 2 sumber',
     'Players confirm': 'Dikonfirmasi pemain',
+    'All values in this table:': 'Semua nilai di tabel ini:',
     'Do these numbers match your game?': 'Apakah angka ini sama dengan di game kamu?',
     'Thanks for checking.': 'Terima kasih sudah mengecek.',
     'Too many answers from this connection. Please try again later.': 'Terlalu banyak jawaban dari koneksi ini. Coba lagi nanti.',
