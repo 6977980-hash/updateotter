@@ -156,7 +156,7 @@ final class Item {
 		$ds   = $c['ds'];
 		$rec  = $c['rec'];
 		$cols = $game->columns( (string) $rec['entity'] );
-		$rows = '';
+		$stats = array();
 		foreach ( (array) ( $game->entity( (string) $rec['entity'] )['fields'] ?? array() ) as $f => $def ) {
 			if ( ! empty( $def['internal'] ) || ! empty( $def['editorial'] ) || ! empty( $def['opinion'] ) || 'aliases' === $f || 'text' === ( $def['type'] ?? '' ) && 'obtain_method_text__en' !== $f
 				|| ! empty( $cols[ $f ]['currency_of'] ) || str_ends_with( $f, 'currency_id' ) || 'visual_color_hex' === $f || 'json' === ( $def['type'] ?? '' ) ) {
@@ -166,8 +166,28 @@ final class Item {
 			if ( 'unknown' === $st['state'] && empty( $def['required_for_index'] ) && empty( $def['compare'] ) ) {
 				continue;
 			}
-			$lv    = $st['last_verified'] ? '<span class="rbx-lv">' . esc_html( Ui::as_of_label( $st ) ) . ' ' . Ui::date( (string) $st['last_verified'] ) . '</span>' : '';
-			$rows .= '<div class="rbx-stat"><dt>' . esc_html( (string) ( $def['label__en'] ?? $f ) ) . '</dt><dd>' . Ui::value( $ds, $rec, $f ) . $lv . '</dd></div>';
+			$known   = 'unknown' !== $st['state'] && 'disputed' !== $st['state'] && null !== $st['value'];
+			$stats[] = array(
+				'label' => (string) ( $def['label__en'] ?? $f ),
+				'value' => Ui::value( $ds, $rec, $f, false ),
+				'full'  => Ui::value( $ds, $rec, $f ),
+				'chip'  => $known ? Ui::chip( $st, $ds ) : null,
+				'lv'    => $st['last_verified'] ? '<span class="rbx-lv">' . esc_html( Ui::as_of_label( $st ) ) . ' ' . Ui::date( (string) $st['last_verified'] ) . '</span>' : '',
+			);
+		}
+		// UO-69: when every known stat has the same source and date, say it once under the stats
+		// instead of repeating the same chips on every row. Mixed sources keep their own chips.
+		$marks  = array_unique( array_map( static fn( $x ) => $x['chip'] . '|' . $x['lv'], array_filter( $stats, static fn( $x ) => null !== $x['chip'] ) ) );
+		$shared = count( array_filter( $stats, static fn( $x ) => null !== $x['chip'] ) ) >= 2 && 1 === count( $marks );
+		$rows   = '';
+		$common = '';
+		foreach ( $stats as $x ) {
+			if ( $shared && null !== $x['chip'] ) {
+				$rows  .= '<div class="rbx-stat"><dt>' . esc_html( $x['label'] ) . '</dt><dd>' . $x['value'] . '</dd></div>';
+				$common = $x['chip'] . $x['lv'];
+			} else {
+				$rows .= '<div class="rbx-stat"><dt>' . esc_html( $x['label'] ) . '</dt><dd>' . $x['full'] . ( null !== $x['chip'] ? $x['lv'] : '' ) . '</dd></div>';
+			}
 		}
 		$chips = '';
 		$rar   = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
@@ -186,6 +206,9 @@ final class Item {
 		$out .= '<div class="rbx-card__top"><div class="rbx-card__icon">' . Ui::icon( $ds, $rec, 128 ) . '</div><div class="rbx-card__chips">' . $chips . '</div></div>';
 		if ( '' !== $rows ) {
 			$out .= '<h2 id="stats" class="rbx-card__title">' . esc_html__( 'Stats', 'rbx-data' ) . '</h2><dl class="rbx-stats">' . $rows . '</dl>';
+			if ( '' !== $common ) {
+				$out .= '<p class="rbx-stats__src">' . esc_html__( 'All stats above:', 'rbx-data' ) . ' ' . $common . '</p>';
+			}
 		}
 		$out .= Ui::trust_strip( $game, (string) get_post_meta( $c['post_id'], '_rbx_last_changed', true ), self::page_last_verified( $c['post_id'] ) );
 		$out .= Ui::license_line( $game );
@@ -357,9 +380,24 @@ final class Item {
 		if ( ! $rows ) {
 			return '';
 		}
-		$li = '';
-		foreach ( array_slice( array_values( $rows ), 0, 20 ) as $r ) {
-			$li .= '<li>' . Ui::change_line( $ds, $r ) . '</li>';
+		// UO-69: the drop and source rows of a new item were logged as their own "added" lines
+		// ("Chicken added / added / added"); the item's own line is enough, and repeats go.
+		$own  = array_filter( $rows, static fn( $r ) => 'create' === $r['change_kind'] && $r['record_id'] === $rec['id'] );
+		$li   = '';
+		$seen = array();
+		foreach ( $rows as $r ) {
+			if ( 'create' === $r['change_kind'] && $r['record_id'] !== $rec['id'] && $own ) {
+				continue;
+			}
+			$line = Ui::change_line( $ds, $r );
+			if ( isset( $seen[ $line ] ) ) {
+				continue;
+			}
+			$seen[ $line ] = true;
+			$li           .= '<li>' . $line . '</li>';
+			if ( count( $seen ) >= 20 ) {
+				break;
+			}
 		}
 		return '<section class="rbx-changes">' . Ui::h2( __( 'Change history', 'rbx-data' ), 'change-history' ) . '<ul>' . $li . '</ul></section>';
 	}

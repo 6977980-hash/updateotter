@@ -141,7 +141,6 @@ RBX_DATA = {
     'Live now:': 'Sekarang:',
     'Roblox shows the newest version of the game was published on %s.': 'Roblox menunjukkan versi terbaru game ini dirilis pada %s.',
     'Partly tested in game': 'Baru sebagian dites di game',
-    'The weight rule comes from the community wiki and matched one in-game reading. The table stops at ten times the base weight because heavier pets have not been checked yet.': 'Aturan berat berasal dari wiki komunitas dan cocok dengan satu pembacaan di game. Tabel berhenti di sepuluh kali berat dasar karena pet yang lebih berat belum dicek.',
     'Game data adapted from the %1$s on Fandom, licensed %2$s. Our changes to that data use the same licence.': 'Data game diadaptasi dari %1$s di Fandom, berlisensi %2$s. Perubahan kami pada data itu memakai lisensi yang sama.',
     'Checked in game': 'Dicek di game',
     'Wiki data as of': 'Data wiki per',
@@ -167,6 +166,16 @@ RBX_DATA = {
     'Popular now:': 'Populer sekarang:',
     'Copy code %s': 'Salin kode %s',
     'Copied %s': '%s disalin',
+    'Open from the start': 'Terbuka dari awal',
+    'Best pet you can hatch in the %1$s zones: %2$s.': 'Pet terbaik yang bisa kamu tetaskan di zona %1$s: %2$s.',
+    'Best pet of each %s zone': 'Pet terbaik di tiap zona %s',
+    'Zone': 'Zona',
+    'Speed needed': 'Speed yang dibutuhkan',
+    'Best pet (income, hatch time)': 'Pet terbaik (pendapatan, waktu menetas)',
+    'Faster pick (half the hatch time or less)': 'Pilihan lebih cepat (separuh waktu menetas atau kurang)',
+    'Event: %s': 'Event: %s',
+    'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.': 'Pet event terkuat selama zona event masih buka. Pet ini terbatas, jadi hilang dari game saat event selesai.',
+    'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.': 'Pet terbaik artinya pendapatan dasar tertinggi menurut wiki komunitas. Waktu menetas juga dari wiki; pass 2x Growth Speed membuatnya jadi separuh.',
 }
 
 RBX_TOOLS = {
