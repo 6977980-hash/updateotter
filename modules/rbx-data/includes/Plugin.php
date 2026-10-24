@@ -68,6 +68,7 @@ final class Plugin {
 		Import\Bundled::boot();
 		Log\Beacon::boot();
 		Content\BundledPages::boot();
+		Content\Guides::boot();
 		Content\Lang::boot();
 		Index\IndexNow::boot();
 		Index\Llms::boot();

@@ -4,7 +4,8 @@
  * from main). `content/launch.json` names two one-time steps, each keyed by an id:
  *
  * - `publish`: publishes every bundled Page (content/pages) that is still a draft. A Page that
- *   still has a Phase 1b todo box or fails the number lint stays a draft and is reported.
+ *   still has a Phase 1b todo box or fails the number lint stays a draft and is reported. Guides
+ *   queued in content/guides.json are skipped: they go live one a week (RBX\Data\Content\Guides).
  * - `go_live`: turns the pre-launch lock off and "Discourage search engines" off in the same
  *   step (P1-45), flushes rewrite rules and purges the page cache.
  *
@@ -77,6 +78,10 @@ function updateotter_launch_publish(): array {
 			continue;
 		}
 		if ( 'publish' === $page->post_status ) {
+			continue;
+		}
+		// Queued guides go live one a week through RBX\Data\Content\Guides, not here.
+		if ( class_exists( '\RBX\Data\Content\Guides' ) && \RBX\Data\Content\Guides::held( $path ) ) {
 			continue;
 		}
 		if ( str_contains( (string) $page->post_content, 'rbx-todo' ) ) {
