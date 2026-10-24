@@ -24,7 +24,7 @@
     "description": "All Steal an Egg pets sorted by rarity, with base income, the eggs they hatch from and the date each value was checked."
   },
   "steal-an-egg/mutations": {
-    "title": "Steal an Egg Mutations & Size Multipliers | UpdateOtter",
+    "title": "Steal an Egg Mutations & Weight | UpdateOtter",
     "description": "Every Steal an Egg mutation with its income multiplier, how weight changes income, and how the two stack, with a worked example."
   },
   "steal-an-egg/codes": {
@@ -37,7 +37,7 @@
   },
   "steal-an-egg/updates": {
     "title": "Steal an Egg Updates: Weekly Patch Notes & Changes | UpdateOtter",
-    "description": "Every Steal an Egg update since launch, newest first: what each one added and its date from the game's Roblox event page."
+    "description": "Every numbered Steal an Egg update since Update 1 (22 Aug 2026), newest first: what each one added and its date from the game's Roblox event page."
   },
   "grow-a-garden": {
     "title": "Grow a Garden Guide & Calculator: Crops, Mutations, Codes | UpdateOtter",

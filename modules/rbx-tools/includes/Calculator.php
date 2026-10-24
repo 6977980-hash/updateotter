@@ -248,7 +248,9 @@ final class Calculator {
 						}
 					}
 					$gr    = '' !== $g ? $ds->get( $g ) : null;
-					$opts .= $gr ? '<optgroup label="' . esc_attr( (string) $gr['name'] ) . '">' . $o . '</optgroup>' : $o;
+					// CR-15: records without a group (e.g. lab pets with no rarity) get an "Other" group when the list is grouped.
+					$label = $gr ? (string) $gr['name'] : ( count( $groups ) > 1 ? __( 'Other', 'rbx-tools' ) : '' );
+					$opts .= '' !== $label ? '<optgroup label="' . esc_attr( $label ) . '">' . $o . '</optgroup>' : $o;
 				}
 				if ( '' !== $popular ) {
 					$opts = '<optgroup label="' . esc_attr__( 'Popular', 'rbx-tools' ) . '">' . $popular . '</optgroup>' . $opts;
