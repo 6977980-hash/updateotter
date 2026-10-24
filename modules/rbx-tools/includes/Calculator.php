@@ -144,7 +144,9 @@ final class Calculator {
 			// UO-29: only the result itself is sticky on phones; the notes below it scroll with the page.
 			. '<div class="rbx-calc__result"><p class="rbx-calc__fix" hidden data-rbx-fix>' . esc_html__( 'Fix the highlighted field to update', 'rbx-tools' ) . '</p><dl class="rbx-calc__outs">' . $results . '</dl></div>'
 			. '<div class="rbx-calc__info"><p class="rbx-calc__meta">' . $meta . '</p>'
-			. ( $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Source: community wiki.', 'rbx-tools' ) . '</strong> ' . ( $game->wiki_formula_ok()
+			// GR-01: the mini calculator on item pages leaves this out; the page's stats card and
+			// "How this page was made" line already say where the values come from.
+			. ( ! $mini && $game->community_single_source() ? '<p class="rbx-calc__meta rbx-calc__unconfirmed"><strong>' . esc_html__( 'Source: community wiki.', 'rbx-tools' ) . '</strong> ' . ( $game->wiki_formula_ok()
 				? esc_html__( 'The values and the formula come from the community wiki. We have not tested them in the game ourselves yet.', 'rbx-tools' )
 				: esc_html__( 'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.', 'rbx-tools' ) ) . '</p>' : '' )
 			. '<p class="rbx-calc__notice" role="alert" hidden data-rbx-notice></p>'

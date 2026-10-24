@@ -353,30 +353,34 @@ final class Item {
 	 * drafted with AI help and reviewed, in the words the methodology page uses.
 	 */
 	private static function how_made( Dataset $ds, array $rec, int $pid, bool $worked ): string {
+		// GR-01: one short line; the long version is on /methodology/#ai.
 		$parts = array(
 			$worked
-				? esc_html__( 'The stats come from the community wiki, and the tables are worked out from them with our calculator formula.', 'rbx-data' )
-				: esc_html__( 'The stats come from the community wiki.', 'rbx-data' ),
+				? esc_html__( 'stats from the community wiki, tables worked out with our calculator formula', 'rbx-data' )
+				: esc_html__( 'stats from the community wiki', 'rbx-data' ),
 		);
 		if ( array_filter( $ds->media_for( (string) $rec['id'] ), static fn( $m ) => 'own_screenshot' === ( $m['data']['image_source'] ?? '' ) ) ) {
-			$parts[] = esc_html__( 'The screenshot is our own, taken in the game.', 'rbx-data' );
+			$parts[] = esc_html__( 'our own in-game screenshot', 'rbx-data' );
 		}
+		$notes = '';
 		if ( '' !== trim( (string) ( $rec['data']['notes__en'] ?? '' ) ) ) {
 			$by     = strtolower( trim( (string) ( $rec['data']['notes_reviewed_by'] ?? '' ) ) );
 			$on     = (string) ( $rec['data']['notes_reviewed_on'] ?? '' );
 			$author = Ui::author( $pid );
 			if ( '' !== $by && in_array( $by, Ui::reviewer_ids(), true ) && $author ) {
-				$parts[] = '' !== $on
+				$notes = '' !== $on
 					/* translators: 1: reviewer name, 2: date */
-					? sprintf( esc_html__( 'The notes were drafted with AI help from that data, then reviewed and edited by %1$s on %2$s.', 'rbx-data' ), esc_html( $author['name'] ), Ui::date( $on ) )
+					? sprintf( esc_html__( 'notes drafted with AI help, reviewed by %1$s on %2$s', 'rbx-data' ), esc_html( $author['name'] ), Ui::date( $on ) )
 					/* translators: %s: reviewer name */
-					: sprintf( esc_html__( 'The notes were drafted with AI help from that data, then reviewed and edited by %s.', 'rbx-data' ), esc_html( $author['name'] ) );
+					: sprintf( esc_html__( 'notes drafted with AI help, reviewed by %s', 'rbx-data' ), esc_html( $author['name'] ) );
 			} else {
-				$parts[] = esc_html__( 'The notes were drafted with AI help from that data and have not been reviewed yet.', 'rbx-data' );
+				$notes = esc_html__( 'notes drafted with AI help, not reviewed yet', 'rbx-data' );
 			}
 		}
-		return '<p class="rbx-how-made"><strong>' . esc_html__( 'How this page was made:', 'rbx-data' ) . '</strong> ' . implode( ' ', $parts ) . ' <a href="' . esc_url( home_url( '/methodology/#ai' ) ) . '">' . esc_html__( 'How we work', 'rbx-data' ) . '</a></p>';
+		$text = implode( ', ', $parts ) . ( '' !== $notes ? '; ' . $notes : '' ) . '.';
+		return '<p class="rbx-how-made"><strong>' . esc_html__( 'How this page was made:', 'rbx-data' ) . '</strong> ' . $text . ' <a href="' . esc_url( home_url( '/methodology/#ai' ) ) . '">' . esc_html__( 'How we work', 'rbx-data' ) . '</a></p>';
 	}
+
 
 	/** Sibling comparison (DATA-22b block 3): deterministic nearest by stat; hidden below 2 siblings. */
 	private static function comparison( Dataset $ds, array $rec ): string {
