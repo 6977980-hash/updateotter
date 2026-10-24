@@ -9,7 +9,9 @@ function readHash() {
 lists.forEach( ( list, n ) => {
 	const controls = list.querySelector( '[data-rbx-controls]' );
 	const tbody = list.querySelector( 'tbody' );
-	const rows = Array.from( tbody.rows );
+	// GR-24: long lists send the first rows in the page and the rest in a <template>.
+	let rest = tbody.querySelector( 'template[data-rbx-rest]' );
+	let rows = Array.from( tbody.rows );
 	const q = list.querySelector( '[data-rbx-q]' );
 	const sort = list.querySelector( '[data-rbx-sort]' );
 	const removedBtn = list.querySelector( '[data-rbx-removed]' );
@@ -54,7 +56,7 @@ lists.forEach( ( list, n ) => {
 
 	// UO-55: row data is read once; a filter tap only flips rows whose state changes, and rows
 	// move only when the sort changes (re-appending 600+ rows on every tap was the slow part).
-	const meta = rows.map( ( r ) => {
+	const toMeta = ( r ) => {
 		const f = {};
 		for ( const a of r.attributes ) {
 			if ( a.name.startsWith( 'data-f-' ) ) {
@@ -62,10 +64,11 @@ lists.forEach( ( list, n ) => {
 			}
 		}
 		return { r, name: r.dataset.name || '', f, removed: r.hasAttribute( 'data-removed' ), shown: ! r.hidden };
-	} );
-	const totalAll = meta.length;
-	const totalLive = meta.filter( ( m ) => ! m.removed ).length;
-	const sortVals = {};
+	};
+	let meta = rows.map( toMeta );
+	let totalAll = meta.length;
+	let totalLive = meta.filter( ( m ) => ! m.removed ).length;
+	let sortVals = {};
 	let lastSort = '';
 
 	function sortValues( key ) {
@@ -84,10 +87,29 @@ lists.forEach( ( list, n ) => {
 	let limited = false;
 	let expanded = false;
 	let order = meta;
+
+	// Moves the template rows into the table, once, before anything needs the whole list.
+	function hydrate() {
+		if ( ! rest ) {
+			return;
+		}
+		tbody.appendChild( rest.content );
+		rest.remove();
+		rest = null;
+		rows = Array.from( tbody.rows );
+		meta = rows.map( toMeta );
+		totalAll = meta.length;
+		totalLive = meta.filter( ( m ) => ! m.removed ).length;
+		sortVals = {};
+		order = meta;
+		lastSort = '';
+	}
+
 	if ( more ) {
 		more.addEventListener( 'click', () => {
 			const before = order.filter( ( m ) => m.shown ).length;
 			expanded = true;
+			hydrate();
 			apply( false );
 			// Focus moves to the first row that just appeared, since the button hides itself.
 			const next = order.filter( ( m ) => m.shown )[ before ];
@@ -100,6 +122,9 @@ lists.forEach( ( list, n ) => {
 
 	function apply( write ) {
 		const s = state();
+		if ( write || expanded || s.q || Object.keys( s.facets ).length || s.sort || s.removed ) {
+			hydrate();
+		}
 		if ( write ) {
 			// The full server-rendered list shows until the first change; then long results are capped.
 			limited = true;
@@ -137,8 +162,10 @@ lists.forEach( ( list, n ) => {
 			}
 		} );
 		if ( more ) {
-			more.parentElement.hidden = shown <= cap;
-			more.textContent = ( more.dataset.template || '{n}' ).replace( '{n}', new Intl.NumberFormat( document.documentElement.lang || 'en' ).format( shown ) );
+			// Rows still in the template: offer them all, counted from the server's total.
+			const n = rest ? parseInt( more.dataset.total, 10 ) || shown : shown;
+			more.parentElement.hidden = ! rest && shown <= cap;
+			more.textContent = ( more.dataset.template || '{n}' ).replace( '{n}', new Intl.NumberFormat( document.documentElement.lang || 'en' ).format( n ) );
 		}
 		empty.hidden = shown > 0;
 		const active = s.q || Object.keys( s.facets ).length || s.sort || s.removed;
@@ -173,8 +200,14 @@ lists.forEach( ( list, n ) => {
 			return;
 		}
 		const p = readHash();
-		// A plain #anchor (row id) is not filter state.
+		// A plain #anchor (row id) is not filter state; a row still in the template is brought in.
 		if ( window.location.hash && ! window.location.hash.includes( '=' ) ) {
+			const id = decodeURIComponent( window.location.hash.slice( 1 ) );
+			if ( rest && ! document.getElementById( id ) && rest.content.getElementById( id ) ) {
+				expanded = true;
+				hydrate();
+				requestAnimationFrame( () => document.getElementById( id )?.scrollIntoView() );
+			}
 			return;
 		}
 		q.value = p.get( 'q' ) || '';

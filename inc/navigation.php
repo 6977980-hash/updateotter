@@ -50,8 +50,8 @@ function updateotter_game_sections( \RBX\Data\Config\Game $g ): array {
 	$order = class_exists( '\RBX\Data\Render\Sections' ) ? \RBX\Data\Render\Sections::priority_sections( $g ) : $g->menu_order();
 	foreach ( $order as $slug ) {
 		$s = $g->section( $slug );
-		// An updates list is linked only once it has a published update (UO-15).
-		if ( null !== $s && 'updates' === ( $s['type'] ?? '' ) && class_exists( '\RBX\Data\Render\Ui' ) && '' === \RBX\Data\Render\Ui::updates_url( $g ) ) {
+		// An updates list is in the menu only once it is in search: 3+ published updates (UO-15, GR-20).
+		if ( null !== $s && 'updates' === ( $s['type'] ?? '' ) && class_exists( '\RBX\Data\Render\Seo' ) && ! \RBX\Data\Render\Seo::has_updates( $g ) ) {
 			continue;
 		}
 		if ( null !== $s ) {

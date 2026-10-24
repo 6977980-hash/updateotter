@@ -26,6 +26,13 @@
 .rbx-calc__find {
 	margin-bottom: var(--sp-1, 4px);
 }
+/* GR-28: a long select gets a type-to-find box from ui.js (UO-32). Its space is kept free while the
+   script loads, so the fields below do not jump down (CLS). */
+@media (scripting: enabled) {
+	.rbx-calc__field:not(:has(> .rbx-calc__find)) > select:has(option:nth-child(31)) {
+		margin-top: calc(48px + var(--sp-1, 4px) + var(--sp-1, 4px));
+	}
+}
 .rbx-calc__hint {
 	margin: 0;
 	font-size: var(--fs-sm, 0.875rem);

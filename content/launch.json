@@ -2,9 +2,11 @@
   "publish": "2026-10-24-google-review-d-speed-calculator",
   "go_live": "2026-10-23-launch",
   "dates": "2026-10-24-google-review-b1",
-  "purge": "2026-10-24-google-review-d",
+  "purge": "2026-10-24-google-review-c",
   "llms": "2026-10-23-remove-hostinger-llms",
   "favicon": "2026-10-24-root-favicon",
   "indexnow": "2026-10-23-first-ping",
-  "search_index": "2026-10-24-google-review-d"
+  "search_index": "2026-10-24-google-review-d",
+  "gate": "2026-10-24-gr15-scope",
+  "db_error": "2026-10-24-gr02-503"
 }

@@ -455,6 +455,11 @@ final class Item {
 				break;
 			}
 		}
+		// GR-01: "X added to UpdateOtter" alone is the same line on every page; the history shows
+		// once something about the item has changed since it was added.
+		if ( 1 === count( $seen ) && $own && 'create' === reset( $own )['change_kind'] && Ui::change_line( $ds, reset( $own ) ) === array_key_first( $seen ) ) {
+			return '';
+		}
 		return '<section class="rbx-changes">' . Ui::h2( __( 'Change history', 'rbx-data' ), 'change-history' ) . '<ul>' . $li . '</ul></section>';
 	}
 

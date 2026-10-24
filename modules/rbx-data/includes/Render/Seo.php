@@ -47,6 +47,41 @@ final class Seo {
 		add_filter( 'wp_sitemaps_posts_entry', array( self::class, 'core_sitemap_entry' ), 10, 2 );
 		add_action( 'template_redirect', array( self::class, 'sitemap_index_redirect' ), 1 );
 		add_action( 'template_redirect', array( self::class, 'last_modified_header' ), 20 );
+		add_action( 'template_redirect', array( self::class, 'clean_urls' ), 0 );
+		// GR-32: sitemaps carry their own cache tag, purged with every page-state change.
+		add_action(
+			'template_redirect',
+			static function (): void {
+				if ( '' !== (string) get_query_var( 'sitemap' ) || '' !== (string) get_query_var( 'sitemap-stylesheet' ) ) {
+					\RBX\Data\Cache\Purge::tag( \RBX\Data\Cache\Purge::SITEMAP_TAG );
+				}
+			},
+			1
+		);
+	}
+
+	/**
+	 * GR-31: one address per page. A path with capital letters 301s to its lower-case form, and
+	 * /page/N/ on a page that has no pages answers 404 instead of a copy of the page.
+	 */
+	public static function clean_urls(): void {
+		if ( is_admin() || 'GET' !== ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+			return;
+		}
+		$uri  = (string) ( $_SERVER['REQUEST_URI'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$path = (string) wp_parse_url( $uri, PHP_URL_PATH );
+		if ( '' !== $path && strtolower( $path ) !== $path && ! str_contains( $path, '/wp-' ) ) {
+			$query = (string) wp_parse_url( $uri, PHP_URL_QUERY );
+			wp_safe_redirect( home_url( strtolower( $path ) ) . ( '' !== $query ? '?' . $query : '' ), 301 );
+			exit;
+		}
+		$post = get_queried_object();
+		if ( is_singular() && $post instanceof \WP_Post && ( (int) get_query_var( 'page' ) > 1 || (int) get_query_var( 'paged' ) > 1 ) && ! str_contains( (string) $post->post_content, '<!--nextpage-->' ) ) {
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+			nocache_headers();
+		}
 	}
 
 	/**
@@ -637,7 +672,7 @@ final class Seo {
 				'url'                 => $url,
 				'applicationCategory' => 'GameApplication',
 				'operatingSystem'     => 'Any (web browser)',
-				'browserRequirements' => 'Requires JavaScript',
+				'browserRequirements' => 'Requires HTML5. Works without JavaScript; JavaScript makes the inputs live.',
 				'isAccessibleForFree' => true,
 				'offers'              => array(
 					'@type'         => 'Offer',
@@ -704,6 +739,9 @@ final class Seo {
 					$node['image'] = array_values( array_unique( $imgs ) );
 				}
 			}
+			if ( empty( $node['image'] ) ) {
+				$node['image'] = self::og_image( $game );
+			}
 			$out['BlogPosting'] = $node;
 		}
 		// Guides: Article node from the page template flag (CONT-28, TECH-25, REV-G28).
@@ -725,6 +763,7 @@ final class Seo {
 			if ( $game ) {
 				$node['about'] = self::video_game( $game );
 			}
+			$node['image']  = self::og_image( $game ); // GR-29.
 			$out['Article'] = $node;
 		}
 		return $out;
@@ -800,6 +839,24 @@ final class Seo {
 			$node['sameAs'] = array_values( array_map( 'strval', $a['org_same_as'] ) );
 		}
 		return $node;
+	}
+
+	/**
+	 * The game's share image (or the site's) as an ImageObject, for Article and BlogPosting (GR-29).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function og_image( ?Game $game ): array {
+		$url = home_url( '/og-default.jpg' );
+		if ( $game && function_exists( 'updateotter_root_file_exists' ) && updateotter_root_file_exists( 'og-' . $game->folder() . '.jpg' ) ) {
+			$url = home_url( '/og-' . $game->folder() . '.jpg' );
+		}
+		return array(
+			'@type'  => 'ImageObject',
+			'url'    => $url,
+			'width'  => 1200,
+			'height' => 630,
+		);
 	}
 
 	/** @return array<string, string> */
@@ -930,8 +987,26 @@ final class Seo {
 			return;
 		}
 		$iso = self::modified( $post );
-		if ( '' !== $iso ) {
-			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', (int) strtotime( $iso ) ) . ' GMT' );
+		if ( '' === $iso ) {
+			return;
+		}
+		$ts = (int) strtotime( $iso );
+		// A deploy that purges the cache changes output on every page, so the last purge counts as
+		// a change too: a crawler then re-reads pages after a template or robots change.
+		$purged = function_exists( 'updateotter_launch_state' ) ? strtotime( (string) ( updateotter_launch_state()['purge']['at'] ?? '' ) . ' UTC' ) : false;
+		if ( false !== $purged && $purged > $ts ) {
+			$ts = (int) $purged;
+		}
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $ts ) . ' GMT' );
+		// GR-23: a crawler that already has this version gets "304 Not Modified" without the page
+		// being rendered. Never stored by the page cache.
+		$since = (string) ( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$since = '' !== $since ? strtotime( $since ) : false;
+		if ( false !== $since && $since >= $ts && 'GET' === ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) && empty( $_SERVER['QUERY_STRING'] ) ) {
+			do_action( 'litespeed_control_set_nocache', 'rbx 304 not modified' );
+			status_header( 304 );
+			header( 'Cache-Control: no-cache' );
+			exit;
 		}
 	}
 
@@ -1090,20 +1165,22 @@ final class Seo {
 		self::social_tags( $c, $desc );
 		$url = is_singular() ? (string) get_permalink() : home_url( '/' );
 		$graph = array();
-		if ( 'home' === $c['kind'] && ! Lang::is_id() ) {
+		if ( 'home' === $c['kind'] ) {
+			// GR-29: the Indonesian root has its own WebSite node in its language.
+			$root    = Lang::is_id() ? home_url( '/' . Lang::ID . '/' ) : home_url( '/' );
 			$graph[] = array(
 				'@type'         => 'WebSite',
-				'@id'           => home_url( '/#website' ),
+				'@id'           => $root . '#website',
 				'name'          => self::BRAND,
 				'alternateName' => (string) wp_parse_url( home_url(), PHP_URL_HOST ),
-				'url'           => home_url( '/' ),
-				'inLanguage'    => 'en',
+				'url'           => $root,
+				'inLanguage'    => Lang::is_id() ? 'id' : 'en',
+				'publisher'     => array( '@id' => home_url( '/#organization' ) ),
 			);
 		}
-		// The publisher every page points at by @id; printed in full where it is the subject.
-		if ( in_array( $c['kind'], array( 'home', 'author' ), true ) || ( 'other' === $c['kind'] && $c['post'] && 'about' === $c['post']->post_name ) ) {
-			$graph[] = self::organization();
-		}
+		// The publisher every page points at by @id, printed on every page so the reference
+		// resolves (GR-29).
+		$graph[] = self::organization();
 		$page = self::page_node( $c, $url );
 		if ( $page ) {
 			$graph[] = $page;
@@ -1145,6 +1222,36 @@ final class Seo {
 	public static function feed( array $qv ): array {
 		if ( isset( $qv['feed'] ) && ! isset( $qv['post_type'] ) && empty( $qv['withcomments'] ) ) {
 			$qv['post_type'] = array( 'rbx_update' );
+			// GR-33: only update pages that are in search, with the site author and a summary.
+			add_action(
+				'pre_get_posts',
+				static function ( \WP_Query $q ): void {
+					if ( $q->is_main_query() && $q->is_feed() ) {
+						$q->set(
+							'meta_query',
+							array(
+								array(
+									'key'   => '_rbx_page_state',
+									'value' => PageState::INDEX,
+								),
+							)
+						);
+					}
+				}
+			);
+			add_filter(
+				'the_author',
+				static function ( $name ) {
+					$au = is_feed() ? Ui::author( (int) get_the_ID() ) : null;
+					return $au ? $au['name'] : $name;
+				}
+			);
+			add_filter(
+				'the_excerpt_rss',
+				static function ( $text ) {
+					return '' !== trim( wp_strip_all_tags( (string) $text ) ) ? $text : esc_html( self::item_description( (int) get_the_ID() ) );
+				}
+			);
 		}
 		return $qv;
 	}

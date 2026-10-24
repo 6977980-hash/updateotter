@@ -96,6 +96,8 @@
       "plural__en": "Crops",
       "named": true,
       "page": true,
+      "index": false,
+      "_index_decision": "2026-10-24 Ali (GR-15, decision card): crop pages stay out of search until they have original data; the hub, calculator, crops list and codes stay indexable.",
       "fields": {
         "aliases": {
           "type": "string",

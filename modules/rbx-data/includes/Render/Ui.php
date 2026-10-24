@@ -98,9 +98,26 @@ final class Ui {
 			return '<a href="' . esc_url( home_url( $path ) ) . '"' . ( '' !== $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . '>' . esc_html( $name ) . '</a>';
 		}
 		if ( $pid && 'publish' === get_post_status( $pid ) ) {
-			return '<a href="' . esc_url( (string) get_permalink( $pid ) ) . '"' . ( '' !== $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . '>' . esc_html( $name ) . '</a>';
+			// GR-20: an item page that is not in search yet keeps its link for visitors, marked
+			// nofollow so crawlers spend their visits on the pages that can rank.
+			$rel = self::indexable( $pid ) ? '' : ' rel="nofollow"';
+			return '<a href="' . esc_url( (string) get_permalink( $pid ) ) . '"' . ( '' !== $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . $rel . '>' . esc_html( $name ) . '</a>';
 		}
 		return '<span' . ( '' !== $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . '>' . esc_html( $name ) . '</span>';
+	}
+
+	/**
+	 * True when an item page is in search (`_rbx_page_state` = index). One query per request
+	 * answers it for every item, so long lists do not look each row up.
+	 */
+	public static function indexable( int $post_id ): bool {
+		static $ids = null;
+		if ( null === $ids ) {
+			global $wpdb;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$ids = array_flip( array_map( 'intval', (array) $wpdb->get_col( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_rbx_page_state' AND meta_value = %s", \RBX\Data\Gate\PageState::INDEX ) ) ) );
+		}
+		return isset( $ids[ $post_id ] );
 	}
 
 	/**
@@ -399,8 +416,13 @@ final class Ui {
 				'field'  => $ctx['field'] ?? '',
 			)
 		);
-		$url = add_query_arg( $q, home_url( '/report/' ) );
-		return '<a class="rbx-report-btn button-secondary" href="' . esc_url( $url ) . '" data-rbx-report data-game="' . esc_attr( $game->key() ) . '" data-record="' . esc_attr( $ctx['record_id'] ?? '' ) . '" data-field="' . esc_attr( $ctx['field'] ?? '' ) . '" data-value="' . esc_attr( $ctx['value'] ?? '' ) . '" data-version="' . esc_attr( Repository::version( $game ) ) . '" rel="nofollow"><svg class="rbx-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>' . esc_html__( 'Report a wrong value', 'rbx-data' ) . '</a>';
+		// GR-20: a small GET form, not a link, so the /report/ page is not a crawlable link on
+		// every page. With JS the button opens the dialog; without JS it opens /report/.
+		$hidden = '';
+		foreach ( $q as $k => $v ) {
+			$hidden .= '<input type="hidden" name="' . esc_attr( $k ) . '" value="' . esc_attr( $v ) . '">';
+		}
+		return '<form class="rbx-report-form-btn" action="' . esc_url( home_url( '/report/' ) ) . '" method="get">' . $hidden . '<button type="submit" class="rbx-report-btn button-secondary" data-rbx-report data-game="' . esc_attr( $game->key() ) . '" data-record="' . esc_attr( $ctx['record_id'] ?? '' ) . '" data-field="' . esc_attr( $ctx['field'] ?? '' ) . '" data-value="' . esc_attr( $ctx['value'] ?? '' ) . '" data-version="' . esc_attr( Repository::version( $game ) ) . '"><svg class="rbx-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>' . esc_html__( 'Report a wrong value', 'rbx-data' ) . '</button></form>';
 	}
 
 	/** Byline: "By {Author}" plus " · Checked by {Reviewer}" when a different person (CONT-41, REV C-38). */
@@ -468,14 +490,19 @@ final class Ui {
 		$hex    = preg_match( '/^#[0-9A-Fa-f]{6}$/', $color ) ? $color : '';
 		$bar    = '' !== $hex ? $hex : 'currentColor';
 		// UO-53: the rarity initial sits in a corner badge, so rarity is not shown by colour alone.
+		// GR-30: the letters are CSS generated text (data-i, data-r), not SVG <text>, so they do not
+		// become part of a link's text ("P E Phoenix") for search engines.
 		$badge = '';
+		$attrs = ' data-i="' . esc_attr( $letter ) . '"';
 		if ( '' !== $rarity && '' !== $hex ) {
-			$rgb   = array_map( 'hexdec', str_split( substr( $hex, 1 ), 2 ) );
-			$ink   = ( 0.299 * $rgb[0] + 0.587 * $rgb[1] + 0.114 * $rgb[2] ) > 150 ? '#111111' : '#ffffff';
-			$badge = '<rect x="58" y="4" width="34" height="34" rx="8" fill="' . esc_attr( $hex ) . '" stroke="#111111" stroke-opacity=".35" stroke-width="2"/><text x="75" y="29" text-anchor="middle" font-size="22" font-weight="800" fill="' . $ink . '">' . esc_html( mb_strtoupper( mb_substr( $rarity, 0, 1 ) ) ) . '</text>';
+			$rgb    = array_map( 'hexdec', str_split( substr( $hex, 1 ), 2 ) );
+			$ink    = ( 0.299 * $rgb[0] + 0.587 * $rgb[1] + 0.114 * $rgb[2] ) > 150 ? '#111111' : '#ffffff';
+			$badge  = '<rect x="58" y="4" width="34" height="34" rx="8" fill="' . esc_attr( $hex ) . '" stroke="#111111" stroke-opacity=".35" stroke-width="2"/>';
+			$attrs .= ' data-r="' . esc_attr( mb_strtoupper( mb_substr( $rarity, 0, 1 ) ) ) . '" style="--ph-ink:' . $ink . '"';
 		}
-		return '<svg class="rbx-ph" width="' . $size . '" height="' . $size . '" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><rect width="96" height="96" rx="12" class="rbx-ph__bg"/><rect y="88" width="96" height="8" fill="' . esc_attr( $bar ) . '"/><text x="48" y="62" text-anchor="middle" font-size="44" font-weight="700" class="rbx-ph__t">' . esc_html( $letter ) . '</text>' . $badge . '</svg>';
+		return '<span class="rbx-ph-wrap" aria-hidden="true"' . $attrs . '><svg class="rbx-ph" width="' . $size . '" height="' . $size . '" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><rect width="96" height="96" rx="12" class="rbx-ph__bg"/><rect y="88" width="96" height="8" fill="' . esc_attr( $bar ) . '"/>' . $badge . '</svg></span>';
 	}
+
 
 	/** Item icon: approved media image or the placeholder. */
 	public static function icon( Dataset $ds, array $rec, int $size = 96 ): string {

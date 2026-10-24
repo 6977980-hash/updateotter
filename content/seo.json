@@ -56,7 +56,7 @@
     "description": "Every Grow a Garden crop mutation with its Sheckle multiplier and how to get it, plus how mutations and Gold or Rainbow variants stack."
   },
   "grow-a-garden/codes": {
-    "title": "Grow a Garden Codes ({month}): Expired List & How to Redeem | UpdateOtter",
+    "title": "Grow a Garden Codes: Reported & Expired List, How to Redeem | UpdateOtter",
     "description": "Are there working Grow a Garden codes? The current list, the expired codes, how to redeem them and how to avoid fake code sites."
   },
   "grow-a-garden-2": {
@@ -76,7 +76,7 @@
     "description": "Every Grow a Garden 2 mutation with its multiplier, harvest chance and where it comes from. Crops carry one mutation, so they never stack."
   },
   "grow-a-garden-2/codes": {
-    "title": "Grow a Garden 2 Codes ({month}) & Rewards | UpdateOtter",
+    "title": "Grow a Garden 2 Codes & Rewards: Reported List | UpdateOtter",
     "description": "Grow a Garden 2 codes reported on the community wiki, with rewards and how to redeem them. We mark the ones we have not redeemed ourselves."
   },
   "about": {
@@ -176,14 +176,20 @@
     "description": "Fan-made Fish It! wiki: every fish with its rarity, chance and location, all rods and baits by Luck, and the mutation list. Sources shown on every value."
   },
   "fish-it/fish": {
+    "_noindex": "Kept out of search until the list has original data (GR-15, Ali 2026-10-24).",
+    "noindex": true,
     "title": "Fish It! Fish List: Rarity, Chance & Location | UpdateOtter",
     "description": "All Fish It! fish from Common to Secret with their base chance and where to catch them. Filter by rarity or event fish."
   },
   "fish-it/rods": {
+    "_noindex": "Kept out of search until the list has original data (GR-15, Ali 2026-10-24).",
+    "noindex": true,
     "title": "Fish It! Rods: Best Rod by Luck, Speed & Price | UpdateOtter",
     "description": "Every Fish It! rod with its Luck, Speed, weight limit and price, which rod to buy next, and how to get the quest rods."
   },
   "fish-it/baits": {
+    "_noindex": "Kept out of search until the list has original data (GR-15, Ali 2026-10-24).",
+    "noindex": true,
     "title": "Fish It! Baits: Luck, Price & Effects | UpdateOtter",
     "description": "Every Fish It! bait with its Luck bonus, price and extra effects such as mutation and shiny chance, and which bait to use."
   },
