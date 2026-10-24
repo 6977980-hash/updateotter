@@ -579,7 +579,7 @@ final class Sections {
 			self::show( array_keys( $tiers[ $t ] ) );
 			$out .= '<section class="rbx-tier rbx-tier--' . esc_attr( strtolower( $t ) ) . '" aria-labelledby="tier-' . esc_attr( strtolower( $t ) ) . '"><h2 id="tier-' . esc_attr( strtolower( $t ) ) . '"><span class="rbx-tier__badge" aria-hidden="true">' . esc_html( $t ) . '</span> ' . esc_html( sprintf( /* translators: %s: tier letter */ __( '%s tier', 'rbx-data' ), $t ) ) . '</h2><ul class="rbx-tier__list">';
 			foreach ( $tiers[ $t ] as $r ) {
-				$why  = (string) ( $r['data']['tier_rationale__en'] ?? '' );
+				$why  = (string) ( ( Lang::is_id() ? ( $r['data']['tier_rationale__id'] ?? '' ) : '' ) ?: ( $r['data']['tier_rationale__en'] ?? '' ) ); // Indonesian reason on /id/ when written.
 				$out .= '<li>' . Ui::icon( $ds, $r, 48 ) . '<span class="rbx-tier__name">' . Ui::link( $r ) . '</span>' . ( '' !== $why ? '<span class="rbx-tier__why">' . esc_html( wp_strip_all_tags( $why ) ) . '</span>' : '' ) . '</li>';
 			}
 			$out .= '</ul></section>';
