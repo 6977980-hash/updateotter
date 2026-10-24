@@ -412,7 +412,7 @@ final class Sections {
 		if ( null === $m ) {
 			return '';
 		}
-		$txt = (string) ( $m['data']['definition__en'] ?? $m['data']['description__en'] ?? '' );
+		$txt = Lang::t( (string) ( $m['data']['definition__en'] ?? $m['data']['description__en'] ?? '' ) ); // GR-18.
 		$out = '' !== $txt ? wpautop( Ui::text( $txt ) ) : '';
 		if ( 'confirmed' !== ( $m['data']['status'] ?? '' ) ) {
 			$out .= '<p class="rbx-note">' . self::mechanic_chip( $m ) . ' ' . ( self::mechanic_tested( $m ) || 'partially_confirmed' !== ( $m['data']['status'] ?? '' )
@@ -504,6 +504,7 @@ final class Sections {
 		$expired = array_filter( $codes, static fn( $c ) => 'expired' === ( $c['data']['code_status'] ?? '' ) && in_array( $c['status'], array( 'live', 'removed_from_game' ), true ) );
 		$reported = array_filter( $codes, static fn( $c ) => 'unverified' === ( $c['data']['code_status'] ?? '' ) && 'live' === $c['status'] );
 		$last     = CheckLog::last_checked( $game );
+		$checked  = self::codes_checked_line( $ds, $last );
 		// Say "community wiki" only when every reported code comes from it (GR-07).
 		$wiki = ! array_filter( $reported, static fn( $c ) => ! str_contains( (string) ( $c['data']['source_url'] ?? '' ), 'fandom.com' ) );
 		self::show( array_keys( $active + $expired + $reported ) );
@@ -518,11 +519,11 @@ final class Sections {
 			) . '</p>';
 		} elseif ( ! $active ) {
 			/* translators: %s: game name */
-			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No working codes right now', 'rbx-data' ) . '</strong></p><p>' . sprintf( esc_html__( 'There are no %s codes right now.', 'rbx-data' ), esc_html( $game->name() ) ) . ( '' !== $last ? ' ' . esc_html__( 'We last checked on', 'rbx-data' ) . ' ' . Ui::date( $last ) . '.' : '' ) . '</p>';
+			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html__( 'No working codes right now', 'rbx-data' ) . '</strong></p><p>' . sprintf( esc_html__( 'There are no %s codes right now.', 'rbx-data' ), esc_html( $game->name() ) ) . '</p>';
 		} else {
 			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html( sprintf( /* translators: %s: number */ _n( 'Working codes: %s', 'Working codes: %s', count( $active ), 'rbx-data' ), number_format_i18n( count( $active ) ) ) ) . '</strong>' . ( '' !== $last ? ' ' . esc_html__( 'We tested them on', 'rbx-data' ) . ' ' . Ui::date( $last ) . '.' : '' ) . '</p>';
 		}
-		$out .= '</div>';
+		$out .= $checked . '</div>';
 		if ( $active ) {
 			$rows = '';
 			foreach ( $active as $c ) {
@@ -575,24 +576,35 @@ final class Sections {
 		return $out;
 	}
 
+	/**
+	 * "Last checked: 24 Oct 2026, 19:00 UTC" (GR-22): the newer of the codes check log (a date)
+	 * and `_meta.codes_checked_at` (a UTC time).
+	 */
+	private static function codes_checked_line( Dataset $ds, string $log_date ): string {
+		$at = (string) ( $ds->meta( 'codes_checked_at' ) ?? '' );
+		$t  = '' !== $at ? (int) strtotime( $at ) : 0;
+		if ( '' !== $log_date && ( ! $t || $log_date > gmdate( 'Y-m-d', $t ) ) ) {
+			return '<p class="rbx-meta">' . esc_html__( 'Last checked:', 'rbx-data' ) . ' ' . Ui::date( $log_date ) . '</p>';
+		}
+		if ( ! $t ) {
+			return '';
+		}
+		return '<p class="rbx-meta">' . esc_html__( 'Last checked:', 'rbx-data' ) . ' <time datetime="' . esc_attr( gmdate( 'c', $t ) ) . '">' . esc_html( wp_date( 'j M Y, H:i', $t, new \DateTimeZone( 'UTC' ) ) ) . ' UTC</time></p>';
+	}
+
 	/** Updates hub list, newest first (CONT-26). */
 	private static function updates( Game $game ): string {
 		$ds   = self::ds( $game );
 		$upds = $ds->all( 'UPD', array( 'live', 'limited' ) );
 		uasort( $upds, static fn( $a, $b ) => strcmp( (string) ( $b['data']['release_date'] ?? '' ), (string) ( $a['data']['release_date'] ?? '' ) ) ?: strcmp( (string) $b['id'], (string) $a['id'] ) );
-		$cadence = Lang::t( (string) ( $ds->meta( 'update_cadence_text' ) ?? '' ) );
 		$pub     = Ui::last_publish( $game );
 		/* translators: %s: date and time in UTC */
 		$out     = '' !== $pub ? '<p class="rbx-live-now"><strong>' . esc_html__( 'Live now:', 'rbx-data' ) . '</strong> ' . sprintf( esc_html__( 'Roblox shows the newest version of the game was published on %s.', 'rbx-data' ), $pub ) . '</p>' : '';
 		$first   = reset( $upds );
 		if ( $first ) {
 			/* translators: 1: update name, 2: date */
-			$out .= '<p class="rbx-summary">' . sprintf( esc_html__( 'The latest update is %1$s, released on %2$s.', 'rbx-data' ), Ui::link( $first ), Ui::date( (string) ( $first['data']['release_date'] ?? '' ) ) );
-			if ( '' !== $cadence ) {
-				/* translators: %s: cadence text from the dataset */
-				$out .= ' ' . sprintf( esc_html__( 'New updates usually come %s.', 'rbx-data' ), esc_html( rtrim( wp_strip_all_tags( $cadence ), '.' ) ) );
-			}
-			$out .= '</p>';
+			// GR-21: the page intro already gives the cadence, so it is not repeated here.
+			$out .= '<p class="rbx-summary">' . sprintf( esc_html__( 'The latest update is %1$s, released on %2$s.', 'rbx-data' ), Ui::link( $first ), Ui::date( (string) ( $first['data']['release_date'] ?? '' ) ) ) . '</p>';
 		} else {
 			$out .= '<p class="rbx-empty">' . esc_html__( 'No updates are listed yet.', 'rbx-data' ) . '</p>';
 			return $out;
@@ -835,7 +847,7 @@ final class Sections {
 		self::show( array_keys( $recs ) );
 		$rows = '';
 		foreach ( $recs as $r ) {
-			$rows .= '<tr id="biome-' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '">' . ( empty( $r['data']['unlock_requirement_text__en'] ) ? '' : Ui::text( (string) $r['data']['unlock_requirement_text__en'] ) ) . '</td><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_speed_required' ) ) . '">' . Ui::value( $ds, $r, 'unlock_speed_required' ) . '</td></tr>';
+			$rows .= '<tr id="biome-' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '">' . ( empty( $r['data']['unlock_requirement_text__en'] ) ? '' : Ui::text( Lang::t( (string) $r['data']['unlock_requirement_text__en'] ) ) ) . '</td><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_speed_required' ) ) . '">' . Ui::value( $ds, $r, 'unlock_speed_required' ) . '</td></tr>';
 		}
 		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'BIO', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Biome', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'BIO', 'unlock_speed_required' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 	}

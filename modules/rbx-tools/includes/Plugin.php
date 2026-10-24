@@ -23,6 +23,7 @@ final class Plugin {
 		}
 		add_action( 'init', array( self::class, 'register' ) );
 		add_shortcode( 'rbx_calculator', array( self::class, 'shortcode' ) );
+		add_shortcode( 'rbx_speed_calculator', array( SpeedCalculator::class, 'shortcode' ) );
 		add_filter( 'rbx_data_item_after_card', array( Calculator::class, 'mini_for_item' ), 10, 4 );
 	}
 
@@ -38,6 +39,7 @@ final class Plugin {
 			$deps[] = $url;
 		}
 		wp_register_script_module( 'rbx-calculator', RBX_TOOLS_URL . 'assets/js/calculator.js', $deps, self::ver( 'assets/js/calculator.js' ) );
+		wp_register_script_module( 'rbx-speed', RBX_TOOLS_URL . 'assets/js/speed.js', array( RBX_TOOLS_URL . 'assets/js/parse-input.js', RBX_TOOLS_URL . 'assets/js/format.js' ), self::ver( 'assets/js/speed.js' ) );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/calculator' );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/mini-calculator' );
 		$style = wp_styles()->query( 'rbx-calculator-style', 'registered' );

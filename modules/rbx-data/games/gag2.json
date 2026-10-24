@@ -356,6 +356,7 @@
       "key": "calculator",
       "path": "calculator",
       "label__en": "Grow a Garden 2 Calculator",
+      "formula_plain__en": ["Fresh sell value = base value × size bonus × mutation multiplier, rounded down, × how many.", "Size bonus = (your weight ÷ the crop's base weight) to the power of the crop's size exponent. Very small weights count as the crop's minimum size.", "No mutation counts as ×1."],
       "slices": [
         "core",
         "plants"

@@ -90,7 +90,7 @@ final class Ui {
 		if ( null === $rec ) {
 			return '';
 		}
-		$name = 'UPD' === $rec['entity'] ? (string) ( $rec['data']['title__en'] ?? $rec['name'] ) : (string) $rec['name'];
+		$name = 'UPD' === $rec['entity'] ? \RBX\Data\Content\Lang::t( (string) ( $rec['data']['title__en'] ?? $rec['name'] ) ) : (string) $rec['name']; // GR-18: update titles from content/i18n/id.json on /id/.
 		$pid  = (int) ( $rec['post_id'] ?? 0 );
 		// An event update points at its guide, the page worth indexing (GR-19).
 		$path = 'UPD' === $rec['entity'] && $guide ? trim( (string) ( $rec['data']['guide_path'] ?? '' ) ) : '';

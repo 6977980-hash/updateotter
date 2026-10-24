@@ -457,6 +457,7 @@ final class Seo {
 			}
 		}
 		$dates[] = (string) ( $ds->meta_all()['redeem_ui_exists']['last_verified'] ?? '' );
+		$dates[] = substr( (string) ( $ds->meta( 'codes_checked_at' ) ?? '' ), 0, 10 );
 		return (string) max( $dates );
 	}
 

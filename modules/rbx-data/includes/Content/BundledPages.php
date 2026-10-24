@@ -189,6 +189,21 @@ final class BundledPages {
 				$skipped[ $path ] = 'no such page (run Setup, Create draft pages)';
 				continue;
 			}
+			// GR-27: the header title is the Page title (H1), so a renamed header renames the Page.
+			if ( null !== $head && $head['title'] !== $page->post_title ) {
+				$r = wp_update_post(
+					array(
+						'ID'         => $page->ID,
+						'post_title' => wp_slash( $head['title'] ),
+					),
+					true
+				);
+				if ( ! is_wp_error( $r ) ) {
+					update_post_meta( $page->ID, self::CHANGED, gmdate( 'Y-m-d H:i:s' ) );
+					$page      = get_post( $page->ID );
+					$written[] = $path . ' (title)';
+				}
+			}
 			$last = (string) get_post_meta( $page->ID, self::META, true );
 			$cur  = self::content_hash( (string) $page->post_content );
 			if ( self::content_hash( $new ) === $cur ) {

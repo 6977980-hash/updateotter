@@ -40,6 +40,7 @@ final class Tabs {
 		'genre',
 		'update_cadence_text',
 		'redeem_ui_exists',
+		'codes_checked_at',
 		'suffix_ladder',
 		'calc_defaults',
 	);

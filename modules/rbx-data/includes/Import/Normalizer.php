@@ -37,6 +37,7 @@ final class Normalizer {
 		'genre'                => 'string',
 		'update_cadence_text'  => 'text',
 		'redeem_ui_exists'     => 'yesno',
+		'codes_checked_at'     => 'datetime',
 		'suffix_ladder'        => 'ladder',
 		'calc_defaults'        => 'json',
 	);
@@ -488,6 +489,8 @@ final class Normalizer {
 				return array_map( 'esc_url_raw', $l );
 			case 'date':
 				return self::date( $v ) ?? $err( __( 'use YYYY-MM-DD.', 'rbx-data' ) );
+			case 'datetime':
+				return self::datetime( $v ) ?? $err( __( 'use YYYY-MM-DD HH:MM (UTC).', 'rbx-data' ) );
 			case 'yesno':
 				return in_array( $v, array( 'yes', 'no', 'unknown' ), true ) ? $v : $err( __( 'use yes, no or unknown.', 'rbx-data' ) );
 			case 'ladder':
