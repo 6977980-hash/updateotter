@@ -23,6 +23,10 @@ jobs:
         run: python3 tools/i18n/build.py && git diff --exit-code languages modules/rbx-data/languages modules/rbx-tools/languages
       - name: Game data CSVs are valid
         run: python3 tools/data/check.py
+      - name: Guides match the game data
+        run: python3 tools/guides/check.py
+      - name: Guide queue and draft-link test
+        run: php modules/rbx-data/tests/guides.test.php
       - name: Calculator PHP/JS parity
         run: RBX_DATA_DIR=modules/rbx-data node --test modules/rbx-tools/tests/parity.test.mjs
       - name: Report form personal-data check

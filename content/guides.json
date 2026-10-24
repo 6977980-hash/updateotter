@@ -1,0 +1,844 @@
+{
+  "steal-an-egg": {
+    "_note": "Guide queue (owner decision 2026-10-24): a guide with queue=true stays a draft. From start (time UTC) one weekly slot opens; the first queued guide in this order with reviewed_by set goes live in it. Set reviewed_by/reviewed_on only for the exact guide the owner reviewed. facts are checked in CI by tools/guides/check.py.",
+    "start": "2026-10-31",
+    "time": "06:00",
+    "guides": [
+      {
+        "slug": "beginners-guide",
+        "label": "Beginner's guide: how to play and progress fast",
+        "summary": "How the game works, which eggs to steal first, how to raise your Speed, how mutations and weight change income, and the mistakes that slow new players down"
+      },
+      {
+        "slug": "halloween-event",
+        "label": "Halloween event guide",
+        "summary": "The Halloween Dimension's eggs and pets, the best ones to aim for and a simple plan for the event"
+      },
+      {
+        "slug": "how-to-get-speed",
+        "label": "How to get Speed fast",
+        "summary": "The treadmill, trails, egg Speed rewards and the free gift, plus a simple loop to reach new biomes sooner",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "more_speed_reward",
+            "frog",
+            "brr-brr-patapim"
+          ],
+          [
+            "more_speed_reward",
+            "jerboa",
+            "leviathan"
+          ],
+          [
+            "in_biome",
+            "leviathan",
+            "lake"
+          ],
+          [
+            "in_biome",
+            "jerboa",
+            "desert"
+          ],
+          [
+            "in_biome",
+            "frog",
+            "lake"
+          ],
+          [
+            "best_in_biome",
+            "forest",
+            "brr-brr-patapim"
+          ]
+        ]
+      },
+      {
+        "slug": "how-to-make-money",
+        "label": "How to make money fast",
+        "summary": "Where Cash comes from and five habits that raise your income, from filling every slot to moving biomes early",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "earns_more",
+            "axolotl",
+            "brr-brr-patapim"
+          ],
+          [
+            "earns_more",
+            "brr-brr-patapim",
+            "chicken"
+          ],
+          [
+            "rarity",
+            "brr-brr-patapim",
+            "legendary"
+          ],
+          [
+            "rarity",
+            "axolotl",
+            "legendary"
+          ],
+          [
+            "in_biome",
+            "axolotl",
+            "lake"
+          ]
+        ]
+      },
+      {
+        "slug": "biomes-in-order",
+        "label": "Biomes in order",
+        "summary": "Every biome from the Forest to the Enchanted Forest, the Speed each one needs, its guardian and when to move on",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "biome_before",
+            "lake",
+            "desert"
+          ],
+          [
+            "biome_before",
+            "desert",
+            "jungle"
+          ],
+          [
+            "biome_before",
+            "jungle",
+            "snow"
+          ],
+          [
+            "biome_before",
+            "snow",
+            "volcano"
+          ],
+          [
+            "biome_before",
+            "volcano",
+            "abyss-ocean"
+          ],
+          [
+            "biome_before",
+            "abyss-ocean",
+            "prehistoric"
+          ],
+          [
+            "biome_before",
+            "prehistoric",
+            "cosmic"
+          ],
+          [
+            "biome_before",
+            "cosmic",
+            "cherry-blossom"
+          ],
+          [
+            "biome_before",
+            "cherry-blossom",
+            "titan-temple"
+          ],
+          [
+            "biome_before",
+            "titan-temple",
+            "angels-and-demons"
+          ],
+          [
+            "biome_before",
+            "angels-and-demons",
+            "enchanted-forest"
+          ],
+          [
+            "rarity",
+            "king-snake",
+            "secret"
+          ],
+          [
+            "in_biome",
+            "king-snake",
+            "jungle"
+          ],
+          [
+            "rarity",
+            "ice-dragon",
+            "eternal"
+          ],
+          [
+            "in_biome",
+            "ice-dragon",
+            "snow"
+          ],
+          [
+            "top_earner",
+            "spirit-world-guardian",
+            ""
+          ],
+          [
+            "in_biome",
+            "axolotl",
+            "lake"
+          ]
+        ]
+      },
+      {
+        "slug": "mutations-explained",
+        "label": "Mutations explained",
+        "summary": "What Silver, Golden and Rainbow do, how the event mutations are found and when a mutated pet is worth keeping",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "mult_above",
+            "golden",
+            "silver"
+          ],
+          [
+            "mult_above",
+            "rainbow",
+            "golden"
+          ],
+          [
+            "mult_over",
+            "golden",
+            2
+          ],
+          [
+            "mult_over",
+            "rainbow",
+            3
+          ]
+        ]
+      },
+      {
+        "slug": "best-egg-in-every-biome",
+        "label": "Best egg to steal in every biome",
+        "summary": "A realistic egg to hunt and the rare jackpot egg for each biome, from the Forest to the Enchanted Forest",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "best_in_biome",
+            "forest",
+            "brr-brr-patapim"
+          ],
+          [
+            "best_in_biome",
+            "lake",
+            "leviathan"
+          ],
+          [
+            "best_in_biome",
+            "desert",
+            "royal-sphinx"
+          ],
+          [
+            "best_in_biome",
+            "jungle",
+            "king-snake"
+          ],
+          [
+            "best_in_biome",
+            "snow",
+            "ice-dragon"
+          ],
+          [
+            "best_in_biome",
+            "volcano",
+            "lava-dragon"
+          ],
+          [
+            "best_in_biome",
+            "abyss-ocean",
+            "el-maja"
+          ],
+          [
+            "best_in_biome",
+            "prehistoric",
+            "mosasaurus"
+          ],
+          [
+            "best_in_biome",
+            "cosmic",
+            "unicorn"
+          ],
+          [
+            "best_in_biome",
+            "cherry-blossom",
+            "kitsune"
+          ],
+          [
+            "best_in_biome",
+            "titan-temple",
+            "nightflame"
+          ],
+          [
+            "best_in_biome",
+            "enchanted-forest",
+            "spirit-world-guardian"
+          ],
+          [
+            "top_earner",
+            "spirit-world-guardian",
+            ""
+          ],
+          [
+            "rarity",
+            "fox",
+            "epic"
+          ],
+          [
+            "rarity",
+            "bear",
+            "epic"
+          ],
+          [
+            "rarity",
+            "brr-brr-patapim",
+            "legendary"
+          ],
+          [
+            "rarity",
+            "axolotl",
+            "legendary"
+          ],
+          [
+            "rarity",
+            "leviathan",
+            "cosmic"
+          ],
+          [
+            "rarity",
+            "scorpion",
+            "mythic"
+          ],
+          [
+            "rarity",
+            "tiger",
+            "mythic"
+          ],
+          [
+            "rarity",
+            "king-snake",
+            "secret"
+          ],
+          [
+            "rarity",
+            "king-mammoth",
+            "cosmic"
+          ],
+          [
+            "rarity",
+            "yeti",
+            "secret"
+          ],
+          [
+            "rarity",
+            "ice-dragon",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "chillin-chilli",
+            "mythic"
+          ],
+          [
+            "rarity",
+            "beluga-whale",
+            "cosmic"
+          ],
+          [
+            "rarity",
+            "whale-shark",
+            "cosmic"
+          ],
+          [
+            "rarity",
+            "unicorn",
+            "divine"
+          ],
+          [
+            "rarity",
+            "kitsune",
+            "divine"
+          ],
+          [
+            "rarity",
+            "nightflame",
+            "divine"
+          ],
+          [
+            "rarity",
+            "pure-jellyfish",
+            "secret"
+          ],
+          [
+            "rarity",
+            "gargoyle",
+            "secret"
+          ],
+          [
+            "rarity",
+            "archangel",
+            "divine"
+          ],
+          [
+            "rarity",
+            "world-burner",
+            "divine"
+          ],
+          [
+            "rarity",
+            "spirit-world-guardian",
+            "divine"
+          ],
+          [
+            "rarity",
+            "la-vacca-saturno-saturnita",
+            "cosmic"
+          ],
+          [
+            "earns_more",
+            "bronto",
+            "triceratops"
+          ],
+          [
+            "earns_same",
+            "pure-jellyfish",
+            "gargoyle"
+          ],
+          [
+            "in_biome",
+            "fox",
+            "forest"
+          ],
+          [
+            "in_biome",
+            "bear",
+            "forest"
+          ],
+          [
+            "in_biome",
+            "axolotl",
+            "lake"
+          ],
+          [
+            "in_biome",
+            "scorpion",
+            "desert"
+          ],
+          [
+            "in_biome",
+            "tiger",
+            "jungle"
+          ],
+          [
+            "in_biome",
+            "king-mammoth",
+            "snow"
+          ],
+          [
+            "in_biome",
+            "chillin-chilli",
+            "volcano"
+          ],
+          [
+            "in_biome",
+            "beluga-whale",
+            "abyss-ocean"
+          ],
+          [
+            "in_biome",
+            "whale-shark",
+            "abyss-ocean"
+          ],
+          [
+            "in_biome",
+            "bronto",
+            "prehistoric"
+          ],
+          [
+            "in_biome",
+            "triceratops",
+            "prehistoric"
+          ],
+          [
+            "in_biome",
+            "la-vacca-saturno-saturnita",
+            "cosmic"
+          ],
+          [
+            "in_biome",
+            "koi",
+            "cherry-blossom"
+          ],
+          [
+            "in_biome",
+            "rhinotaur",
+            "titan-temple"
+          ],
+          [
+            "in_biome",
+            "pure-jellyfish",
+            "angels-and-demons"
+          ],
+          [
+            "in_biome",
+            "gargoyle",
+            "angels-and-demons"
+          ],
+          [
+            "in_biome",
+            "spirit-panda",
+            "enchanted-forest"
+          ]
+        ]
+      },
+      {
+        "slug": "how-to-steal-eggs",
+        "label": "How to steal eggs without getting caught",
+        "summary": "Spare Speed, light eggs, a planned way home and bear traps: the habits that keep your eggs safe",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": ""
+      },
+      {
+        "slug": "pet-weight-explained",
+        "label": "Pet weight explained",
+        "summary": "How a pet's kg compares with its base weight, how weight changes income and why heavy eggs slow you down",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "earns_more",
+            "bear",
+            "chicken"
+          ]
+        ]
+      },
+      {
+        "slug": "rarities-explained",
+        "label": "Rarities explained",
+        "summary": "All ten rarities from Common to Divine, how rarity relates to income and why the top rarities are so hard to find",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "rarer_rarity",
+            "uncommon",
+            "common"
+          ],
+          [
+            "rarer_rarity",
+            "rare",
+            "uncommon"
+          ],
+          [
+            "rarer_rarity",
+            "epic",
+            "rare"
+          ],
+          [
+            "rarer_rarity",
+            "legendary",
+            "epic"
+          ],
+          [
+            "rarer_rarity",
+            "mythic",
+            "legendary"
+          ],
+          [
+            "rarer_rarity",
+            "cosmic",
+            "mythic"
+          ],
+          [
+            "rarer_rarity",
+            "secret",
+            "cosmic"
+          ],
+          [
+            "rarer_rarity",
+            "eternal",
+            "secret"
+          ],
+          [
+            "rarer_rarity",
+            "divine",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "chicken",
+            "common"
+          ],
+          [
+            "rarity",
+            "frog",
+            "common"
+          ],
+          [
+            "rarity",
+            "catfish",
+            "uncommon"
+          ],
+          [
+            "rarity",
+            "raccoon",
+            "rare"
+          ],
+          [
+            "rarity",
+            "bear",
+            "epic"
+          ],
+          [
+            "rarity",
+            "axolotl",
+            "legendary"
+          ],
+          [
+            "rarity",
+            "scorpion",
+            "mythic"
+          ],
+          [
+            "rarity",
+            "leviathan",
+            "cosmic"
+          ],
+          [
+            "rarity",
+            "king-snake",
+            "secret"
+          ],
+          [
+            "rarity",
+            "ice-dragon",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "unicorn",
+            "divine"
+          ],
+          [
+            "rarity",
+            "spirit-world-guardian",
+            "divine"
+          ],
+          [
+            "rarity",
+            "brr-brr-patapim",
+            "legendary"
+          ],
+          [
+            "rarity",
+            "gorilla",
+            "legendary"
+          ],
+          [
+            "in_biome",
+            "gorilla",
+            "jungle"
+          ],
+          [
+            "earns_more",
+            "axolotl",
+            "brr-brr-patapim"
+          ],
+          [
+            "earns_more",
+            "gorilla",
+            "axolotl"
+          ],
+          [
+            "in_biome",
+            "king-snake",
+            "jungle"
+          ],
+          [
+            "in_biome",
+            "ice-dragon",
+            "snow"
+          ],
+          [
+            "in_biome",
+            "leviathan",
+            "lake"
+          ]
+        ]
+      },
+      {
+        "slug": "hatch-times-guide",
+        "label": "Hatch times and planning your pen",
+        "summary": "Why better eggs take longer, how to order your pen around slow eggs and what the Growth Speed pass changes",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "hatches_faster",
+            "chicken",
+            "brr-brr-patapim"
+          ],
+          [
+            "hatches_faster",
+            "brr-brr-patapim",
+            "leviathan"
+          ],
+          [
+            "hatches_faster",
+            "axolotl",
+            "leviathan"
+          ],
+          [
+            "hatches_faster",
+            "leviathan",
+            "ice-dragon"
+          ]
+        ]
+      },
+      {
+        "slug": "which-pets-to-keep",
+        "label": "Which pets to keep and which to replace",
+        "summary": "How to judge a pet by income per pen slot, which pets never to throw away and when a full pen means it is time to move on",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "earns_more",
+            "bear",
+            "turtle"
+          ],
+          [
+            "earns_more",
+            "swan",
+            "bear"
+          ],
+          [
+            "earns_more",
+            "axolotl",
+            "swan"
+          ],
+          [
+            "in_biome",
+            "turtle",
+            "lake"
+          ],
+          [
+            "in_biome",
+            "swan",
+            "lake"
+          ],
+          [
+            "in_biome",
+            "bear",
+            "forest"
+          ],
+          [
+            "mult_over",
+            "golden",
+            2
+          ]
+        ]
+      },
+      {
+        "slug": "angels-and-demons-guide",
+        "label": "Angels & Demons guide",
+        "summary": "The biome's three forms, which eggs to steal, the Secret Shrine fusions and whether fusing is worth it",
+        "queue": true,
+        "reviewed_by": "",
+        "reviewed_on": "",
+        "facts": [
+          [
+            "best_in_biome",
+            "angels-and-demons",
+            "aetheron"
+          ],
+          [
+            "earns_same",
+            "pure-jellyfish",
+            "gargoyle"
+          ],
+          [
+            "earns_same",
+            "centaur",
+            "razorfang"
+          ],
+          [
+            "earns_same",
+            "pegasus",
+            "skeleton-horse"
+          ],
+          [
+            "earns_same",
+            "archangel",
+            "world-burner"
+          ],
+          [
+            "earns_same",
+            "light-dove",
+            "flame-sprite"
+          ],
+          [
+            "fusion",
+            "aetheron",
+            "archangel",
+            "world-burner"
+          ],
+          [
+            "fusion",
+            "equinox",
+            "pegasus",
+            "skeleton-horse"
+          ],
+          [
+            "rarity",
+            "pegasus",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "skeleton-horse",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "archangel",
+            "divine"
+          ],
+          [
+            "rarity",
+            "world-burner",
+            "divine"
+          ],
+          [
+            "rarity",
+            "pure-jellyfish",
+            "secret"
+          ],
+          [
+            "rarity",
+            "gargoyle",
+            "secret"
+          ],
+          [
+            "biome_before",
+            "angels-and-demons",
+            "enchanted-forest"
+          ]
+        ]
+      }
+    ]
+  }
+}
