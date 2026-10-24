@@ -10,6 +10,7 @@ return array( 'domain' => 'rbx-tools', 'language' => 'id_ID', 'plural-forms' => 
 	'Each mutation counts once. Pick a different one.' => 'Tiap mutasi hanya dihitung sekali. Pilih yang lain.',
 	'Enter a number.' => 'Masukkan angka.',
 	'Fix the highlighted field to update' => 'Perbaiki kolom yang ditandai agar hasilnya diperbarui',
+	'Formula last checked in game: %s' => 'Rumus terakhir dicek di game: %s',
 	'How the result is worked out' => 'Cara hasilnya dihitung',
 	'Link copied' => 'Link disalin',
 	'None' => 'Tidak ada',
@@ -37,5 +38,6 @@ return array( 'domain' => 'rbx-tools', 'language' => 'id_ID', 'plural-forms' => 
 	'Use a whole number.' => 'Gunakan bilangan bulat.',
 	'Use digits, like 1500 or 1.5K.' => 'Gunakan angka, misalnya 1500 atau 1,5K.',
 	'Wiki data as of %1$s (data version %2$s)' => 'Data wiki per %1$s (versi data %2$s)',
+	'Wiki data as of %1$s. Our data file: version %2$s, rebuilt %3$s.' => 'Data wiki per %1$s. File data kami: versi %2$s, dibuat ulang %3$s.',
 	'no suffix' => 'tanpa akhiran',
 ) );
