@@ -28,6 +28,10 @@
  * - `db_error`: copies inc/dropins/db-error.php to wp-content/db-error.php (GR-02), so a lost
  *   database connection answers 503 + Retry-After instead of WordPress's 500 page. A different
  *   db-error.php already there (not ours) is left alone.
+ * - `php_error`: copies inc/dropins/php-error.php to wp-content/php-error.php (CR-05), so a PHP
+ *   fatal error (seen once while a deploy warmed the cache) answers 503 + Retry-After instead of
+ *   WordPress's 500 "critical error" page, and is kept in the `updateotter_fatal_log` option.
+ *   Same rule: a php-error.php that is not ours is left alone.
  *
  * `purge` empties the page cache only, marked stale, and then warms the pages in search one at a
  * time through WP-Cron (RBX\Data\Cache\Purge::pages(), Warm). It no longer calls
@@ -57,7 +61,7 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live', 'search_index', 'dates', 'gate', 'purge', 'llms', 'favicon', 'db_error', 'indexnow' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'search_index', 'dates', 'gate', 'purge', 'llms', 'favicon', 'db_error', 'php_error', 'indexnow' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
@@ -117,8 +121,16 @@ function updateotter_launch_gate(): array {
  * GR-02: installs the 503 db-error drop-in. Returns what happened.
  */
 function updateotter_launch_db_error(): string {
-	$src  = get_template_directory() . '/inc/dropins/db-error.php';
-	$dest = WP_CONTENT_DIR . '/db-error.php';
+	return updateotter_launch_dropin( 'db-error.php', 'UpdateOtter db-error drop-in' );
+}
+
+/**
+ * Copies a drop-in from inc/dropins/ into wp-content unless another one (without our signature)
+ * is already there. Returns what happened.
+ */
+function updateotter_launch_dropin( string $name, string $signature ): string {
+	$src  = get_template_directory() . '/inc/dropins/' . $name;
+	$dest = WP_CONTENT_DIR . '/' . $name;
 	if ( ! is_readable( $src ) ) {
 		return 'no source';
 	}
@@ -127,11 +139,29 @@ function updateotter_launch_db_error(): string {
 		if ( md5( $old ) === md5_file( $src ) ) {
 			return 'up to date';
 		}
-		if ( ! str_contains( $old, 'UpdateOtter db-error drop-in' ) ) {
-			return 'kept: another db-error.php is installed';
+		if ( ! str_contains( $old, $signature ) ) {
+			return 'kept: another ' . $name . ' is installed';
 		}
 	}
 	return copy( $src, $dest ) ? 'copied' : 'copy failed'; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_copy
+}
+
+/**
+ * CR-05: PHP fatal errors the php-error drop-in caught (newest first). Without login only the
+ * time and page; message, file and line are for admins.
+ *
+ * @return array{count: int, last: array<int, array<string, mixed>>}
+ */
+function updateotter_fatal_log( bool $details ): array {
+	$log = get_option( 'updateotter_fatal_log', array() );
+	$log = is_array( $log ) ? array_values( $log ) : array();
+	if ( ! $details ) {
+		$log = array_map( static fn( $r ) => is_array( $r ) ? array_intersect_key( $r, array_flip( array( 't', 'uri' ) ) ) : $r, $log );
+	}
+	return array(
+		'count' => count( $log ),
+		'last'  => array_slice( $log, 0, 5 ),
+	);
 }
 
 /**
@@ -329,6 +359,14 @@ add_action(
 			);
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
+		if ( isset( $todo['php_error'] ) ) {
+			$state['php_error'] = array(
+				'id'     => $todo['php_error'],
+				'at'     => gmdate( 'Y-m-d H:i:s' ),
+				'result' => updateotter_launch_dropin( 'php-error.php', 'UpdateOtter php-error drop-in' ),
+			);
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
 		if ( isset( $todo['indexnow'] ) && class_exists( '\RBX\Data\Index\IndexNow' ) && \RBX\Data\Index\IndexNow::enabled() ) {
 			$urls              = \RBX\Data\Index\IndexNow::site_urls();
 			$sent              = \RBX\Data\Index\IndexNow::submit( $urls );
@@ -354,6 +392,18 @@ add_action(
 		}
 	},
 	30 // After BundledPages (21) and the post types.
+);
+
+// CR-05: until the php-error drop-in is installed, WordPress's own fatal page answers 503 too.
+add_filter(
+	'wp_php_error_args',
+	static function ( $args ) {
+		if ( ! headers_sent() ) {
+			header( 'Retry-After: 120' );
+			header( 'Cache-Control: no-store' );
+		}
+		return array( 'response' => 503 ) + (array) $args;
+	}
 );
 
 add_action(
@@ -384,6 +434,12 @@ add_action(
 							'cache'         => updateotter_cache_settings(),
 							'warm'          => class_exists( '\RBX\Data\Cache\Warm' ) ? \RBX\Data\Cache\Warm::summary() : array(),
 							'db_error'      => is_readable( WP_CONTENT_DIR . '/db-error.php' ),
+							'php_error'     => is_readable( WP_CONTENT_DIR . '/php-error.php' ),
+							'fatal'         => updateotter_fatal_log( current_user_can( 'manage_options' ) ),
+							'opcache'       => array(
+								'validate_timestamps' => (bool) ini_get( 'opcache.validate_timestamps' ),
+								'revalidate_freq'     => (int) ini_get( 'opcache.revalidate_freq' ),
+							),
 						)
 					);
 				},
