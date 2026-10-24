@@ -74,6 +74,7 @@
         "is_lab_egg": { "type": "bool", "label__en": "Lab egg (Dr. Scramble)" },
         "obtain_method": { "type": "enum", "enum": ["biome_spawn", "shop", "lab", "event", "game_pass", "other"], "label__en": "How to get", "required_for_index": true, "facet": true },
         "odds_published": { "type": "bool", "label__en": "Odds published by the developer" },
+        "spawn_chance_prob": { "type": "prob", "label__en": "Spawn chance", "display_format": "prob", "list": true, "compare": true },
         "notes__en": { "type": "text", "label__en": "Our notes", "editorial": true },
         "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
         "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }

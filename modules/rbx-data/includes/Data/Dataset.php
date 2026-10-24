@@ -383,7 +383,7 @@ final class Dataset {
 			case 'in_game':
 				return __( 'Verified in game', 'rbx-data' );
 			case 'official':
-				return __( 'Official patch notes', 'rbx-data' );
+				return null !== $url && str_contains( $url, '/game-passes' ) ? __( 'Roblox store listing', 'rbx-data' ) : __( 'Official patch notes', 'rbx-data' );
 			case 'community':
 				return null !== $url && '' !== $url && ! str_contains( (string) wp_parse_url( $url, PHP_URL_HOST ), 'fandom.com' ) ? __( 'Source page', 'rbx-data' ) : __( 'Wiki page', 'rbx-data' );
 		}

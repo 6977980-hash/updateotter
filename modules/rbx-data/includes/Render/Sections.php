@@ -31,7 +31,7 @@ final class Sections {
 	/** Rows a list renders in the page; the rest load on demand (GR-24). */
 	public const LIST_ROWS = 100;
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -106,6 +106,10 @@ final class Sections {
 					return self::licensed( $game, self::biomes( $game ) );
 				case 'mounts':
 					return self::licensed( $game, self::mounts( $game ) );
+				case 'game_passes':
+					return self::game_passes( $game );
+				case 'fusions':
+					return self::licensed( $game, self::fusions( $game ) );
 				case 'latest_update':
 					return self::latest_update( $game );
 				case 'top_tier':
@@ -898,6 +902,46 @@ final class Sections {
 			$rows .= '<tr><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'MNT', $field ) ) . '">' . Ui::value( $ds, $r, $field ) . '</td><td data-label="' . esc_attr( $game->label( 'MNT', 'obtain_method_text__en' ) ) . '">' . ( empty( $r['data']['obtain_method_text__en'] ) ? '' : Ui::text( (string) $r['data']['obtain_method_text__en'] ) ) . ( $upd ? ' (' . Ui::link( $upd ) . ')' : '' ) . '</td></tr>';
 		}
 		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'MNT', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Mount', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Speed', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'How to get', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+	}
+
+	private static function fusions( Game $game ): string {
+		if ( null === $game->entity( 'FUS' ) ) {
+			return '';
+		}
+		$ds   = self::ds( $game );
+		$recs = $ds->all( 'FUS', array( 'live', 'limited' ) );
+		if ( ! $recs ) {
+			return '<p class="rbx-note">' . esc_html__( 'No fusion recipes are listed yet.', 'rbx-data' ) . '</p>';
+		}
+		self::show( array_keys( $recs ) );
+		$rows = '';
+		foreach ( $recs as $r ) {
+			$out  = $ds->get( (string) ( $r['data']['output_pet_id'] ?? '' ) );
+			$ins  = array();
+			foreach ( (array) ( $r['data']['inputs'] ?? array() ) as $in ) {
+				$pet   = $ds->get( (string) ( $in['pet_id'] ?? '' ) );
+				$ins[] = ( (int) ( $in['qty'] ?? 1 ) > 1 ? esc_html( number_format_i18n( (int) $in['qty'] ) ) . ' × ' : '' ) . ( $pet ? Ui::link( $pet ) : Ui::dash() );
+			}
+			$rows .= '<tr><th scope="row">' . ( $out ? Ui::link( $out ) : esc_html( (string) $r['name'] ) ) . '</th><td data-label="' . esc_attr( $game->label( 'FUS', 'inputs' ) ) . '">' . implode( ' + ', $ins ) . '</td><td data-label="' . esc_attr( $game->label( 'FUS', 'station_text__en' ) ) . '">' . ( empty( $r['data']['station_text__en'] ) ? Ui::dash() : Ui::text( Lang::t( html_entity_decode( (string) $r['data']['station_text__en'], ENT_QUOTES ) ) ) ) . '</td></tr>';
+		}
+		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'FUS', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html( $game->label( 'FUS', 'output_pet_id' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'FUS', 'inputs' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'FUS', 'station_text__en' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+	}
+
+	private static function game_passes( Game $game ): string {
+		if ( null === $game->entity( 'GPS' ) ) {
+			return '';
+		}
+		$ds   = self::ds( $game );
+		$recs = $ds->all( 'GPS', array( 'live', 'limited' ) );
+		if ( ! $recs ) {
+			return '<p class="rbx-note">' . esc_html__( 'No game passes are listed yet.', 'rbx-data' ) . '</p>';
+		}
+		self::show( array_keys( $recs ) );
+		$rows = '';
+		foreach ( $recs as $r ) {
+			$rows .= '<tr><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'GPS', 'price_robux' ) ) . '">' . Ui::value( $ds, $r, 'price_robux' ) . '</td><td data-label="' . esc_attr( $game->label( 'GPS', 'effect_text__en' ) ) . '">' . ( empty( $r['data']['effect_text__en'] ) ? Ui::dash() : Ui::text( Lang::t( (string) $r['data']['effect_text__en'] ) ) ) . '</td></tr>';
+		}
+		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'GPS', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Game pass', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'GPS', 'price_robux' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'GPS', 'effect_text__en' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 	}
 
 	private static function latest_update( Game $game ): string {

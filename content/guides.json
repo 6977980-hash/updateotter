@@ -838,6 +838,54 @@
             "enchanted-forest"
           ]
         ]
+      },
+      {
+        "slug": "lab-trade-ins",
+        "label": "Dr. Scramble's Lab guide",
+        "summary": "How the Lab trade-in works, what each of the three banners asks for and gives, which banner to use and whether trading pets in is worth it",
+        "queue": true,
+        "facts": [
+          [
+            "rarity",
+            "nuclear-mantis",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "dreadstinger",
+            "eternal"
+          ],
+          [
+            "rarity",
+            "octophant",
+            "divine"
+          ],
+          [
+            "rarity",
+            "toxic-rat",
+            "mythic"
+          ],
+          [
+            "rarity",
+            "gargoyle",
+            "secret"
+          ],
+          [
+            "rarity",
+            "pure-jellyfish",
+            "secret"
+          ],
+          [
+            "earns_more",
+            "dreadstinger",
+            "nuclear-mantis"
+          ],
+          [
+            "earns_more",
+            "octophant",
+            "dreadstinger"
+          ]
+        ]
       }
     ]
   }
