@@ -26,10 +26,9 @@ final class Insights {
 	private const MUT_TABLE_MAX = 20;
 
 	public static function render( Dataset $ds, array $rec ): string {
-		// GR-26: one source line for all the blocks, not one under each.
-		$html = self::blocks( $ds, $rec );
-		$note = self::source_note();
-		return str_contains( $html, $note ) ? str_replace( $note, '', $html ) . $note : $html;
+		// GR-26 / GR-01: no per-block source line; the page's "How this page was made" line says
+		// the tables are worked out with our calculator formula from community wiki values.
+		return str_replace( self::source_note(), '', self::blocks( $ds, $rec ) );
 	}
 
 	private static function blocks( Dataset $ds, array $rec ): string {
@@ -123,13 +122,7 @@ final class Insights {
 							esc_html( number_format_i18n( count( $all ) ) )
 						) );
 			}
-			$facts[] = sprintf(
-				/* translators: 1: pet, 2: per minute, 3: per hour */
-				esc_html__( 'At its base weight one %1$s earns %2$s Cash per minute, or %3$s per hour.', 'rbx-data' ),
-				esc_html( $name ),
-				Ui::number( $ds, $income * 60, 'abbr' ),
-				Ui::number( $ds, $income * 3600, 'abbr' )
-			);
+			// GR-01: the per-hour figure is in the income section below; not repeated here.
 		}
 
 		// Egg, biome, hatch time and reward.
@@ -197,13 +190,24 @@ final class Insights {
 		$name = (string) $rec['name'];
 		$rows = '<tr><th scope="row">' . esc_html( $name ) . ' ' . esc_html__( '(no mutation)', 'rbx-data' ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, 1.0, 'mult' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $base, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $base * 3600, 'abbr' ) . '</td></tr>';
 		$best = null;
+		// GR-01: mutations with the same multiplier share one row ("Enchanted, Nitro … Phoenix").
+		$groups = array();
 		foreach ( self::mutations( $ds ) as $m ) {
 			$v = self::income( $ds, (string) $rec['id'], (string) $m['record']['id'], null );
 			if ( null === $v ) {
 				continue;
 			}
-			$best  = array( $m['record'], $v );
-			$rows .= '<tr><th scope="row">' . Ui::link( $m['record'] ) . ' ' . esc_html( $name ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $m['mult'], 'mult' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $v, 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $v * 3600, 'abbr' ) . '</td></tr>';
+			$best = array( $m['record'], $v );
+			$key  = (string) $m['mult'];
+			$groups[ $key ] ??= array(
+				'mult'  => $m['mult'],
+				'v'     => $v,
+				'links' => array(),
+			);
+			$groups[ $key ]['links'][] = Ui::link( $m['record'] );
+		}
+		foreach ( $groups as $g ) {
+			$rows .= '<tr><th scope="row">' . implode( ', ', $g['links'] ) . ' ' . esc_html( $name ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $g['mult'], 'mult' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $g['v'], 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $g['v'] * 3600, 'abbr' ) . '</td></tr>';
 		}
 		if ( null === $best ) {
 			return '';
@@ -239,7 +243,7 @@ final class Insights {
 		$cap   = sprintf( __( 'Income of one %s at its base weight, by mutation', 'rbx-data' ), $name );
 		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Version', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Multiplier', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per hour', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: pet */
-		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much does %s make?', 'rbx-data' ), self::a( $name ) ), 'income' ) . '<p>' . $intro . '</p>' . $table . self::source_note() . '</section>';
+		return '<section class="rbx-income">' . Ui::h2( sprintf( __( 'How much does %s make?', 'rbx-data' ), self::a( $name ) ), 'income' ) . '<p>' . $intro . '</p>' . $table . '</section>';
 	}
 
 	/**
@@ -259,11 +263,10 @@ final class Insights {
 		if ( null === $two || null === $ten ) {
 			return '';
 		}
+		// GR-01: one short sentence; the rule itself is explained once on the mutations page.
 		$text = sprintf(
-			/* translators: 1: pet, 2: base weight, 3: weight x2, 4: income at x2, 5: weight x10, 6: income at x10, 7: ratio at x10 */
-			esc_html__( 'Yes, but not in step with the weight. %1$s at its base weight of %2$s kg is the plain income above; at %3$s kg it earns %4$s per second, and at %5$s kg %6$s, about %7$s times the base, not ten.', 'rbx-data' ),
-			esc_html( self::a( $name, true ) ),
-			Ui::number( $ds, $bw, 'abbr' ),
+			/* translators: 1: weight x2, 2: income at x2, 3: weight x10, 4: income at x10, 5: ratio at x10 */
+			esc_html__( 'Yes: at %1$s kg it earns %2$s per second, and at %3$s kg %4$s, %5$s times its base income.', 'rbx-data' ),
 			Ui::number( $ds, $bw * 2, 'abbr' ),
 			Ui::number( $ds, $two, 'abbr' ),
 			Ui::number( $ds, $bw * 10, 'abbr' ),
@@ -271,9 +274,9 @@ final class Insights {
 			esc_html( self::ratio( $ten / $base ) )
 		);
 		$chip = 'confirmed' !== $ds->mechanic_status( 'weight_scaling' ) ? ' ' . self::weight_chip( $ds, $rec ) : '';
-		$calc = Item::calculator_link( $ds->game(), $rec );
+		// The calculator link is in the stats card already (GR-01: no second copy here).
 		/* translators: %s: pet */
-		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $text . $chip . '</p>' . ( '' !== $calc ? '<p>' . $calc . '</p>' : '' ) . '</section>';
+		return '<section class="rbx-weight">' . Ui::h2( sprintf( __( 'Does a heavier %s earn more?', 'rbx-data' ), $name ), 'weight' ) . '<p>' . $text . $chip . '</p></section>';
 	}
 
 	/**

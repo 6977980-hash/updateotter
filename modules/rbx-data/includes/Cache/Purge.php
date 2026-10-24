@@ -20,6 +20,9 @@ final class Purge {
 
 	public const PURGE_ALL_OVER = 50;
 
+	/** Cache tag on the sitemap responses (GR-32). */
+	public const SITEMAP_TAG = 'rbx-sitemap';
+
 	/** @var array<int, string> Tags collected during this request. */
 	private static array $tags = array();
 
@@ -59,12 +62,34 @@ final class Purge {
 			return;
 		}
 		if ( count( $record_ids ) > self::PURGE_ALL_OVER ) {
-			do_action( 'litespeed_purge_all' );
+			self::pages();
 			return;
 		}
 		do_action( 'litespeed_purge', 'rbx-' . $game->key() );
+		do_action( 'litespeed_purge', self::SITEMAP_TAG );
 		foreach ( $record_ids as $id ) {
 			do_action( 'litespeed_purge', 'rbx-rec-' . strtolower( $id ) );
+		}
+	}
+
+	/**
+	 * Purges every cached page, and only the pages (GR-02, deploy CPU spikes 2026-10-24).
+	 *
+	 * `litespeed_purge_all` also empties the object cache and resets OPcache, so every PHP file
+	 * is compiled again and every cached query re-run at the moment crawlers arrive. This purges
+	 * the page cache alone, marked stale: LiteSpeed keeps serving the old copy of a page while
+	 * one request builds the new one, instead of every visitor rendering it at once. A gentle
+	 * warm of the pages in search follows (Warm).
+	 */
+	public static function pages( bool $warm = true ): void {
+		if ( self::active() ) {
+			if ( class_exists( '\LiteSpeed\Control' ) && method_exists( '\LiteSpeed\Control', 'cls' ) ) {
+				\LiteSpeed\Control::cls()->set_stale();
+			}
+			do_action( 'litespeed_purge', '*' );
+		}
+		if ( $warm ) {
+			Warm::schedule();
 		}
 	}
 

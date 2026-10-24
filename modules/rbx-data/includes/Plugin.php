@@ -66,6 +66,7 @@ final class Plugin {
 		Reports\Endpoint::boot();
 		Rest\Routes::boot();
 		Import\Bundled::boot();
+		Cache\Warm::boot();
 		Log\Beacon::boot();
 		Content\BundledPages::boot();
 		Content\Guides::boot();

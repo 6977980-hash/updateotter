@@ -812,6 +812,15 @@ summary.rbx-chip {
 	color: var(--text-muted);
 	margin: 0 0 var(--sp-3);
 }
+/* GR-34: small inline links still get a 24 px tall tap target. */
+.rbx-trust a,
+.rbx-byline a,
+.rbx-stats__src a,
+a.rbx-chip {
+	display: inline-block;
+	min-height: 24px;
+	line-height: 24px;
+}
 .rbx-trust--stale {
 	color: var(--warning);
 }
@@ -821,10 +830,40 @@ summary.rbx-chip {
 .rbx-ph__bg {
 	fill: var(--surface-2);
 }
-.rbx-ph__t {
-	fill: var(--text);
+/* GR-30: placeholder letters as generated text over the SVG, sized to the icon. */
+.rbx-ph-wrap {
+	position: relative;
+	display: inline-block;
+	flex: 0 0 auto;
+	line-height: 0;
+	vertical-align: middle;
+}
+.rbx-ph-wrap::before,
+.rbx-ph-wrap[data-r]::after {
+	position: absolute;
 	font-family: var(--font);
 	font-weight: 800;
+	line-height: 1;
+	text-align: center;
+}
+.rbx-ph-wrap::before {
+	content: attr(data-i);
+	inset: 0 0 8% 0;
+	display: grid;
+	place-items: center;
+	font-size: calc(var(--ph, var(--ph-size, 48px)) * 0.46);
+	color: var(--text);
+}
+.rbx-ph-wrap[data-r]::after {
+	content: attr(data-r);
+	top: 4.2%;
+	left: 60.4%;
+	width: 35.4%;
+	height: 35.4%;
+	display: grid;
+	place-items: center;
+	font-size: calc(var(--ph, var(--ph-size, 48px)) * 0.23);
+	color: var(--ph-ink, #fff);
 }
 .rbx-icon-img {
 	border-radius: var(--r-md);
@@ -881,6 +920,9 @@ summary.rbx-chip {
 	width: 96px;
 	height: 96px;
 }
+.rbx-card__icon .rbx-ph-wrap {
+	--ph: 96px;
+}
 .rbx-card__chips {
 	display: flex;
 	flex-wrap: wrap;
@@ -936,6 +978,12 @@ summary.rbx-chip {
 	color: var(--link);
 	text-decoration: none;
 	background: var(--bg);
+	font: inherit;
+	cursor: pointer;
+}
+.rbx-report-form-btn {
+	display: inline-flex;
+	margin: 0;
 }
 .rbx-dispute ul {
 	margin: var(--sp-2) 0 0;
@@ -1102,6 +1150,9 @@ summary.rbx-chip {
 .rbx-related__item img {
 	width: 48px;
 	height: 48px;
+}
+.rbx-related__item .rbx-ph-wrap {
+	--ph: 48px;
 }
 .rbx-game-cards {
 	grid-template-columns: 1fr;
@@ -1391,6 +1442,9 @@ summary.rbx-chip {
 	.rbx-card__icon img {
 		width: 128px;
 		height: 128px;
+	}
+	.rbx-card__icon .rbx-ph-wrap {
+		--ph: 128px;
 	}
 	.rbx-grid {
 		grid-template-columns: repeat(4, minmax(0, 1fr));

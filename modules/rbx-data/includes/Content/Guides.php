@@ -285,7 +285,7 @@ final class Guides {
 				\RBX\Data\Export\SearchIndex::write();
 			}
 			// Hub list, "More guides" blocks and links in older guides change with the new guide.
-			do_action( 'litespeed_purge_all' );
+			\RBX\Data\Cache\Purge::pages();
 		}
 	}
 

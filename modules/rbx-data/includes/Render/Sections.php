@@ -28,6 +28,9 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sections {
 
+	/** Rows a list renders in the page; the rest load on demand (GR-24). */
+	public const LIST_ROWS = 100;
+
 	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
@@ -238,6 +241,8 @@ final class Sections {
 		}
 
 		$body       = '';
+		$rest       = '';
+		$n_rows     = 0;
 		$dash       = false;
 		$facet_vals = array();
 		foreach ( $recs as $id => $r ) {
@@ -273,8 +278,17 @@ final class Sections {
 			if ( 'EGG' === $entity ) {
 				$row .= '<td data-label="' . esc_attr__( 'Pets', 'rbx-data' ) . '">' . esc_html( number_format_i18n( count( $ds->children( 'DRP', 'egg_id', (string) $id ) ) ) ) . '</td>';
 			}
-			$row  .= ( $one_conf ? '' : '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . $conf[ $id ] . '</td>' ) . '</tr>';
-			$body .= $row;
+			$row .= ( $one_conf ? '' : '<td data-label="' . esc_attr__( 'Confidence', 'rbx-data' ) . '">' . $conf[ $id ] . '</td>' ) . '</tr>';
+			// GR-24: the first rows are in the page; the rest wait in a <template> (not part of the
+			// page's DOM) until a search, filter, sort or "Show all" needs them.
+			if ( ++$n_rows <= self::LIST_ROWS ) {
+				$body .= $row;
+			} else {
+				$rest .= $row;
+			}
+		}
+		if ( '' !== $rest ) {
+			$body .= '<template data-rbx-rest>' . $rest . '</template>';
 		}
 
 		$chips = '';
@@ -314,8 +328,13 @@ final class Sections {
 		$empty = '<p class="rbx-empty" hidden data-rbx-empty>' . esc_html__( 'No results. Try fewer filters.', 'rbx-data' ) . ' <a href="' . esc_url( home_url( '/report/' ) ) . '">' . esc_html__( 'Report a missing item', 'rbx-data' ) . '</a></p>';
 		// UO-55: after a filter or sort, long lists show the first 100 matches and this button.
 		if ( count( $recs ) > 100 ) {
+			$live = count( array_filter( $recs, static fn( $r ) => 'removed_from_game' !== $r['status'] ) );
 			/* translators: {n}: number of matching rows, filled in by list.js */
-			$empty .= '<p class="rbx-more" hidden><button type="button" class="button-secondary" data-rbx-more data-template="' . esc_attr__( 'Show all {n}', 'rbx-data' ) . '"></button></p>';
+			$empty .= '<p class="rbx-more" hidden><button type="button" class="button-secondary" data-rbx-more data-total="' . esc_attr( (string) $live ) . '" data-template="' . esc_attr__( 'Show all {n}', 'rbx-data' ) . '"></button></p>';
+		}
+		if ( '' !== $rest ) {
+			/* translators: 1: rows shown, 2: rows in the list */
+			$empty .= '<noscript><p class="rbx-note">' . esc_html( sprintf( __( 'Showing the first %1$s of %2$s. Turn on JavaScript to see the full list, or use the search at the top of the site.', 'rbx-data' ), number_format_i18n( self::LIST_ROWS ), number_format_i18n( count( $recs ) ) ) ) . '</p></noscript>';
 		}
 		self::enqueue_list_js();
 		$top = '<a class="rbx-backtop" href="#top" hidden data-rbx-backtop>' . esc_html__( 'Back to top', 'rbx-data' ) . '</a>';

@@ -22,6 +22,18 @@
  *   that time is worked out. A Page with no text-change time yet gets its modified time. Runs
  *   before `purge`, so the purged pages show the new dates.
  *
+ * - `gate`: re-runs the index gate for every game once (GR-15), for changes to the gate rules or
+ *   to a game config's index scope that come with code rather than with a data import. Purges
+ *   the cached pages of a game whose page states changed and rebuilds the search index.
+ * - `db_error`: copies inc/dropins/db-error.php to wp-content/db-error.php (GR-02), so a lost
+ *   database connection answers 503 + Retry-After instead of WordPress's 500 page. A different
+ *   db-error.php already there (not ours) is left alone.
+ *
+ * `purge` empties the page cache only, marked stale, and then warms the pages in search one at a
+ * time through WP-Cron (RBX\Data\Cache\Purge::pages(), Warm). It no longer calls
+ * `litespeed_purge_all`, which also emptied the object cache and reset OPcache on every deploy
+ * (the CPU spikes Ali saw on 24 Oct).
+ *
  * A step runs once per id, on the first request after the deploy. Turning the lock back on in
  * RBX Data → Setup is not undone by a later request. Status: GET /wp-json/rbx/v1/launch.
  *
@@ -45,7 +57,7 @@ function updateotter_launch_plan(): array {
 		return array();
 	}
 	$out = array();
-	foreach ( array( 'publish', 'go_live', 'search_index', 'dates', 'purge', 'llms', 'favicon', 'indexnow' ) as $step ) {
+	foreach ( array( 'publish', 'go_live', 'search_index', 'dates', 'gate', 'purge', 'llms', 'favicon', 'db_error', 'indexnow' ) as $step ) {
 		if ( isset( $plan[ $step ] ) && is_string( $plan[ $step ] ) && '' !== $plan[ $step ] ) {
 			$out[ $step ] = $plan[ $step ];
 		}
@@ -78,6 +90,72 @@ function updateotter_launch_dates(): array {
 	return array(
 		'games'  => $games,
 		'seeded' => $seeded,
+	);
+}
+
+/**
+ * GR-15: re-runs the index gate for every game; purges a game's pages when a page state changed.
+ *
+ * @return array<string, int> game => pages whose state changed
+ */
+function updateotter_launch_gate(): array {
+	$out = array();
+	foreach ( \RBX\Data\Config\Loader::games() as $game ) {
+		$changed = array_keys( array_filter( \RBX\Data\Gate\Runner::run( $game ), static fn( array $t ): bool => $t['old'] !== $t['new'] ) );
+		$out[ $game->key() ] = count( $changed );
+		if ( $changed ) {
+			\RBX\Data\Cache\Purge::after_run( $game, $changed );
+		}
+	}
+	if ( array_sum( $out ) && class_exists( '\RBX\Data\Export\SearchIndex' ) ) {
+		\RBX\Data\Export\SearchIndex::write();
+	}
+	return $out;
+}
+
+/**
+ * GR-02: installs the 503 db-error drop-in. Returns what happened.
+ */
+function updateotter_launch_db_error(): string {
+	$src  = get_template_directory() . '/inc/dropins/db-error.php';
+	$dest = WP_CONTENT_DIR . '/db-error.php';
+	if ( ! is_readable( $src ) ) {
+		return 'no source';
+	}
+	if ( is_readable( $dest ) ) {
+		$old = (string) file_get_contents( $dest ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( md5( $old ) === md5_file( $src ) ) {
+			return 'up to date';
+		}
+		if ( ! str_contains( $old, 'UpdateOtter db-error drop-in' ) ) {
+			return 'kept: another db-error.php is installed';
+		}
+	}
+	return copy( $src, $dest ) ? 'copied' : 'copy failed'; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_copy
+}
+
+/**
+ * LiteSpeed Cache settings that decide how deploys and crawlers load the server (GR-02, GR-23).
+ * Read-only: shown on the launch status so they can be checked without an admin login.
+ *
+ * @return array<string, mixed>
+ */
+function updateotter_cache_settings(): array {
+	if ( ! defined( 'LSCWP_V' ) ) {
+		return array( 'litespeed' => false );
+	}
+	$opt = static fn( string $id ) => get_option( 'litespeed.conf.' . $id, null );
+	$ua  = $opt( 'cache-exc_useragents' );
+	return array(
+		'litespeed'           => LSCWP_V,
+		'cache'               => (bool) $opt( 'cache' ),
+		'purge_stale'         => (bool) $opt( 'purge-stale' ),
+		'exclude_user_agents' => is_array( $ua ) ? array_values( $ua ) : (string) $ua,
+		'crawler'             => (bool) $opt( 'crawler' ),
+		'object_cache'        => (bool) $opt( 'object' ),
+		'cache_mobile'        => (bool) $opt( 'cache-mobile' ),
+		'ttl_pub'             => (int) $opt( 'cache-ttl_pub' ),
+		'purge_upgrade'       => (bool) $opt( 'purge-upgrade' ),
 	);
 }
 
@@ -190,8 +268,20 @@ add_action(
 			) + updateotter_launch_dates();
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
+		if ( isset( $todo['gate'] ) && class_exists( '\RBX\Data\Gate\Runner' ) ) {
+			$state['gate'] = array(
+				'id'      => $todo['gate'],
+				'at'      => gmdate( 'Y-m-d H:i:s' ),
+				'changed' => updateotter_launch_gate(),
+			);
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
 		if ( isset( $todo['purge'] ) ) {
-			do_action( 'litespeed_purge_all' );
+			if ( class_exists( '\RBX\Data\Cache\Purge' ) ) {
+				\RBX\Data\Cache\Purge::pages();
+			} else {
+				do_action( 'litespeed_purge_all' );
+			}
 			$state['purge'] = array(
 				'id' => $todo['purge'],
 				'at' => gmdate( 'Y-m-d H:i:s' ),
@@ -228,6 +318,14 @@ add_action(
 				'id'     => $todo['favicon'],
 				'at'     => gmdate( 'Y-m-d H:i:s' ),
 				'copied' => is_readable( $dest ) && md5_file( $src ) === md5_file( $dest ),
+			);
+			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
+		}
+		if ( isset( $todo['db_error'] ) ) {
+			$state['db_error'] = array(
+				'id'     => $todo['db_error'],
+				'at'     => gmdate( 'Y-m-d H:i:s' ),
+				'result' => updateotter_launch_db_error(),
 			);
 			update_option( UPDATEOTTER_LAUNCH_OPTION, $state, false );
 		}
@@ -283,6 +381,9 @@ add_action(
 							'locked'        => updateotter_locked(),
 							'blog_public'   => (bool) get_option( 'blog_public' ),
 							'page_on_front' => (int) get_option( 'page_on_front' ),
+							'cache'         => updateotter_cache_settings(),
+							'warm'          => class_exists( '\RBX\Data\Cache\Warm' ) ? \RBX\Data\Cache\Warm::summary() : array(),
+							'db_error'      => is_readable( WP_CONTENT_DIR . '/db-error.php' ),
 						)
 					);
 				},

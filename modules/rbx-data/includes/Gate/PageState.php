@@ -147,8 +147,18 @@ final class PageState {
 			}
 		}
 
+		// I-9 index scope (GR-15, Ali 2026-10-24): an entity with `"index": false` in the game config
+		// keeps every page out of search, whatever its notes say. The near-duplicate checks below
+		// are then skipped: they are the slowest part of a gate run and cannot change the result.
+		$scoped_out = array_key_exists( 'index', $def ) && false === $def['index'];
+		if ( $scoped_out ) {
+			$reasons[] = 'I-9';
+		}
+
 		// I-3 unique editorial block, reviewed by a person listed in content/author.json (UO-02).
-		if ( isset( $def['fields']['notes__en'] ) ) {
+		if ( $scoped_out ) {
+			// Nothing to compare.
+		} elseif ( isset( $def['fields']['notes__en'] ) ) {
 			if ( '' === trim( (string) ( $d['notes__en'] ?? '' ) ) || ! $this->is_reviewer( (string) ( $d['notes_reviewed_by'] ?? '' ) ) || empty( $d['notes_reviewed_on'] ) ) {
 				$reasons[] = 'I-3';
 			} else {
@@ -162,12 +172,15 @@ final class PageState {
 			}
 		}
 
-		// I-4 page-level near duplicate.
-		$mine = $this->shingles( $rec, 'page' );
-		foreach ( $this->ds->all( $entity ) as $sid => $sib ) {
-			if ( $sid !== $rec['id'] && Similarity::jaccard( $mine, $this->shingles( $sib, 'page' ) ) >= 0.8 ) {
-				$reasons[] = 'I-4';
-				break;
+		// I-4 page-level near duplicate. Only worth the comparisons while the page could still be
+		// indexed: a page with a reason already is noindex, and an "index" override ignores I-4.
+		if ( ! $reasons ) {
+			$mine = $this->shingles( $rec, 'page' );
+			foreach ( $this->ds->all( $entity ) as $sid => $sib ) {
+				if ( $sid !== $rec['id'] && Similarity::jaccard( $mine, $this->shingles( $sib, 'page' ) ) >= 0.8 ) {
+					$reasons[] = 'I-4';
+					break;
+				}
 			}
 		}
 
@@ -184,14 +197,14 @@ final class PageState {
 			}
 		}
 
-		// I-6 comparison computable.
+		// I-6 comparison computable (skipped like I-4 once the page is noindex for another reason).
 		$compare = array();
 		foreach ( (array) $def['fields'] as $f => $fd ) {
 			if ( ! empty( $fd['compare'] ) ) {
 				$compare[] = $f;
 			}
 		}
-		if ( $compare && ! $this->comparison_ok( $rec, $compare, (array) ( $def['siblings_by'] ?? array() ) ) && empty( $post['manual_index_ok'] ) ) {
+		if ( $compare && ! $reasons && ! $this->comparison_ok( $rec, $compare, (array) ( $def['siblings_by'] ?? array() ) ) && empty( $post['manual_index_ok'] ) ) {
 			$reasons[] = 'I-6';
 		}
 
@@ -208,7 +221,7 @@ final class PageState {
 				$reasons[] = 'override';
 			}
 		} elseif ( 'index' === $override ) {
-			$hard  = array_intersect( $reasons, array( 'I-1', 'I-7', 'I-8' ) );
+			$hard  = array_intersect( $reasons, array( 'I-1', 'I-7', 'I-8', 'I-9' ) );
 			$state = $hard ? self::NOINDEX : self::INDEX;
 			if ( ! $hard ) {
 				$notes[] = 'forced_index';
