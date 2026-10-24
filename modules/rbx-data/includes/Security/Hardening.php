@@ -47,6 +47,12 @@ final class Hardening {
 
 	/** @param array<string, mixed> $endpoints REST endpoints. */
 	public static function rest_endpoints( array $endpoints ): array {
+		// UO-59: Ali uses no AI/MCP connector (2026-10-24), so the MCP and Abilities routes are off for everyone.
+		foreach ( array_keys( $endpoints ) as $route ) {
+			if ( preg_match( '#^/(mcp|wp-abilities)(/|$)#', (string) $route ) ) {
+				unset( $endpoints[ $route ] );
+			}
+		}
 		if ( ! is_user_logged_in() ) {
 			foreach ( array_keys( $endpoints ) as $route ) {
 				if ( str_starts_with( (string) $route, '/wp/v2/comments' ) ) {
