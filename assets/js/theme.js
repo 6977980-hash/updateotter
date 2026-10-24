@@ -64,17 +64,55 @@ const i18n = ( () => {
 	}
 } )();
 
-function find( n, game ) {
-	return index.items
-		.filter( ( it ) => ! game || it.g === game )
+// CR-19: Indonesian words people type for English page names ("kode" for codes).
+const SYNONYMS = { kode: 'codes', telur: 'egg', hewan: 'pet', kalkulator: 'calculator', mutasi: 'mutations', panduan: 'guide', daftar: 'list' };
+const words = ( s ) => String( s ).toLowerCase().split( /[^a-z0-9]+/ ).filter( Boolean );
+const swap = ( q ) => String( q ).replace( /[^\s]+/g, ( w ) => SYNONYMS[ w.toLowerCase() ] || w );
+
+// Edit distance with swapped neighbours counting as one edit ("pheonix" -> "phoenix").
+function edits( a, b ) {
+	const d = Array.from( { length: a.length + 1 }, ( _, i ) => [ i, ...Array( b.length ).fill( 0 ) ] );
+	for ( let j = 1; j <= b.length; j++ ) {
+		d[ 0 ][ j ] = j;
+	}
+	for ( let i = 1; i <= a.length; i++ ) {
+		for ( let j = 1; j <= b.length; j++ ) {
+			const c = a[ i - 1 ] === b[ j - 1 ] ? 0 : 1;
+			d[ i ][ j ] = Math.min( d[ i - 1 ][ j ] + 1, d[ i ][ j - 1 ] + 1, d[ i - 1 ][ j - 1 ] + c );
+			if ( i > 1 && j > 1 && a[ i - 1 ] === b[ j - 2 ] && a[ i - 2 ] === b[ j - 1 ] ) {
+				d[ i ][ j ] = Math.min( d[ i ][ j ], d[ i - 2 ][ j - 2 ] + 1 );
+			}
+		}
+	}
+	return d[ a.length ][ b.length ];
+}
+
+// A word of 4+ letters one typo away (two from 7 letters) from a word in the name, or its start.
+function typo( q, names ) {
+	const qs = words( q ).filter( ( w ) => w.length >= 4 );
+	if ( ! qs.length ) {
+		return false;
+	}
+	const ws = names.flatMap( words );
+	return qs.every( ( w ) => {
+		const max = w.length >= 7 ? 2 : 1;
+		return ws.some( ( x ) => x.startsWith( w ) || Math.min( edits( w, x ), edits( w, x.slice( 0, w.length ) ) ) <= max );
+	} );
+}
+
+function find( q, game ) {
+	const n = norm( q );
+	const items = index.items.filter( ( it ) => ! game || it.g === game );
+	const hits = items
 		.map( ( it ) => {
 			const names = [ it.n, ...String( it.a || '' ).split( /[|,]/ ) ].map( norm );
 			const score = names.some( ( x ) => x.startsWith( n ) ) ? 0 : names.some( ( x ) => x.includes( n ) ) ? 1 : 2;
 			return [ score, it ];
 		} )
-		.filter( ( [ s ] ) => s < 2 )
-		.sort( ( a, b ) => a[ 0 ] - b[ 0 ] || a[ 1 ].n.localeCompare( b[ 1 ].n ) )
-		.slice( 0, 30 );
+		.filter( ( [ s ] ) => s < 2 );
+	// No direct match: allow small typos ("pheonix") before showing "No results".
+	const out = hits.length ? hits : items.filter( ( it ) => typo( q, [ it.n, ...String( it.a || '' ).split( /[|,]/ ) ] ) ).map( ( it ) => [ 2, it ] );
+	return out.sort( ( a, b ) => a[ 0 ] - b[ 0 ] || a[ 1 ].n.localeCompare( b[ 1 ].n ) ).slice( 0, 30 );
 }
 
 function render( q ) {
@@ -85,11 +123,11 @@ function render( q ) {
 	}
 	const only = $( '[data-only-game]', panel );
 	const game = only && only.checked ? panel.dataset.game : '';
-	const n = norm( q );
-	let hits = find( n, game );
+	const w = swap( q );
+	let hits = find( w, game );
 	// Nothing in this game: show the other games' results instead of a dead end (UO-31).
 	if ( ! hits.length && game ) {
-		hits = find( n, '' );
+		hits = find( w, '' );
 		if ( hits.length ) {
 			const p = document.createElement( 'p' );
 			p.className = 'rbx-note';

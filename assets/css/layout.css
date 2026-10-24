@@ -171,13 +171,13 @@
 	font-size: var(--fs-sm);
 	margin-block: var(--sp-2) 0;
 }
+/* CR-18: the trail wraps onto a second line on phones instead of squeezing crumbs into each other. */
 .breadcrumbs ol {
 	display: flex;
+	flex-wrap: wrap;
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	white-space: nowrap;
-	overflow: hidden;
 	min-height: 32px;
 	align-items: center;
 }
@@ -209,6 +209,10 @@
 	display: inline-flex;
 	align-items: center;
 	min-width: 0;
+	max-width: 100%;
+}
+.breadcrumbs li:not(:last-child) {
+	white-space: nowrap;
 }
 /* UO-52: breadcrumb links are 44 px tall tap targets. */
 .breadcrumbs a {

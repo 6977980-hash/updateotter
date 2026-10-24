@@ -186,6 +186,8 @@ RBX_DATA = {
     'Speed needed': 'Speed yang dibutuhkan',
     'Best pet (income, hatch time)': 'Pet terbaik (pendapatan, waktu menetas)',
     'Faster pick (half the hatch time or less)': 'Pilihan lebih cepat (separuh waktu menetas atau kurang)',
+    'None worth it': 'Tidak ada yang sepadan',
+    'A faster pick has to hatch in half the time or less and still earn at least a twentieth as much as the best pet. "None worth it" means no other pet in that zone passes both.': 'Pilihan lebih cepat harus menetas dalam separuh waktu atau kurang dan tetap menghasilkan setidaknya seperdua puluh dari pet terbaik. "Tidak ada yang sepadan" berarti tidak ada pet lain di zona itu yang memenuhi keduanya.',
     'Event: %s': 'Event: %s',
     'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.': 'Pet event terkuat selama zona event masih buka. Pet ini terbatas, jadi hilang dari game saat event selesai.',
     'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.': 'Pet terbaik artinya pendapatan dasar tertinggi menurut wiki komunitas. Waktu menetas juga dari wiki; pass 2x Growth Speed membuatnya jadi separuh.',
@@ -232,6 +234,7 @@ RBX_TOOLS = {
     'A number in this link could not be read, so the default is shown.': 'Ada angka di link ini yang tidak terbaca, jadi nilai bawaan yang ditampilkan.',
     'The weight effect is not known for this pick, so the result uses the base weight.': 'Efek berat untuk pilihan ini belum diketahui, jadi hasilnya memakai berat dasar.',
     'Type to find': 'Ketik untuk mencari',
+    'Nothing called "%s" in this list. Check the spelling or pick from the list below.': 'Tidak ada yang bernama "%s" di daftar ini. Cek ejaannya atau pilih dari daftar di bawah.',
 }
 
 UPDATEOTTER = {
@@ -275,6 +278,7 @@ UPDATEOTTER = {
     'Nothing here yet.': 'Belum ada isinya.',
     'Search results for "%s"': 'Hasil pencarian untuk "%s"',
     'No results for "%s".': 'Tidak ada hasil untuk "%s".',
+    'No results for "%1$s". Showing results for "%2$s".': 'Tidak ada hasil untuk "%1$s". Menampilkan hasil untuk "%2$s".',
     'Report a missing item': 'Laporkan item yang belum ada',
     'Search UpdateOtter': 'Cari di UpdateOtter',
     'Only %s': 'Hanya %s',

@@ -704,6 +704,7 @@ final class Sections {
 			}
 			$rows = '';
 			$top  = null;
+			$none = false;
 			foreach ( $groups[ $i ] as $bio ) {
 				$pets = Insights::zone_pets( $ds, (string) $bio['id'] );
 				if ( ! $pets ) {
@@ -727,7 +728,9 @@ final class Sections {
 				}
 				self::show( $ids );
 				$speed = (float) $bio['data']['unlock_speed_required'];
-				$rows .= '<tr><th scope="row">' . esc_html( (string) $bio['name'] ) . '</th><td class="rbx-num-cell">' . ( $speed > 0 ? Ui::number( $ds, $speed, 'abbr' ) : esc_html__( 'Open from the start', 'rbx-data' ) ) . '</td><td>' . $cell( $best ) . '</td><td>' . ( $fast ? $cell( $fast ) : '' ) . '</td></tr>';
+				$rows .= '<tr><th scope="row">' . esc_html( (string) $bio['name'] ) . '</th><td class="rbx-num-cell">' . ( $speed > 0 ? Ui::number( $ds, $speed, 'abbr' ) : esc_html__( 'Open from the start', 'rbx-data' ) ) . '</td><td>' . $cell( $best ) . '</td><td>' . ( $fast ? $cell( $fast ) : ( null !== $bh ? esc_html__( 'None worth it', 'rbx-data' ) : Ui::dash() ) ) . '</td></tr>';
+				// CR-08: say why a zone has no faster pick instead of leaving the cell blank.
+				$none = $none || ( ! $fast && null !== $bh );
 			}
 			if ( '' === $rows ) {
 				continue;
@@ -741,7 +744,9 @@ final class Sections {
 				Ui::link( $top['record'] )
 			);
 			$out .= '<section class="rbx-stage" aria-labelledby="stage-' . esc_attr( $slug ) . '"><h3 id="stage-' . esc_attr( $slug ) . '">' . esc_html( $label ) . '</h3><p>' . $lead . '</p>';
-			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( sprintf( /* translators: %s: stage */ __( 'Best pet of each %s zone', 'rbx-data' ), $label ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Zone', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Speed needed', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Best pet (income, hatch time)', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Faster pick (half the hatch time or less)', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div></section>';
+			$out .= '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( sprintf( /* translators: %s: stage */ __( 'Best pet of each %s zone', 'rbx-data' ), $label ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Zone', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Speed needed', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Best pet (income, hatch time)', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Faster pick (half the hatch time or less)', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>'
+				. ( $none ? '<p class="rbx-note">' . esc_html__( 'A faster pick has to hatch in half the time or less and still earn at least a twentieth as much as the best pet. "None worth it" means no other pet in that zone passes both.', 'rbx-data' ) . '</p>' : '' )
+				. '</section>';
 		}
 		// Event zones: the strongest pets whose eggs come from a limited zone.
 		foreach ( $ds->all( 'BIO', array( 'limited' ) ) as $bio ) {

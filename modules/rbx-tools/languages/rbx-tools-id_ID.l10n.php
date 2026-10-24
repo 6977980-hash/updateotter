@@ -16,6 +16,7 @@ return array( 'domain' => 'rbx-tools', 'language' => 'id_ID', 'plural-forms' => 
 	'None' => 'Tidak ada',
 	'Not available yet' => 'Belum tersedia',
 	'Not known yet for this pick' => 'Belum diketahui untuk pilihan ini',
+	'Nothing called "%s" in this list. Check the spelling or pick from the list below.' => 'Tidak ada yang bernama "%s" di daftar ini. Cek ejaannya atau pilih dari daftar di bawah.',
 	'Other' => 'Lainnya',
 	'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.' => 'Nilai pet berasal dari wiki komunitas. Rumusnya cocok dengan satu tes kami di game sejauh ini (Golden Chicken); cek lainnya sedang direncanakan.',
 	'Popular' => 'Populer',

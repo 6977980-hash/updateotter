@@ -192,5 +192,6 @@ export function formatExact( value, locale = 'en', ladder = null ) {
 	if ( Math.abs( value ) > MAX_SAFE ) {
 		return abbr( value, locale, ladderOf( ladder ) );
 	}
-	return fixed( value, 4, true, locale );
+	// CR-17: whole numbers from 1,000 up ("912,330,365", not "912,330,365.0784").
+	return fixed( value, Math.abs( value ) >= 1000 ? 0 : 4, true, locale );
 }

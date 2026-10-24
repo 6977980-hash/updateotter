@@ -23,10 +23,12 @@ export function createUI( root, cfg ) {
 		}
 		const list = document.createElement( 'datalist' );
 		list.id = c.id + '-list';
+		// CR-06: match trimmed and case-insensitive, so "phoenix " on a phone finds Phoenix.
+		const key = ( v ) => v.trim().toLowerCase();
 		const names = new Map();
 		for ( const o of c.options ) {
-			if ( o.value !== '' && ! names.has( o.textContent ) ) {
-				names.set( o.textContent, o.value );
+			if ( o.value !== '' && ! names.has( key( o.textContent ) ) ) {
+				names.set( key( o.textContent ), o.value );
 				const opt = document.createElement( 'option' );
 				opt.value = o.textContent;
 				list.append( opt );
@@ -40,16 +42,25 @@ export function createUI( root, cfg ) {
 		find.placeholder = t.find;
 		find.autocomplete = 'off';
 		find.spellcheck = false;
+		const miss = document.createElement( 'p' );
+		miss.className = 'rbx-calc__err';
+		miss.id = c.id + '-find-e';
+		miss.hidden = true;
+		find.setAttribute( 'aria-describedby', miss.id );
 		find.addEventListener( 'input', ( e ) => {
 			e.stopPropagation();
-			const slug = names.get( find.value );
+			const q = key( find.value );
+			const slug = names.get( q );
 			if ( slug !== undefined && c.value !== slug ) {
 				c.value = slug;
 				c.dispatchEvent( new Event( 'change', { bubbles: true } ) );
 			}
+			const none = q !== '' && slug === undefined && ! [ ...names.keys() ].some( ( n ) => n.includes( q ) );
+			miss.textContent = none ? t.noMatch.replace( '%s', find.value.trim() ) : '';
+			miss.hidden = ! none;
 		} );
 		find.addEventListener( 'change', ( e ) => e.stopPropagation() );
-		c.before( find, list );
+		c.before( find, list, miss );
 	}
 	let lastSpoken = 0;
 	let speakTimer = null;

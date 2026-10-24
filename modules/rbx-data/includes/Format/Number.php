@@ -74,7 +74,8 @@ final class Number {
 		if ( abs( $v ) > self::MAX_SAFE ) {
 			return self::abbr( $v, $locale, self::ladder( $ladder ) );
 		}
-		return self::fixed( $v, 4, true, $locale );
+		// CR-17: whole numbers from 1,000 up ("912,330,365", not "912,330,365.0784").
+		return self::fixed( $v, abs( $v ) >= 1000 ? 0 : 4, true, $locale );
 	}
 
 	/**

@@ -2508,7 +2508,7 @@
         "format": "exact",
         "locale": "en",
         "ladder": null,
-        "out": "1,234,567.891"
+        "out": "1,234,568"
     },
     {
         "value": 2.5,
