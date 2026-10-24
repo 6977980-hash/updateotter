@@ -180,6 +180,7 @@ function updateotter_footer_links(): array {
 			array( __( 'Terms of Use', 'updateotter' ), $p( 'terms' ) ),
 			array( __( 'Disclaimer', 'updateotter' ), $p( 'disclaimer' ) ),
 			array( __( 'Copyright & Takedown', 'updateotter' ), $p( 'dmca' ) ),
+			array( __( 'Image credits', 'updateotter' ), $p( 'image-credits' ) ),
 		),
 	);
 }

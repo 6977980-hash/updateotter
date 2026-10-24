@@ -237,21 +237,52 @@ final class Item {
 	/** Verified screenshots with caption and credit (DATA-22b block 5, POL-48e). */
 	private static function screenshots( Dataset $ds, array $rec ): string {
 		$items = '';
+		$own   = true;
 		foreach ( array_slice( $ds->media_for( (string) $rec['id'] ), 0, 4 ) as $m ) {
 			$d   = $m['data'];
 			$img = Media::img( (string) $d['file_name'], (string) $d['alt__en'], 800, 'rbx-shot', true );
 			if ( '' === $img ) {
 				continue;
 			}
-			$upd   = $ds->get( (string) ( $d['captured_in_update_id'] ?? '' ) );
-			$cap   = '' !== (string) ( $d['caption__en'] ?? '' ) ? esc_html( (string) $d['caption__en'] ) . ' ' : '';
-			$cap  .= 'own_screenshot' === $d['image_source'] ? esc_html__( '(in-game screenshot)', 'rbx-data' ) . ' ' : '';
-			/* translators: 1: credit, 2: date */
-			$cap  .= sprintf( esc_html__( 'Credit: %1$s, captured %2$s', 'rbx-data' ), esc_html( (string) $d['image_credit'] ), Ui::date( (string) $d['captured_on'] ) );
-			$cap  .= $upd ? ' (' . Ui::link( $upd ) . ')' : '';
+			$cap = '' !== (string) ( $d['caption__en'] ?? '' ) ? esc_html( (string) $d['caption__en'] ) . '. ' : '';
+			if ( 'wiki_cc' === $d['image_source'] ) {
+				$own   = false;
+				$cap  .= self::wiki_credit( $d );
+			} else {
+				$upd   = $ds->get( (string) ( $d['captured_in_update_id'] ?? '' ) );
+				$cap   = rtrim( $cap, '. ' ) . ( '' !== $cap ? ' ' : '' );
+				$cap  .= 'own_screenshot' === $d['image_source'] ? esc_html__( '(in-game screenshot)', 'rbx-data' ) . ' ' : '';
+				/* translators: 1: credit, 2: date */
+				$cap  .= sprintf( esc_html__( 'Credit: %1$s, captured %2$s', 'rbx-data' ), esc_html( (string) $d['image_credit'] ), Ui::date( (string) $d['captured_on'] ) );
+				$cap  .= $upd ? ' (' . Ui::link( $upd ) . ')' : '';
+			}
 			$items .= '<figure class="rbx-figure">' . $img . '<figcaption>' . $cap . '</figcaption></figure>';
 		}
-		return '' === $items ? '' : '<section class="rbx-shots">' . Ui::h2( __( 'Screenshots', 'rbx-data' ), 'screenshots' ) . $items . '</section>';
+		if ( '' === $items ) {
+			return '';
+		}
+		return '<section class="rbx-shots">' . Ui::h2( $own ? __( 'Screenshots', 'rbx-data' ) : __( 'Images', 'rbx-data' ), 'screenshots' ) . $items . '</section>';
+	}
+
+	/**
+	 * Credit line for a wiki image (Phase E, owner decision 2026-10-24): uploader, licence and a
+	 * link to the wiki file page, as CC BY-SA asks. Also used by the image credits page.
+	 *
+	 * @param array<string, mixed> $d Media row.
+	 */
+	public static function wiki_credit( array $d ): string {
+		$lic = (string) ( $d['license_note'] ?? '' );
+		$lic = str_starts_with( $lic, 'CC BY-SA 3.0' )
+			? '<a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license nofollow">CC BY-SA 3.0</a>' . esc_html( substr( $lic, strlen( 'CC BY-SA 3.0' ) ) )
+			: esc_html( $lic );
+		/* translators: 1: uploader and wiki, 2: licence, 3: link to the wiki file page, 4: upload date */
+		return sprintf(
+			esc_html__( 'Image: %1$s, %2$s, %3$s, uploaded %4$s. Not our screenshot.', 'rbx-data' ),
+			esc_html( (string) $d['image_credit'] ),
+			$lic,
+			'<a href="' . esc_url( (string) $d['source_url'] ) . '" rel="nofollow">' . esc_html__( 'wiki file page', 'rbx-data' ) . '</a>',
+			Ui::date( (string) $d['captured_on'] )
+		);
 	}
 
 	/** Where to get it (DATA-22b block 4); odds only from official/observed sources (CONT-22). */

@@ -848,8 +848,8 @@ final class Seo {
 	 * @return array<string, mixed>
 	 */
 	private static function og_image( ?Game $game ): array {
-		$url = home_url( '/og-default.jpg' );
-		if ( $game && function_exists( 'updateotter_root_file_exists' ) && updateotter_root_file_exists( 'og-' . $game->folder() . '.jpg' ) ) {
+		$url = self::page_og() ?? home_url( '/og-default.jpg' );
+		if ( $url === home_url( '/og-default.jpg' ) && $game && function_exists( 'updateotter_root_file_exists' ) && updateotter_root_file_exists( 'og-' . $game->folder() . '.jpg' ) ) {
 			$url = home_url( '/og-' . $game->folder() . '.jpg' );
 		}
 		return array(
@@ -858,6 +858,28 @@ final class Seo {
 			'width'  => 1200,
 			'height' => 630,
 		);
+	}
+
+	/**
+	 * This page's own share image (GR-04, Phase E): assets/og/{page path}.jpg, built by
+	 * tools/og/make.py for hubs, tools, lists, guides and items with a picture. Null when the page has none.
+	 */
+	private static function page_og(): ?string {
+		static $cache = array();
+		$url  = is_singular() ? (string) ( wp_get_canonical_url() ?: get_permalink() ) : '';
+		$path = trim( (string) wp_parse_url( $url, PHP_URL_PATH ), '/' );
+		$base = trim( (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ), '/' );
+		if ( '' !== $base && str_starts_with( $path, $base . '/' ) ) {
+			$path = substr( $path, strlen( $base ) + 1 );
+		}
+		if ( '' === $path || ! preg_match( '#^[a-z0-9/-]+$#', $path ) ) {
+			return null;
+		}
+		if ( ! array_key_exists( $path, $cache ) ) {
+			$file           = get_template_directory() . '/assets/og/' . $path . '.jpg';
+			$cache[ $path ] = is_readable( $file ) ? get_template_directory_uri() . '/assets/og/' . $path . '.jpg?ver=' . filemtime( $file ) : null;
+		}
+		return $cache[ $path ];
 	}
 
 	/** @return array<string, string> */
@@ -1107,6 +1129,11 @@ final class Seo {
 		if ( $game && function_exists( 'updateotter_root_file_exists' ) && updateotter_root_file_exists( 'og-' . $game->folder() . '.jpg' ) ) {
 			$img = home_url( '/og-' . $game->folder() . '.jpg' );
 			$alt = self::BRAND . ': ' . $game->name();
+		}
+		$own = self::page_og();
+		if ( null !== $own ) {
+			$img = $own;
+			$alt = $title;
 		}
 		$w = 1200;
 		$h = 630;

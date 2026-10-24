@@ -127,6 +127,12 @@
     "title": "Copyright and DMCA | UpdateOtter",
     "description": "How to send a copyright notice to UpdateOtter and what we do when we get one."
   },
+  "image-credits": {
+    "title": "Image Credits | UpdateOtter",
+    "description": "Every picture on UpdateOtter that is not our own, with its uploader, licence and a link to the source file.",
+    "_noindex": "A credits list, not a page for search (Phase E, 2026-10-24).",
+    "noindex": true
+  },
   "steal-an-egg/guides": {
     "title": "Steal an Egg Guides: Beginner Tips & How-Tos | UpdateOtter",
     "description": "Step-by-step Steal an Egg guides: how to start, which eggs to steal, how to get Speed, and how mutations and weight change a pet's income."
