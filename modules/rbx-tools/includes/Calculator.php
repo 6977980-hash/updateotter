@@ -114,6 +114,7 @@ final class Calculator {
 			'locale'   => \RBX\Data\Content\Lang::num(),
 			'ladder'   => $ladder,
 			'slices'   => $slices,
+			'beacon'   => rest_url( 'rbx/v1/beacon' ),
 			'inputs'   => $decls,
 			'fixed'    => array_keys( $fixed ),
 			'formulas' => $schema,

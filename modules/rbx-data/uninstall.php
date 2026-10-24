@@ -3,6 +3,9 @@
  * Uninstall: removes options, roles and caps. Tables and exports are dropped only
  * when RBX_DATA_UNINSTALL_DROP is true (ENG-27).
  *
+ * Only runs when rbx-data is installed as a separate plugin. Inside the theme (inc/modules.php)
+ * WordPress never calls it; switching themes stops the cron jobs instead (switch_theme hook, UO-66).
+ *
  * @package RBX\Data
  */
 
