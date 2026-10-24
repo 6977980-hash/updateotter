@@ -19,7 +19,8 @@ function init( root, ownsHash ) {
 	const cfg = JSON.parse( cfgEl.textContent );
 	const ui = createUI( root, cfg );
 	const notice = root.querySelector( '[data-rbx-notice]' );
-	const loadError = root.querySelector( '[data-rbx-load-error]' );
+	// Built here, not in the page HTML, so text-only readers never quote it as page content.
+	let loadError = null;
 	const actions = root.querySelector( '[data-rbx-actions]' );
 	const schema = { inputs: cfg.inputs, defaults: cfg.defaults };
 	let data = { records: cfg.seed.records || {}, params: cfg.seed.params || {} };
@@ -100,7 +101,9 @@ function init( root, ownsHash ) {
 	}
 
 	const fetchData = async () => {
-		loadError.hidden = true;
+		if ( loadError ) {
+			loadError.hidden = true;
+		}
 		try {
 			const slices = await loadSlices( Object.values( cfg.slices ) );
 			const merged = mergeSlices( data, slices );
@@ -115,7 +118,7 @@ function init( root, ownsHash ) {
 			loaded = true;
 			run( false );
 		} catch ( e ) {
-			loadError.hidden = false;
+			showLoadError();
 			window.dispatchEvent( new CustomEvent( 'rbx:data_load_error', { detail: { game: cfg.game, tool: cfg.tool } } ) );
 			// UO-58: a count only (no IP or cookie), so a broken deploy shows up on the server.
 			if ( cfg.beacon && navigator.sendBeacon ) {
@@ -123,7 +126,22 @@ function init( root, ownsHash ) {
 			}
 		}
 	};
-	root.querySelector( '[data-rbx-retry]' ).addEventListener( 'click', fetchData );
+	const showLoadError = () => {
+		if ( ! loadError ) {
+			loadError = document.createElement( 'div' );
+			loadError.className = 'rbx-calc__error';
+			const p = document.createElement( 'p' );
+			p.textContent = cfg.i18n.loadError;
+			const retry = document.createElement( 'button' );
+			retry.type = 'button';
+			retry.className = 'button';
+			retry.textContent = cfg.i18n.retry;
+			retry.addEventListener( 'click', fetchData );
+			loadError.append( p, retry );
+			( root.querySelector( '.rbx-calc__info' ) || root ).append( loadError );
+		}
+		loadError.hidden = false;
+	};
 	const start = () => fetchData();
 	if ( 'requestIdleCallback' in window ) {
 		requestIdleCallback( start, { timeout: 2000 } );

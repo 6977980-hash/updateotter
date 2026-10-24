@@ -127,12 +127,23 @@ final class Calculator {
 		);
 
 		// GR-25: the date of the data the tool uses (the oldest wiki copy date of its records), not a page field.
-		$asof = self::data_date( $ds, $decls );
-		$meta = '' !== $asof
-			/* translators: 1: date, 2: dataset version */
-			? sprintf( esc_html__( 'Wiki data as of %1$s (data version %2$s)', 'rbx-tools' ), '<time datetime="' . esc_attr( $asof ) . '">' . esc_html( wp_date( 'j M Y', strtotime( $asof . ' 12:00 UTC' ) ) ) . '</time>', esc_html( $manifest['version'] ) )
-			/* translators: %s: dataset version */
-			: sprintf( esc_html__( 'Data version %s', 'rbx-tools' ), esc_html( $manifest['version'] ) );
+		// The version carries the date our file was rebuilt, which can be later; say so, so the two dates don't look contradictory.
+		$asof  = self::data_date( $ds, $decls );
+		$built = preg_match( '/-(\d{4})(\d{2})(\d{2})-/', (string) $manifest['version'], $bm ) ? $bm[1] . '-' . $bm[2] . '-' . $bm[3] : '';
+		$meta  = '' !== $asof && '' !== $built
+			/* translators: 1: date, 2: dataset version, 3: date */
+			? sprintf( esc_html__( 'Wiki data as of %1$s. Our data file: version %2$s, rebuilt %3$s.', 'rbx-tools' ), self::time_tag( $asof ), esc_html( $manifest['version'] ), self::time_tag( $built ) )
+			: ( '' !== $asof
+				/* translators: 1: date, 2: dataset version */
+				? sprintf( esc_html__( 'Wiki data as of %1$s (data version %2$s)', 'rbx-tools' ), self::time_tag( $asof ), esc_html( $manifest['version'] ) )
+				/* translators: %s: dataset version */
+				: sprintf( esc_html__( 'Data version %s', 'rbx-tools' ), esc_html( $manifest['version'] ) ) );
+		// Date of our latest in-game formula check (a live test row with a screenshot), when there is one.
+		$checked = self::checked_date( $ds );
+		if ( '' !== $checked && ! $mini ) {
+			/* translators: %s: date */
+			$meta .= '</p><p class="rbx-calc__meta">' . sprintf( esc_html__( 'Formula last checked in game: %s', 'rbx-tools' ), self::time_tag( $checked ) );
+		}
 
 		// UO-41: the full calculator sits under the page H1 with the same words, so only the mini
 		// calculator on item pages gets its own heading.
@@ -150,7 +161,7 @@ final class Calculator {
 				? esc_html__( 'The values and the formula come from the community wiki. We have not tested them in the game ourselves yet.', 'rbx-tools' )
 				: esc_html__( 'Pet values come from the community wiki. The formula matched our one in-game test so far (Golden Chicken); more checks are planned.', 'rbx-tools' ) ) . '</p>' : '' )
 			. '<p class="rbx-calc__notice" role="alert" hidden data-rbx-notice></p>'
-			. '<div class="rbx-calc__error" hidden data-rbx-load-error><p>' . esc_html__( 'The live calculator could not load. The example result shown is correct for the default inputs.', 'rbx-tools' ) . '</p><button type="button" class="button" data-rbx-retry>' . esc_html__( 'Try again', 'rbx-tools' ) . '</button></div>'
+			// The load-error box is built by calculator.js only when loading fails, so text-only readers never see it.
 			. '</div>'
 			. '<p class="screen-reader-text" role="status" aria-live="polite" aria-atomic="true" data-rbx-live></p>';
 		if ( ! $mini ) {
@@ -313,6 +324,27 @@ final class Calculator {
 		return $dates ? (string) min( $dates ) : '';
 	}
 
+	/** The newest capture date of a live formula test that has an in-game screenshot, or ''. */
+	private static function checked_date( Dataset $ds ): string {
+		$dates = array();
+		foreach ( $ds->all( 'TST', null ) as $t ) {
+			$mid = (string) ( $t['data']['evidence_media_id'] ?? '' );
+			if ( 'live' !== ( $t['data']['status'] ?? '' ) || '' === $mid ) {
+				continue;
+			}
+			$m  = $ds->get( $mid );
+			$on = (string) ( $m['data']['captured_on'] ?? '' );
+			if ( preg_match( '/^\d{4}-\d{2}-\d{2}/', $on ) ) {
+				$dates[] = substr( $on, 0, 10 );
+			}
+		}
+		return $dates ? (string) max( $dates ) : '';
+	}
+
+	private static function time_tag( string $ymd ): string {
+		return '<time datetime="' . esc_attr( $ymd ) . '">' . esc_html( wp_date( 'j M Y', strtotime( $ymd . ' 12:00 UTC' ) ) ) . '</time>';
+	}
+
 	/**
 	 * "How the result is worked out" (GR-25): the plain-maths lines from the tool config
 	 * (`formula_plain__en`), so players never see the formula language.
@@ -350,6 +382,8 @@ final class Calculator {
 			'badNumber'   => __( 'A number in this link could not be read, so the default is shown.', 'rbx-tools' ),
 			'noWeight'    => __( 'The weight effect is not known for this pick, so the result uses the base weight.', 'rbx-tools' ),
 			'find'        => __( 'Type to find', 'rbx-tools' ),
+			'loadError'   => __( 'The live calculator could not load. The example result shown is correct for the default inputs.', 'rbx-tools' ),
+			'retry'       => __( 'Try again', 'rbx-tools' ),
 		);
 	}
 

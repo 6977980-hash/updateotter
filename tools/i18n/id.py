@@ -206,6 +206,8 @@ RBX_TOOLS = {
     'Suffix': 'Akhiran',
     'How the result is worked out': 'Cara hasilnya dihitung',
     'Wiki data as of %1$s (data version %2$s)': 'Data wiki per %1$s (versi data %2$s)',
+    'Wiki data as of %1$s. Our data file: version %2$s, rebuilt %3$s.': 'Data wiki per %1$s. File data kami: versi %2$s, dibuat ulang %3$s.',
+    'Formula last checked in game: %s': 'Rumus terakhir dicek di game: %s',
     'Data version %s': 'Versi data %s',
     'Not available yet': 'Belum tersedia',
     'Being re-verified': 'Sedang dicek ulang',
