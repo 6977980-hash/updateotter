@@ -13,6 +13,7 @@ namespace RBX\Data\Data;
 use RBX\Data\Config\Game;
 use RBX\Data\Formula\Parser;
 use RBX\Data\Formula\SyntaxError;
+use RBX\Data\Reports\Votes;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -320,6 +321,22 @@ final class Dataset {
 		if ( 'community' === $out['state'] && $out['mechanic_ok'] && ! empty( $out['source_url'] ) && ! str_contains( (string) wp_parse_url( (string) $out['source_url'], PHP_URL_HOST ), 'fandom.com' ) ) {
 			$out['label'] = __( 'Source: community site', 'rbx-data' );
 		}
+		// A wiki value that a second, independent source gives too, or that players confirmed in
+		// the game on the item page. "Checked in game" stays for our own in-game checks.
+		$out['sources'] = array();
+		$out['players'] = false;
+		if ( 'community' === $out['state'] && null !== $value ) {
+			$agree = $out['mechanic_ok'] ? self::agreeing_sources( $rows, $value ) : array();
+			if ( count( $agree ) >= 2 ) {
+				$out['sources'] = $agree;
+				$out['label']   = __( 'Matches 2 sources', 'rbx-data' );
+			}
+			// Players check the number itself, so this also replaces "Not tested in game yet".
+			if ( Votes::players_confirm( $this, $rec ) ) {
+				$out['label']   = __( 'Players confirm', 'rbx-data' );
+				$out['players'] = true;
+			}
+		}
 		$this->state_cache[ $ck ] = $out;
 		return $out;
 	}
@@ -330,21 +347,34 @@ final class Dataset {
 	 * @param array<int, array<string, mixed>> $rows PRV rows.
 	 */
 	private static function community_agrees( array $rows, mixed $value ): bool {
-		if ( null === $value ) {
-			return false;
+		return count( self::agreeing_sources( $rows, $value ) ) >= 2;
+	}
+
+	/**
+	 * PRV rows that give the same number, one per site (two pages of one wiki are one source).
+	 *
+	 * @param array<int, array<string, mixed>> $rows PRV rows.
+	 * @return array<int, array{source_type: ?string, source_url: string}>
+	 */
+	public static function agreeing_sources( array $rows, mixed $value ): array {
+		if ( null === $value || ! is_numeric( $value ) ) {
+			return array();
 		}
-		$domains = array();
+		$sites = array();
 		foreach ( $rows as $r ) {
 			if ( ! is_numeric( $r['value'] ?? null ) || abs( (float) $r['value'] - (float) $value ) > 1e-12 * max( 1, abs( (float) $value ) ) ) {
 				continue;
 			}
 			$host = strtolower( (string) wp_parse_url( (string) ( $r['source_url'] ?? '' ), PHP_URL_HOST ) );
-			$host = preg_replace( '/^www\./', '', $host ) ?? $host;
-			if ( '' !== $host ) {
-				$domains[ $host ] = true;
+			$site = implode( '.', array_slice( explode( '.', $host ), -2 ) );
+			if ( '' !== $site && ! isset( $sites[ $site ] ) ) {
+				$sites[ $site ] = array(
+					'source_type' => $r['source_type'] ?? null,
+					'source_url'  => (string) $r['source_url'],
+				);
 			}
 		}
-		return count( $domains ) >= 2;
+		return array_values( $sites );
 	}
 
 	public static function typed( string $v, string $type ): mixed {
