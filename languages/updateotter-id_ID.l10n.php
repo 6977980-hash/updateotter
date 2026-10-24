@@ -22,6 +22,7 @@ return array( 'domain' => 'updateotter', 'language' => 'id_ID', 'plural-forms' =
 	'Games' => 'Game',
 	'Go to the %s hub' => 'Ke halaman utama %s',
 	'Home' => 'Beranda',
+	'Image credits' => 'Kredit gambar',
 	'Last updated' => 'Terakhir diperbarui',
 	'Legal' => 'Legal',
 	'Light' => 'Terang',

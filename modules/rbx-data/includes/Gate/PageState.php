@@ -283,7 +283,8 @@ final class PageState {
 		}
 		foreach ( $this->ds->media_for( (string) $rec['id'] ) as $m ) {
 			$md = $m['data'];
-			if ( true === ( $md['contains_usernames'] ?? true ) || empty( $md['image_source'] ) || empty( $md['image_credit'] ) ) {
+			// A wiki picture (Phase E) is not first-hand evidence, so it never counts here (GR-01).
+			if ( true === ( $md['contains_usernames'] ?? true ) || empty( $md['image_source'] ) || 'wiki_cc' === $md['image_source'] || empty( $md['image_credit'] ) ) {
 				continue;
 			}
 			if ( (string) $md['captured_on'] >= $newest ) {

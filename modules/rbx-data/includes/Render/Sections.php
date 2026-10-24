@@ -31,7 +31,7 @@ final class Sections {
 	/** Rows a list renders in the page; the rest load on demand (GR-24). */
 	public const LIST_ROWS = 100;
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'latest_update', 'top_tier', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -59,7 +59,7 @@ final class Sections {
 	 */
 	public static function render( array $a ): string {
 		$section = (string) ( $a['section'] ?? '' );
-		if ( 'home_games' === $section || 'home_latest' === $section || 'home_guides' === $section || 'corrections' === $section || 'report_form' === $section ) {
+		if ( 'home_games' === $section || 'home_latest' === $section || 'home_guides' === $section || 'corrections' === $section || 'image_credits' === $section || 'report_form' === $section ) {
 			$game = null;
 		} else {
 			$game = Loader::game( (string) ( $a['game'] ?? '' ) );
@@ -114,6 +114,8 @@ final class Sections {
 					return self::page_changes( $game );
 				case 'corrections':
 					return self::corrections();
+				case 'image_credits':
+					return self::image_credits();
 				case 'report_form':
 					return Report::form();
 				case 'home_games':
@@ -944,6 +946,36 @@ final class Sections {
 			$tr .= '<tr><td>' . Ui::date( substr( (string) $r['changed_at'], 0, 10 ) ) . '</td><th scope="row">' . ( $rec ? Ui::link( $rec ) : esc_html( (string) $r['record_id'] ) ) . '</th><td>' . esc_html( $rec ? $game->label( (string) $rec['entity'], (string) $r['field'] ) : (string) $r['field'] ) . '</td><td>' . Ui::raw( $ds, $def, self::decode( $r['old_value'] ), false ) . '</td><td>' . Ui::raw( $ds, $def, self::decode( $r['new_value'] ), false ) . '</td><td>' . esc_html( $game->name() ) . '</td></tr>';
 		}
 		return '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><caption>' . esc_html__( 'Corrections', 'rbx-data' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Date', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Item', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Field', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Old', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'New', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Game', 'rbx-data' ) . '</th></tr></thead><tbody>' . $tr . '</tbody></table></div>';
+	}
+
+	/**
+	 * Every wiki image the site shows, with its credit (Phase E, owner decision 2026-10-24). List
+	 * icons are too small for a caption, so this page carries their CC BY-SA attribution.
+	 */
+	private static function image_credits(): string {
+		$li = '';
+		foreach ( Loader::games() as $game ) {
+			$ds = self::ds( $game );
+			foreach ( $ds->all( 'MED', array( 'live' ) ) as $m ) {
+				$d = $m['data'];
+				if ( 'wiki_cc' !== ( $d['image_source'] ?? '' ) ) {
+					continue;
+				}
+				$what = array();
+				foreach ( (array) ( $d['depicts_record_ids'] ?? array() ) as $rid ) {
+					$rec = $ds->get( (string) $rid );
+					if ( $rec ) {
+						$what[] = Ui::link( $rec );
+					}
+				}
+				$img = Media::img( (string) $d['file_name'], (string) $d['alt__en'], 48, 'rbx-icon-img', true );
+				$li .= '<li>' . $img . '<span><strong>' . ( $what ? implode( ', ', $what ) : esc_html( (string) $d['file_name'] ) ) . '</strong> (' . esc_html( $game->name() ) . '). ' . Item::wiki_credit( $d ) . '</span></li>';
+			}
+		}
+		if ( '' === $li ) {
+			return '<p class="rbx-empty">' . esc_html__( 'No wiki images are in use.', 'rbx-data' ) . '</p>';
+		}
+		return '<ul class="rbx-credits">' . $li . '</ul>';
 	}
 
 	private static function decode( mixed $stored ): mixed {

@@ -163,7 +163,8 @@ a.rbx-chip {
 .rbx-icon-img {
 	border-radius: var(--r-md);
 	background: var(--surface);
-	object-fit: cover;
+	/* Phase E: wiki pictures are not square; show the whole pet, not a crop. */
+	object-fit: contain;
 }
 .rbx-summary {
 	font-size: var(--fs-lg);
@@ -632,6 +633,21 @@ a.rbx-chip {
 }
 .rbx-figure img {
 	border-radius: var(--r-md);
+}
+.rbx-credits {
+	list-style: none;
+	padding: 0;
+}
+.rbx-credits li {
+	display: flex;
+	gap: var(--sp-3);
+	align-items: flex-start;
+	margin-block-end: var(--sp-3);
+}
+.rbx-credits .rbx-icon-img {
+	flex: none;
+	width: 48px;
+	height: 48px;
 }
 .rbx-hp {
 	position: absolute;

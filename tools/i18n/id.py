@@ -255,6 +255,7 @@ UPDATEOTTER = {
     'Terms of Use': 'Ketentuan Penggunaan',
     'Disclaimer': 'Penafian',
     'Copyright & Takedown': 'Hak Cipta & Penghapusan',
+    'Image credits': 'Kredit gambar',
     'Last updated': 'Terakhir diperbarui',
     'Page not found': 'Halaman tidak ditemukan',
     'This page does not exist or was moved. Try a search or pick a game.': 'Halaman ini tidak ada atau sudah dipindah. Coba cari atau pilih game.',

@@ -296,6 +296,11 @@ final class Validator {
 			if ( in_array( $d['image_source'] ?? '', array( 'licensed', 'press_kit' ), true ) && empty( $d['license_note'] ) ) {
 				$this->issues->error( 'media_license', __( 'Licensed or press-kit images need license_note (POL-48).', 'rbx-data' ), $this->tab( $id ), $this->row( $id ), $id, 'license_note' );
 			}
+			// Phase E (owner decision 2026-10-24): a wiki image is used only when its file page carries a
+			// licence tag, and its credit names the licence and links that file page.
+			if ( 'wiki_cc' === ( $d['image_source'] ?? '' ) && ( empty( $d['license_note'] ) || empty( $d['source_url'] ) ) ) {
+				$this->issues->error( 'media_license', __( 'Wiki images need license_note and source_url (the wiki file page).', 'rbx-data' ), $this->tab( $id ), $this->row( $id ), $id, empty( $d['license_note'] ) ? 'license_note' : 'source_url' );
+			}
 		}
 	}
 
