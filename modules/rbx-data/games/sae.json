@@ -105,6 +105,7 @@
         "is_mountable": { "type": "bool", "label__en": "Can be ridden", "requires_mechanics": ["mounts"] },
         "tier_list_rank": { "type": "enum", "enum": ["S", "A", "B", "C", "D"], "label__en": "Tier", "opinion": true },
         "tier_rationale__en": { "type": "text", "label__en": "Why this tier", "opinion": true },
+        "tier_rationale__id": { "type": "text", "label__en": "Why this tier (Indonesian)", "opinion": true, "internal": true },
         "notes__en": { "type": "text", "label__en": "Our notes", "editorial": true },
         "notes_reviewed_by": { "type": "string", "label__en": "Notes reviewed by", "internal": true },
         "notes_reviewed_on": { "type": "date", "label__en": "Notes reviewed on", "internal": true }
