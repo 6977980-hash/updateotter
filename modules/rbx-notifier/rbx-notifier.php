@@ -37,6 +37,7 @@ spl_autoload_register(
 	}
 );
 
+// Fire only for a plugin install; the theme copy uses the init/switch_theme hooks in inc/modules.php.
 register_activation_hook( __FILE__, array( 'RBX\\Notifier\\Plugin', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'RBX\\Notifier\\Plugin', 'deactivate' ) );
 

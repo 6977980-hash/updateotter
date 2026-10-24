@@ -117,6 +117,10 @@ function init( root, ownsHash ) {
 		} catch ( e ) {
 			loadError.hidden = false;
 			window.dispatchEvent( new CustomEvent( 'rbx:data_load_error', { detail: { game: cfg.game, tool: cfg.tool } } ) );
+			// UO-58: a count only (no IP or cookie), so a broken deploy shows up on the server.
+			if ( cfg.beacon && navigator.sendBeacon ) {
+				navigator.sendBeacon( cfg.beacon, new URLSearchParams( { k: 'calc_load', g: cfg.game } ) );
+			}
 		}
 	};
 	root.querySelector( '[data-rbx-retry]' ).addEventListener( 'click', fetchData );

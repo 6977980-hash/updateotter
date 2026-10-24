@@ -78,3 +78,25 @@ for ( const name of readdirSync( join( dataDir, 'tests', 'fixtures' ) ).filter( 
 		}
 	} );
 }
+
+// UO-67: every GAG2 size exponent in the data scales value as (weight / base weight) ^ exponent.
+// The expected value is worked out here by hand, not by the formula engine.
+test( 'GAG2 size exponents', () => {
+	const f = load( 'gag2-real.json' );
+	const fm = f.formulas[ 'GAG2-FRM-0001' ];
+	const ast = compile( fm.expr, fm.decl );
+	const seen = new Set();
+	for ( const [ id, p ] of Object.entries( f.data.records.PLT ) ) {
+		const e = p.size_exponent?.v;
+		if ( e === undefined || seen.has( e ) || ! p.base_value?.v || ! p.base_weight_kg?.v ) {
+			continue;
+		}
+		seen.add( e );
+		for ( const ratio of [ 2, 3.5 ] ) {
+			const want = Math.floor( p.base_value.v * Math.pow( ratio, e ) );
+			const got = evaluate( ast, { plant: id, weight: p.base_weight_kg.v * ratio, count: 1 }, f.data );
+			assert.ok( Math.abs( got - want ) <= 1, `${ p.n } exponent ${ e } at ${ ratio }x: ${ got } vs ${ want }` );
+		}
+	}
+	assert.ok( seen.size >= 3, `expected at least 3 exponents, saw ${ [ ...seen ] }` );
+} );
