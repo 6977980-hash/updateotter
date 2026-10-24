@@ -8,5 +8,6 @@
   "indexnow": "2026-10-23-first-ping",
   "search_index": "2026-10-24-google-review-d",
   "gate": "2026-10-24-gr15-scope",
-  "db_error": "2026-10-24-gr02-503"
+  "db_error": "2026-10-24-gr02-503",
+  "php_error": "2026-10-24-cr05-503"
 }
