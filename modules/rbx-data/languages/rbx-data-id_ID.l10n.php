@@ -12,6 +12,7 @@ return array( 'domain' => 'rbx-data', 'language' => 'id_ID', 'plural-forms' => '
 	'A faster pick has to hatch in half the time or less and still earn at least a twentieth as much as the best pet. "None worth it" means no other pet in that zone passes both.' => 'Pilihan lebih cepat harus menetas dalam separuh waktu atau kurang dan tetap menghasilkan setidaknya seperdua puluh dari pet terbaik. "Tidak ada yang sepadan" berarti tidak ada pet lain di zona itu yang memenuhi keduanya.',
 	'Active codes' => 'Kode aktif',
 	'All updates and changes' => 'Semua update dan perubahan',
+	'All values in this table:' => 'Semua nilai di tabel ini:',
 	'Back to top' => 'Kembali ke atas',
 	'Best pet (income, hatch time)' => 'Pet terbaik (pendapatan, waktu menetas)',
 	'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.' => 'Pet terbaik artinya pendapatan dasar tertinggi menurut wiki komunitas. Waktu menetas juga dari wiki; pass 2x Growth Speed membuatnya jadi separuh.',

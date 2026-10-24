@@ -17,7 +17,7 @@ document.addEventListener( 'submit', async ( ev ) => {
 	// Time the page was open, from the page's own timer (the device clock can be wrong).
 	body.set( 'e', String( Math.round( performance.now() - shownAt ) ) );
 	if ( 'no' === answer ) {
-		const report = form.closest( '.rbx-card' )?.querySelector( '[data-rbx-report]' );
+		const report = form.parentElement.querySelector( '[data-rbx-report]' );
 		if ( report ) {
 			report.click();
 		}

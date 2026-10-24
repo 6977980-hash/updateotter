@@ -878,11 +878,40 @@ final class Sections {
 			return '';
 		}
 		self::show( array_keys( $recs ) );
-		$rows = '';
+		$common = self::shared_chip( $ds, $recs, 'unlock_speed_required' );
+		$rows   = '';
 		foreach ( $recs as $r ) {
-			$rows .= '<tr id="biome-' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '">' . ( empty( $r['data']['unlock_requirement_text__en'] ) ? '' : Ui::text( Lang::t( (string) $r['data']['unlock_requirement_text__en'] ) ) ) . '</td><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_speed_required' ) ) . '">' . Ui::value( $ds, $r, 'unlock_speed_required' ) . '</td></tr>';
+			$rows .= '<tr id="biome-' . esc_attr( (string) $r['slug'] ) . '"><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '">' . ( empty( $r['data']['unlock_requirement_text__en'] ) ? '' : Ui::text( Lang::t( (string) $r['data']['unlock_requirement_text__en'] ) ) ) . '</td><td data-label="' . esc_attr( $game->label( 'BIO', 'unlock_speed_required' ) ) . '">' . ( '' !== $common ? Ui::cell( $ds, $r, 'unlock_speed_required' ) : Ui::value( $ds, $r, 'unlock_speed_required' ) ) . '</td></tr>';
 		}
-		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'BIO', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Biome', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'BIO', 'unlock_speed_required' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		$list = array_values( $recs );
+		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'BIO', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Biome', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'BIO', 'unlock_requirement_text__en' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'BIO', 'unlock_speed_required' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>'
+			. ( '' !== $common ? '<p class="rbx-stats__src">' . esc_html__( 'All values in this table:', 'rbx-data' ) . ' ' . $common . '</p>' : '' )
+			. '<div class="rbx-table-check">' . Ui::vote_box( $game, $list[0], array_slice( $list, 1 ) ) . '<div class="rbx-card__actions">' . Ui::report_button( $game ) . '</div></div>';
+	}
+
+	/**
+	 * One label for a table column when every row with a value has the same one (UO-69 for
+	 * tables): the table says it once below, with the pages the rows come from, instead of on
+	 * every row. '' when the rows differ, so each row keeps its own chips.
+	 *
+	 * @param array<string, array<string, mixed>> $recs Rows.
+	 */
+	private static function shared_chip( Dataset $ds, array $recs, string $field ): string {
+		$chips = array();
+		foreach ( $recs as $r ) {
+			$st = $ds->field_state( $r, $field );
+			if ( 'disputed' === $st['state'] ) {
+				return '';
+			}
+			if ( 'unknown' !== $st['state'] && null !== $st['value'] ) {
+				$chips[ Ui::chip( array_merge( $st, array( 'source_type' => null, 'source_url' => null, 'evidence_media_id' => null, 'sources' => array() ) ), $ds ) ] = true;
+			}
+		}
+		if ( count( $recs ) < 2 || 1 !== count( $chips ) ) {
+			return '';
+		}
+		$src = self::sources_line( $ds->game(), $recs );
+		return (string) array_key_first( $chips ) . ( '' !== $src ? ' ' . preg_replace( '#^<p class="rbx-sources">(.*)</p>$#s', '$1', $src ) : '' );
 	}
 
 	private static function mounts( Game $game ): string {
@@ -937,11 +966,13 @@ final class Sections {
 			return '<p class="rbx-note">' . esc_html__( 'No game passes are listed yet.', 'rbx-data' ) . '</p>';
 		}
 		self::show( array_keys( $recs ) );
-		$rows = '';
+		$common = self::shared_chip( $ds, $recs, 'price_robux' );
+		$rows   = '';
 		foreach ( $recs as $r ) {
-			$rows .= '<tr><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'GPS', 'price_robux' ) ) . '">' . Ui::value( $ds, $r, 'price_robux' ) . '</td><td data-label="' . esc_attr( $game->label( 'GPS', 'effect_text__en' ) ) . '">' . ( empty( $r['data']['effect_text__en'] ) ? Ui::dash() : Ui::text( Lang::t( (string) $r['data']['effect_text__en'] ) ) ) . '</td></tr>';
+			$rows .= '<tr><th scope="row">' . esc_html( (string) $r['name'] ) . '</th><td data-label="' . esc_attr( $game->label( 'GPS', 'price_robux' ) ) . '">' . ( '' !== $common ? Ui::cell( $ds, $r, 'price_robux' ) : Ui::value( $ds, $r, 'price_robux' ) ) . '</td><td data-label="' . esc_attr( $game->label( 'GPS', 'effect_text__en' ) ) . '">' . ( empty( $r['data']['effect_text__en'] ) ? Ui::dash() : Ui::text( Lang::t( (string) $r['data']['effect_text__en'] ) ) ) . '</td></tr>';
 		}
-		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'GPS', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Game pass', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'GPS', 'price_robux' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'GPS', 'effect_text__en' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		return '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $game->entity_label( 'GPS', true ) ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Game pass', 'rbx-data' ) . '</th><th scope="col">' . esc_html( $game->label( 'GPS', 'price_robux' ) ) . '</th><th scope="col">' . esc_html( $game->label( 'GPS', 'effect_text__en' ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>'
+			. ( '' !== $common ? '<p class="rbx-stats__src">' . esc_html__( 'All values in this table:', 'rbx-data' ) . ' ' . $common . '</p>' : '' );
 	}
 
 	private static function latest_update( Game $game ): string {

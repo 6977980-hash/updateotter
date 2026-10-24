@@ -437,16 +437,19 @@ final class Ui {
 
 	/**
 	 * "Do these numbers match your game? Yes / No" on an item card. Yes counts towards "Players
-	 * confirm"; No also opens the report form. Without JS both post to admin-post.php.
+	 * confirm"; No also opens the report form. Without JS both post to admin-post.php. A table
+	 * (biomes) passes its other rows in $more, and one answer counts for every row.
 	 *
-	 * @param array<string, mixed> $rec Record.
+	 * @param array<string, mixed>             $rec  Record.
+	 * @param array<int, array<string, mixed>> $more More records the same answer is about.
 	 */
-	public static function vote_box( Game $game, array $rec ): string {
+	public static function vote_box( Game $game, array $rec, array $more = array() ): string {
+		$ids = implode( ',', array_merge( array( (string) $rec['id'] ), array_map( static fn( $r ) => (string) $r['id'], $more ) ) );
 		$p   = 'rbx-vote-' . strtolower( (string) $rec['id'] );
 		$out = '<form class="rbx-vote" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" data-endpoint="' . esc_url( rest_url( 'rbx/v1/vote' ) ) . '" data-thanks="' . esc_attr( \RBX\Data\Reports\Votes::thanks() ) . '" data-error="' . esc_attr__( 'Could not send. Check your connection and try again.', 'rbx-data' ) . '" aria-labelledby="' . esc_attr( $p ) . '">'
 			. '<input type="hidden" name="action" value="rbx_vote">'
 			. '<input type="hidden" name="game" value="' . esc_attr( $game->key() ) . '">'
-			. '<input type="hidden" name="record_id" value="' . esc_attr( (string) $rec['id'] ) . '">'
+			. '<input type="hidden" name="record_id" value="' . esc_attr( $ids ) . '">'
 			. '<input type="hidden" name="page_url" value="' . esc_attr( (string) get_permalink() ) . '">'
 			. '<input type="hidden" name="t" value="' . esc_attr( (string) ( time() * 1000 ) ) . '">'
 			. '<p class="rbx-hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'

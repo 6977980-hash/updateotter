@@ -162,18 +162,23 @@ final class Votes {
 		}
 		$answer = (string) ( $p['answer'] ?? '' );
 		$game   = Loader::game( sanitize_key( (string) ( $p['game'] ?? '' ) ) );
-		$rid    = (string) ( $p['record_id'] ?? '' );
-		if ( ! in_array( $answer, array( 'yes', 'no' ), true ) || ! $game || ! preg_match( '/^[A-Z][A-Z0-9]{1,4}-[A-Z]{3}-\d{4,6}$/', $rid ) ) {
+		// One item, or every row of a table (biomes): "A,B,C", at most 40 ids.
+		$rids = array_slice( array_values( array_unique( array_filter( array_map( 'trim', explode( ',', (string) ( $p['record_id'] ?? '' ) ) ) ) ) ), 0, 40 );
+		if ( ! in_array( $answer, array( 'yes', 'no' ), true ) || ! $game || ! $rids ) {
 			return $spam;
 		}
-		$ds  = Repository::dataset( $game );
-		$rec = $ds->get( $rid );
-		if ( ! $rec || ! in_array( (string) ( $rec['status'] ?? '' ), array( 'live', 'limited' ), true ) ) {
-			return $spam;
+		$ds   = Repository::dataset( $game );
+		$recs = array();
+		foreach ( $rids as $rid ) {
+			$rec = preg_match( '/^[A-Z][A-Z0-9]{1,4}-[A-Z]{3}-\d{4,6}$/', $rid ) ? $ds->get( $rid ) : null;
+			if ( ! $rec || ! in_array( (string) ( $rec['status'] ?? '' ), array( 'live', 'limited' ), true ) ) {
+				return $spam;
+			}
+			$recs[] = $rec;
 		}
-		$who = self::visitor( $rid );
+		$who = self::visitor( implode( ',', $rids ) );
 		if ( get_transient( $who ) ) {
-			// Already answered this item today: say thanks, count nothing.
+			// Already answered this today: say thanks, count nothing.
 			return true;
 		}
 		if ( ! self::rate_ok() ) {
@@ -181,7 +186,7 @@ final class Votes {
 		}
 		set_transient( $who, 1, DAY_IN_SECONDS );
 		try {
-			self::add( $ds, $rec, 'yes' === $answer );
+			self::add( $ds, $recs, 'yes' === $answer );
 		} catch ( \Throwable $e ) {
 			ErrorLog::add( 'vote', $e->getMessage() );
 			return $spam;
@@ -189,34 +194,39 @@ final class Votes {
 		return true;
 	}
 
-	/** @param array<string, mixed> $rec Record. */
-	private static function add( Dataset $ds, array $rec, bool $yes ): void {
-		$opt    = 'rbx_votes_' . $ds->game()->key();
-		$all    = (array) get_option( $opt, array() );
-		$key    = self::value_key( $ds, $rec );
-		$c      = (array) ( $all[ $rec['id'] ] ?? array() );
-		$before = self::confirms( $c, $key );
-		if ( ( $c['k'] ?? '' ) !== $key ) {
-			$c = array(
-				'k' => $key,
-				'y' => 0,
-				'n' => 0,
-				'd' => array(),
-			);
+	/** @param array<int, array<string, mixed>> $recs Records the answer is about. */
+	private static function add( Dataset $ds, array $recs, bool $yes ): void {
+		$opt     = 'rbx_votes_' . $ds->game()->key();
+		$all     = (array) get_option( $opt, array() );
+		$flipped = false;
+		foreach ( $recs as $rec ) {
+			$key    = self::value_key( $ds, $rec );
+			$c      = (array) ( $all[ $rec['id'] ] ?? array() );
+			$before = self::confirms( $c, $key );
+			if ( ( $c['k'] ?? '' ) !== $key ) {
+				$c = array(
+					'k' => $key,
+					'y' => 0,
+					'n' => 0,
+					'd' => array(),
+				);
+			}
+			if ( $yes ) {
+				++$c['y'];
+				// Only the number of days matters; keep the last few so the option stays small.
+				$c['d'] = array_slice( array_values( array_unique( array_merge( (array) $c['d'], array( gmdate( 'Y-m-d' ) ) ) ) ), -self::MIN_DAYS * 2 );
+			} else {
+				++$c['n'];
+			}
+			$all[ $rec['id'] ] = $c;
+			if ( $before !== self::confirms( $c, $key ) ) {
+				$flipped = true;
+				do_action( 'litespeed_purge', 'rbx-rec-' . strtolower( (string) $rec['id'] ) );
+			}
 		}
-		if ( $yes ) {
-			++$c['y'];
-			$day = gmdate( 'Y-m-d' );
-			// Only the number of days matters; keep the last few so the option stays small.
-			$c['d'] = array_slice( array_values( array_unique( array_merge( (array) $c['d'], array( $day ) ) ) ), -self::MIN_DAYS * 2 );
-		} else {
-			++$c['n'];
-		}
-		$all[ $rec['id'] ] = $c;
 		update_option( $opt, $all, false );
 		self::$counts[ $ds->game()->key() ] = $all;
-		if ( $before !== self::confirms( $c, $key ) ) {
-			do_action( 'litespeed_purge', 'rbx-rec-' . strtolower( (string) $rec['id'] ) );
+		if ( $flipped ) {
 			do_action( 'litespeed_purge', 'rbx-' . $ds->game()->key() );
 		}
 	}
