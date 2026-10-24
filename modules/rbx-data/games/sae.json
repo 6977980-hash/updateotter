@@ -23,9 +23,10 @@
     { "label__en": "End game" }
   ],
   "notifier": { "update_windows": [] },
-  "menu_order": ["calculator", "pets", "eggs", "mutations", "codes", "updates", "tier-list"],
+  "menu_order": ["calculator", "speed-calculator", "pets", "eggs", "mutations", "codes", "updates", "tier-list"],
   "sections": {
     "calculator": { "label__en": "Calculator", "type": "tool", "tool": "calculator" },
+    "speed-calculator": { "label__en": "Speed calculator", "type": "page" },
     "pets": { "label__en": "Pets", "type": "list", "entity": "PET" },
     "eggs": { "label__en": "Eggs", "type": "list", "entity": "EGG" },
     "mutations": { "label__en": "Mutations", "type": "mutations", "entity": "MUT" },
@@ -248,6 +249,7 @@
       "key": "calculator",
       "path": "calculator",
       "label__en": "Steal an Egg Calculator",
+      "formula_plain__en": ["Income per second = the pet's base income × the mutation multiplier × the weight bonus × how many pets.", "No mutation counts as ×1, and an empty weight counts as the pet's base weight (bonus ×1).", "Weight bonus = (your weight ÷ the pet's base weight) to the power of 37/60. Above 125 times the base weight the bonus grows more slowly, to the power of 2/5."],
       "slices": ["core", "pets"],
       "inputs": [
         { "key": "pet", "type": "ref", "target": "PET", "label__en": "Pet", "group_by": "rarity_id" },

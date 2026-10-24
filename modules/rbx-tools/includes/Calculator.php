@@ -126,16 +126,13 @@ final class Calculator {
 			'i18n'     => self::strings(),
 		);
 
-		$page_lv = (string) get_post_meta( (int) get_the_ID(), '_rbx_page_last_verified', true );
-		$meta    = sprintf(
-			/* translators: 1: dataset version, 2: "data from the community wiki, <date>" or "no data date yet" */
-			esc_html__( 'Data version %1$s, %2$s', 'rbx-tools' ),
-			esc_html( $manifest['version'] ),
-			'' !== $page_lv
-				/* translators: %s: date */
-				? sprintf( esc_html__( 'data from the community wiki, %s', 'rbx-tools' ), '<time datetime="' . esc_attr( $page_lv ) . '">' . esc_html( wp_date( 'j M Y', strtotime( $page_lv . ' 12:00 UTC' ) ) ) . '</time>' )
-				: esc_html__( 'no data date yet', 'rbx-tools' )
-		);
+		// GR-25: the date of the data the tool uses (the oldest wiki copy date of its records), not a page field.
+		$asof = self::data_date( $ds, $decls );
+		$meta = '' !== $asof
+			/* translators: 1: date, 2: dataset version */
+			? sprintf( esc_html__( 'Wiki data as of %1$s (data version %2$s)', 'rbx-tools' ), '<time datetime="' . esc_attr( $asof ) . '">' . esc_html( wp_date( 'j M Y', strtotime( $asof . ' 12:00 UTC' ) ) ) . '</time>', esc_html( $manifest['version'] ) )
+			/* translators: %s: dataset version */
+			: sprintf( esc_html__( 'Data version %s', 'rbx-tools' ), esc_html( $manifest['version'] ) );
 
 		// UO-41: the full calculator sits under the page H1 with the same words, so only the mini
 		// calculator on item pages gets its own heading.
@@ -156,7 +153,7 @@ final class Calculator {
 			. '<p class="screen-reader-text" role="status" aria-live="polite" aria-atomic="true" data-rbx-live></p>';
 		if ( ! $mini ) {
 			$out .= '<div class="rbx-calc__actions" hidden data-rbx-actions><button type="button" class="button" data-rbx-copy>' . esc_html__( 'Copy link', 'rbx-tools' ) . '</button> <button type="button" class="button button-secondary" data-rbx-reset>' . esc_html__( 'Reset', 'rbx-tools' ) . '</button> <span class="rbx-live" role="status" data-rbx-copy-status></span></div>';
-			$out .= self::formula_notes( $formulas );
+			$out .= self::formula_notes( $tool );
 		}
 		$out .= '<script type="application/json" class="rbx-calc-config">' . wp_json_encode( $config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script></section>';
 		wp_enqueue_script_module( 'rbx-calculator' );
@@ -293,15 +290,39 @@ final class Calculator {
 		return $html . ( '' !== $unit ? ' <span class="rbx-calc__unit">' . esc_html( $unit ) . '</span>' : '' );
 	}
 
-	/** @param array<string, array<string, mixed>> $formulas Formulas. */
-	private static function formula_notes( array $formulas ): string {
-		$li = '';
-		foreach ( $formulas as $f ) {
-			if ( $f['available'] ) {
-				$li .= '<li><strong>' . esc_html( \RBX\Data\Content\Lang::t( (string) ( $f['record']['data']['label__en'] ?? $f['key'] ) ) ) . '</strong>: <code>' . esc_html( (string) $f['record']['data']['expression'] ) . '</code></li>';
+	/**
+	 * Oldest `last_verified` of the live records the tool's pick lists use, or ''.
+	 *
+	 * @param array<int, array<string, mixed>> $decls Inputs.
+	 */
+	private static function data_date( Dataset $ds, array $decls ): string {
+		$dates = array();
+		foreach ( $decls as $d ) {
+			if ( 'ref' !== ( $d['type'] ?? '' ) ) {
+				continue;
+			}
+			foreach ( $ds->all( (string) $d['target'] ) as $r ) {
+				$lv = (string) ( $r['data']['last_verified'] ?? $r['last_verified'] ?? '' );
+				if ( preg_match( '/^\d{4}-\d{2}-\d{2}/', $lv ) ) {
+					$dates[] = substr( $lv, 0, 10 );
+				}
 			}
 		}
-		return '' === $li ? '' : '<details class="rbx-calc__formula"><summary>' . esc_html__( 'Formula used', 'rbx-tools' ) . '</summary><ul>' . $li . '</ul></details>';
+		return $dates ? (string) min( $dates ) : '';
+	}
+
+	/**
+	 * "How the result is worked out" (GR-25): the plain-maths lines from the tool config
+	 * (`formula_plain__en`), so players never see the formula language.
+	 *
+	 * @param array<string, mixed> $tool Tool config.
+	 */
+	private static function formula_notes( array $tool ): string {
+		$li = '';
+		foreach ( (array) ( $tool['formula_plain__en'] ?? array() ) as $line ) {
+			$li .= '<li>' . esc_html( \RBX\Data\Content\Lang::t( (string) $line ) ) . '</li>';
+		}
+		return '' === $li ? '' : '<details class="rbx-calc__formula"><summary>' . esc_html__( 'How the result is worked out', 'rbx-tools' ) . '</summary><ul>' . $li . '</ul></details>';
 	}
 
 	/** @return array<string, string> */

@@ -227,3 +227,22 @@
 		padding-inline-start: var(--sp-5, 24px);
 	}
 }
+
+/* Speed calculator (GR-25): one column, the result is not sticky (tables follow it). */
+.rbx-calc.rbx-speed .rbx-calc__result {
+	position: static;
+}
+.rbx-speed tr.is-reached th::after {
+	content: " \2713";
+	color: var(--success, #1a7f37);
+}
+@media (min-width: 900px) {
+	.rbx-calc.rbx-speed {
+		display: block;
+	}
+	.rbx-calc.rbx-speed .rbx-calc__result {
+		border-inline-start: 0;
+		padding-inline-start: 0;
+		margin-top: var(--sp-4, 16px);
+	}
+}

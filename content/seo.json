@@ -4,12 +4,16 @@
     "description": "Unofficial, fan-made calculators and wikis for Roblox games. Every value shows where it comes from and when we last checked it."
   },
   "steal-an-egg": {
-    "title": "Steal an Egg Wiki: Pets, Eggs, Mutations & Biomes | UpdateOtter",
-    "description": "Fan-made Steal an Egg wiki: every pet, egg, mutation and biome, with the source and last-checked date shown on each value."
+    "title": "Steal an Egg Guide & Calculator: Pets, Eggs, Biomes | UpdateOtter",
+    "description": "Fan-made Steal an Egg guide and calculator: every pet, egg, mutation and biome, with the source and last-checked date shown on each value."
   },
   "steal-an-egg/calculator": {
     "title": "Steal an Egg Calculator: Pet Value & Income | UpdateOtter",
     "description": "Work out a Steal an Egg pet's income per second from its base income, mutation and weight. Free, no sign-up, works on phones."
+  },
+  "steal-an-egg/speed-calculator": {
+    "title": "Steal an Egg Speed Calculator: Biomes You Can Reach | UpdateOtter",
+    "description": "Type your Steal an Egg Speed to see the farthest biome you can reach, how much Speed the next one needs and which eggs give the biggest Speed reward."
   },
   "steal-an-egg/eggs": {
     "title": "Steal an Egg Eggs: Full List with Hatch Times | UpdateOtter",
@@ -25,18 +29,18 @@
   },
   "steal-an-egg/codes": {
     "title": "Steal an Egg Codes ({month}): None Yet, Here's Why | UpdateOtter",
-    "description": "Are there Steal an Egg codes? Not yet. Here is what we check, where codes would appear, and how to avoid fake code sites."
+    "description": "Are there Steal an Egg codes? No. When we last checked, the free Speed gift you can claim instead, lookalike games to avoid and where real codes would appear first."
   },
   "steal-an-egg/tier-list": {
     "title": "Steal an Egg Tier List: Best Pets Ranked | UpdateOtter",
-    "description": "Steal an Egg pets you can still get, ranked S to B by base income, with the ranking date and how we rank."
+    "description": "Permanent Steal an Egg pets ranked S to B by base income, with the ranking date and how we rank. Limited event pets are listed separately."
   },
   "steal-an-egg/updates": {
     "title": "Steal an Egg Updates: Weekly Patch Notes & Changes | UpdateOtter",
-    "description": "Steal an Egg updates we have tracked, newest first, and what changed in our data after each one."
+    "description": "Every Steal an Egg update since launch, newest first: what each one added and its date from the game's Roblox event page."
   },
   "grow-a-garden": {
-    "title": "Grow a Garden Wiki: Crops, Mutations & Codes | UpdateOtter",
+    "title": "Grow a Garden Guide & Calculator: Crops, Mutations, Codes | UpdateOtter",
     "description": "Fan-made Grow a Garden wiki: every crop with its base value and weight, all crop mutations, a sell-value calculator and the codes list."
   },
   "grow-a-garden/calculator": {
@@ -56,7 +60,7 @@
     "description": "Are there working Grow a Garden codes? The current list, the expired codes, how to redeem them and how to avoid fake code sites."
   },
   "grow-a-garden-2": {
-    "title": "Grow a Garden 2 Wiki: Crops, Mutations & Codes | UpdateOtter",
+    "title": "Grow a Garden 2 Guide & Calculator: Crops, Mutations, Codes | UpdateOtter",
     "description": "Fan-made Grow a Garden 2 wiki: every crop with its base value, all mutations, a fresh-value calculator, codes and what changed from the first game."
   },
   "grow-a-garden-2/calculator": {
@@ -140,8 +144,8 @@
     "description": "Kalkulator dan wiki tidak resmi buatan penggemar untuk game Roblox. Setiap nilai menunjukkan sumbernya dan kapan terakhir kami mengeceknya."
   },
   "id/steal-an-egg": {
-    "title": "Wiki Steal an Egg: Pet, Telur, Mutasi & Biome | UpdateOtter",
-    "description": "Wiki Steal an Egg dalam Bahasa Indonesia: cara main, semua pet, telur dan mutasi, dengan sumber dan tanggal cek di setiap nilai."
+    "title": "Panduan & Kalkulator Steal an Egg: Pet, Telur, Biome | UpdateOtter",
+    "description": "Panduan Steal an Egg dalam Bahasa Indonesia: cara main, semua pet, telur dan mutasi, dengan sumber dan tanggal cek di setiap nilai."
   },
   "id/steal-an-egg/calculator": {
     "title": "Kalkulator Steal an Egg: Hitung Pendapatan Pet | UpdateOtter",
@@ -161,14 +165,14 @@
   },
   "id/steal-an-egg/codes": {
     "title": "Kode Steal an Egg ({month}): Belum Ada, Ini Alasannya | UpdateOtter",
-    "description": "Apakah ada kode Steal an Egg? Belum. Ini yang kami cek, di mana kode akan muncul, dan cara menghindari situs kode palsu."
+    "description": "Apakah ada kode Steal an Egg? Tidak. Kapan terakhir kami cek, hadiah Speed gratis sebagai gantinya, game mirip yang perlu dihindari dan di mana kode asli akan muncul."
   },
   "id/steal-an-egg/tier-list": {
     "title": "Tier List Steal an Egg: Pet Terbaik | UpdateOtter",
-    "description": "Pet Steal an Egg yang masih bisa didapat, diurutkan dari S sampai B menurut pendapatan dasar, dengan tanggal dan cara kami mengurutkan."
+    "description": "Pet permanen Steal an Egg diurutkan dari S sampai B menurut pendapatan dasar, dengan tanggal dan cara kami mengurutkan. Pet event terbatas dicatat terpisah."
   },
   "fish-it": {
-    "title": "Fish It! Wiki: Fish, Rods, Baits & Mutations | UpdateOtter",
+    "title": "Fish It! Guide: Fish, Rods, Baits & Mutations | UpdateOtter",
     "description": "Fan-made Fish It! wiki: every fish with its rarity, chance and location, all rods and baits by Luck, and the mutation list. Sources shown on every value."
   },
   "fish-it/fish": {

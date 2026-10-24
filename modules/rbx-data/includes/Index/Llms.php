@@ -178,6 +178,13 @@ final class Llms {
 			$l[] = '## Optional';
 			$l[] = '';
 			$l[] = self::line( array( 'Bahasa Indonesia', (string) get_permalink( $id ), 'Indonesian versions of the Steal an Egg pages.' ) );
+			// GR-35: every indexable Indonesian page, not only the root.
+			$skip = Seo::thin_pages();
+			foreach ( get_pages( array( 'child_of' => $id->ID, 'post_status' => 'publish', 'sort_column' => 'menu_order,post_title' ) ) as $p ) {
+				if ( ! in_array( (int) $p->ID, $skip, true ) ) {
+					$l[] = self::line( self::page_row( $p ) );
+				}
+			}
 		}
 		return implode( "\n", $l ) . "\n";
 	}
