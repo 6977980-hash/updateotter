@@ -40,7 +40,7 @@ final class Report {
 			}
 		}
 		$p    = $dialog ? 'rbx-dlg-' : 'rbx-rep-';
-		$out  = '<p class="rbx-note">' . esc_html__( "Don't write your name, username or any personal details.", 'rbx-data' ) . '</p>';
+		$out  = '<p class="rbx-note">' . esc_html__( 'Don\'t write your name, username or any personal details.', 'rbx-data' ) . '</p>';
 		$out .= '<p><label for="' . $p . 'kind">' . esc_html__( 'What is wrong?', 'rbx-data' ) . '</label><select id="' . $p . 'kind" name="kind" required>'
 			. '<option value="wrong_number">' . esc_html__( 'Wrong number', 'rbx-data' ) . '</option>'
 			. '<option value="missing_item">' . esc_html__( 'Missing item', 'rbx-data' ) . '</option>'

@@ -14,6 +14,13 @@ function updateotter_disclaimer(): string {
 	return 'UpdateOtter is an independent fan site. It is not affiliated with, endorsed, sponsored or approved by Roblox Corporation or the developers of the games covered. Roblox and the game names are trademarks of their respective owners and are used here only to identify the games.';
 }
 
+/** POL-46 in the page language (/id/), shown under the exact English text; '' when there is none. */
+function updateotter_disclaimer_translation(): string {
+	$en = updateotter_disclaimer();
+	$tr = __( $en, 'updateotter' ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+	return $tr === $en ? '' : $tr;
+}
+
 /** CC BY-SA credit for the wiki data (UO-04). Our own text and code are not under it. */
 function updateotter_license_line(): string {
 	return sprintf(

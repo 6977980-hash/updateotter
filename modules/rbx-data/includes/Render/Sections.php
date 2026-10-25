@@ -669,7 +669,11 @@ final class Sections {
 			$out .= '<section class="rbx-tier rbx-tier--' . esc_attr( strtolower( $t ) ) . '" aria-labelledby="tier-' . esc_attr( strtolower( $t ) ) . '"><h2 id="tier-' . esc_attr( strtolower( $t ) ) . '"><span class="rbx-tier__badge" aria-hidden="true">' . esc_html( $t ) . '</span> ' . esc_html( sprintf( /* translators: %s: tier letter */ __( '%s tier', 'rbx-data' ), $t ) ) . '</h2><ul class="rbx-tier__list">';
 			foreach ( $tiers[ $t ] as $r ) {
 				$why  = (string) ( ( Lang::is_id() ? ( $r['data']['tier_rationale__id'] ?? '' ) : '' ) ?: ( $r['data']['tier_rationale__en'] ?? '' ) ); // Indonesian reason on /id/ when written.
-				$out .= '<li>' . Ui::icon( $ds, $r, 48 ) . '<span class="rbx-tier__name">' . Ui::link( $r ) . '</span>' . ( '' !== $why ? '<span class="rbx-tier__why">' . esc_html( wp_strip_all_tags( $why ) ) . '</span>' : '' ) . '</li>';
+				$inc  = $r['data']['base_income_per_s'] ?? null;
+				$cur  = $ds->get( (string) ( $r['data']['currency_id'] ?? '' ) );
+				/* translators: 1: income such as 3B, 2: currency such as Cash */
+				$inc  = is_numeric( $inc ) ? ' <span class="rbx-meta">' . esc_html( sprintf( __( '%1$s %2$s/s', 'rbx-data' ), \RBX\Data\Format\Number::format( 0 + $inc, 'abbr', Lang::num(), is_array( $ds->meta( 'suffix_ladder' ) ) ? $ds->meta( 'suffix_ladder' ) : null ), $cur ? (string) $cur['name'] : '' ) ) . '</span>' : '';
+				$out .= '<li>' . Ui::icon( $ds, $r, 48 ) . '<span class="rbx-tier__name">' . Ui::link( $r ) . $inc . '</span>' . ( '' !== $why ? '<span class="rbx-tier__why">' . esc_html( wp_strip_all_tags( $why ) ) . '</span>' : '' ) . '</li>';
 			}
 			$out .= '</ul></section>';
 		}

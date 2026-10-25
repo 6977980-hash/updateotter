@@ -50,6 +50,7 @@ return array( 'domain' => 'updateotter', 'language' => 'id_ID', 'plural-forms' =
 	'This page does not exist or was moved. Try a search or pick a game.' => 'Halaman ini tidak ada atau sudah dipindah. Coba cari atau pilih game.',
 	'Tools' => 'Alat',
 	'UpdateOtter home' => 'Beranda UpdateOtter',
+	'UpdateOtter is an independent fan site. It is not affiliated with, endorsed, sponsored or approved by Roblox Corporation or the developers of the games covered. Roblox and the game names are trademarks of their respective owners and are used here only to identify the games.' => 'UpdateOtter adalah situs penggemar independen. Situs ini tidak berafiliasi dengan, didukung, disponsori, atau disetujui oleh Roblox Corporation maupun pengembang game yang dibahas. Roblox dan nama-nama game adalah merek dagang milik pemiliknya masing-masing dan hanya dipakai di sini untuk menyebut game tersebut.',
 	'Updated %s' => 'Diperbarui %s',
 	'Where our data comes from' => 'Asal data kami',
 	'and' => 'dan',

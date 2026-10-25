@@ -117,6 +117,15 @@ final class PageState {
 				$i1 = false;
 			}
 			$changes = isset( $this->opts['update_changes'] ) ? (int) ( $this->opts['update_changes'] )( (string) $rec['id'] ) : 0;
+			// Records tagged added_in_update / removed_in_update also fill the "What's new" list.
+			foreach ( $this->ds->records() as $r ) {
+				if ( $changes > 0 ) {
+					break;
+				}
+				if ( in_array( $r['status'], Dataset::PUBLIC_STATUSES, true ) && in_array( (string) $rec['id'], array( (string) ( $r['data']['added_in_update'] ?? '' ), (string) ( $r['data']['removed_in_update'] ?? '' ) ), true ) ) {
+					++$changes;
+				}
+			}
 			if ( $changes < 1 ) {
 				$i1 = false;
 			}
