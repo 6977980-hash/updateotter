@@ -4,8 +4,9 @@
     "community_required": "Seed data from the Fandom wiki (CC BY-SA). Values show 'Source: community wiki'; owner decision 2026-10-23: pages index on wiki data once Ali has reviewed our own note (notes_reviewed_by=ali), no in-game screenshot required.",
     "rarity_order": "Wiki values kept as reported; flagged for Ali's in-game check list.",
     "meta_provenance": "calc_defaults is our own editorial choice, not a game fact.",
-    "large_change": "Light Dove and Flame Sprite base income fixed from 225 to 225000: our seed dropped the 'k' from the wiki's $225k/s (the egg's cash reward on the wiki is 100x that value, like every other biome egg).",
-    "outlier": "Egg spawn chances (spawn_chance_prob, 2026-10-24) are per-biome shares from the wiki Drop Rates list (game files). They do not follow rarity across biomes, so rarity outlier flags are expected."
+    "large_change": "Light Dove and Flame Sprite base income fixed from 225 to 225000: our seed dropped the 'k' from the wiki's $225k/s (the egg's cash reward on the wiki is 100x that value, like every other biome egg). 2026-10-25: four base incomes follow the wiki pet data module (admin-protected, edited 24 Oct 2026): Night Fang 4M to 160K (matches its 16M egg reward, so a correction), Toxic Hedgehog 1.75B to 1.75M (wiki typo fix, correction), Spirit World Guardian 26B to 15B and Voidseer Pumpkin 12.5B to 14B (wiki changed both; not tied to an update because the game did not say).",
+    "outlier": "Egg spawn chances (spawn_chance_prob, 2026-10-24) are per-biome shares from the wiki Drop Rates list (game files). They do not follow rarity across biomes, so rarity outlier flags are expected.",
+    "slug_change": "2026-10-25: the wiki renamed Abomination Kong to Gorillastein (same pet, same income). The record keeps its ID; the old pet and egg slugs stay in slug_history so the old URLs 301 to the new ones."
   },
   "large": [
     "SAE-FRM-0001",
@@ -13,11 +14,17 @@
     "SAE-MEC-0002",
     "SAE-MEC-0003",
     "SAE-PET-0089",
-    "SAE-PET-0090"
+    "SAE-PET-0090",
+    "SAE-PET-0131",
+    "SAE-PET-0213",
+    "SAE-PET-0225",
+    "SAE-PET-0228"
   ],
   "corrections": [
     "SAE-PET-0089:base_income_per_s",
-    "SAE-PET-0090:base_income_per_s"
+    "SAE-PET-0090:base_income_per_s",
+    "SAE-PET-0131:base_income_per_s",
+    "SAE-PET-0213:base_income_per_s"
   ],
   "missing": {}
 }
