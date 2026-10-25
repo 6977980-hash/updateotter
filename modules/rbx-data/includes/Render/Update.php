@@ -77,14 +77,7 @@ final class Update {
 		}
 		$new = array_keys( array_filter( $created ) );
 		if ( $new ) {
-			$out .= '<section>' . Ui::h2( __( "What's new", 'rbx-data' ), 'whats-new' ) . '<ul>';
-			foreach ( $new as $nid ) {
-				$r = $ds->get( (string) $nid );
-				if ( $r && in_array( $r['entity'], array_keys( $game->entities() ), true ) ) {
-					$out .= '<li>' . Ui::link( $r ) . ' <span class="rbx-chip">' . esc_html( $game->entity_label( (string) $r['entity'] ) ) . '</span></li>';
-				}
-			}
-			$out .= '</ul></section>';
+			$out .= self::whats_new( $game, $ds, $new );
 		}
 		if ( $changed ) {
 			$tr = '';
@@ -136,5 +129,55 @@ final class Update {
 		}
 		$out .= '<p>' . Ui::report_button( $game, array( 'record_id' => $id ) ) . '</p>';
 		return $out . '</article>';
+	}
+
+	/** Key stat for each new record in the "What's new" table: the first of these fields with a value. */
+	private const KEY_FIELDS = array(
+		'BIO' => array( 'unlock_speed_required' ),
+		'EGG' => array( 'hatch_time_s', 'spawn_chance_prob', 'rarity_id' ),
+		'PET' => array( 'base_income_per_s', 'rarity_id' ),
+		'MUT' => array( 'income_mult', 'chance_prob' ),
+	);
+
+	/**
+	 * "What's new" table: each added record with its type and one key stat, biomes first.
+	 *
+	 * @param array<int, string> $ids Record ids added in this update.
+	 */
+	private static function whats_new( Game $game, Dataset $ds, array $ids ): string {
+		$order = array_flip( array_keys( $game->entities() ) );
+		$recs  = array();
+		foreach ( $ids as $nid ) {
+			$r = $ds->get( (string) $nid );
+			if ( $r && isset( $order[ $r['entity'] ] ) ) {
+				$recs[] = $r;
+			}
+		}
+		if ( ! $recs ) {
+			return '';
+		}
+		usort( $recs, static fn( $a, $b ) => ( $order[ $a['entity'] ] <=> $order[ $b['entity'] ] ) ?: $ds->compare_records( $a, $b ) );
+		$counts = array();
+		$rows   = '';
+		foreach ( $recs as $r ) {
+			$ent             = (string) $r['entity'];
+			$counts[ $ent ]  = ( $counts[ $ent ] ?? 0 ) + 1;
+			$key             = Ui::dash();
+			foreach ( self::KEY_FIELDS[ $ent ] ?? array() as $field ) {
+				$st = null !== $game->field( $ent, $field ) ? $ds->field_state( $r, $field ) : array( 'value' => null );
+				if ( null !== ( $st['value'] ?? null ) ) {
+					$key = esc_html( $game->label( $ent, $field ) ) . ': ' . Ui::cell( $ds, $r, $field );
+					break;
+				}
+			}
+			$rows           .= '<tr><th scope="row">' . Ui::link( $r ) . '</th><td data-label="' . esc_attr__( 'Type', 'rbx-data' ) . '">' . esc_html( $game->entity_label( $ent ) ) . '</td><td data-label="' . esc_attr__( 'Key stat', 'rbx-data' ) . '">' . $key . '</td></tr>';
+		}
+		$parts = array();
+		foreach ( $counts as $ent => $n ) {
+			$parts[] = $n . ' ' . strtolower( $game->entity_label( (string) $ent, $n > 1 ) );
+		}
+		/* translators: %s: list such as "1 biome, 8 eggs, 8 pets" */
+		$lead = '<p>' . esc_html( sprintf( __( 'This update added %s to our lists.', 'rbx-data' ), implode( ', ', $parts ) ) ) . '</p>';
+		return '<section>' . Ui::h2( __( "What's new", 'rbx-data' ), 'whats-new' ) . $lead . '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html__( "What's new", 'rbx-data' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Name', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Type', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Key stat', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div></section>';
 	}
 }

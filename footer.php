@@ -38,7 +38,11 @@ $updateotter_links = updateotter_footer_links();
 			</nav>
 			<?php endforeach; ?>
 		</div>
-		<p class="footer-disclaimer"><?php echo esc_html( updateotter_disclaimer() ); ?></p>
+		<?php $updateotter_disclaimer_tr = updateotter_disclaimer_translation(); ?>
+		<p class="footer-disclaimer"<?php echo '' !== $updateotter_disclaimer_tr ? ' lang="en"' : ''; ?>><?php echo esc_html( updateotter_disclaimer() ); ?></p>
+		<?php if ( '' !== $updateotter_disclaimer_tr ) : ?>
+		<p class="footer-disclaimer"><?php echo esc_html( $updateotter_disclaimer_tr ); ?></p>
+		<?php endif; ?>
 		<p class="footer-disclaimer"><?php echo wp_kses( updateotter_license_line(), array( 'a' => array( 'href' => true, 'rel' => true ) ) ); ?></p>
 		<div class="footer-bottom">
 			<?php updateotter_theme_toggle(); ?>

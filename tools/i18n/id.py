@@ -18,6 +18,8 @@ RBX_DATA = {
     '%s tier': 'Tier %s',
     'Name': 'Nama',
     'What is wrong?': 'Apa yang salah?',
+    'Showing the first %1$s of %2$s. Turn on JavaScript to see the full list, or use the search at the top of the site.': 'Menampilkan %1$s pertama dari %2$s. Aktifkan JavaScript untuk melihat daftar lengkap, atau gunakan pencarian di bagian atas situs.',
+    'Don\'t write your name, username or any personal details.': 'Jangan tulis nama, username, atau data pribadi apa pun.',
     'Wrong number': 'Angka salah',
     'Missing item': 'Item tidak ada',
     'Item removed': 'Item sudah dihapus',
@@ -248,6 +250,7 @@ RBX_TOOLS = {
 }
 
 UPDATEOTTER = {
+    'UpdateOtter is an independent fan site. It is not affiliated with, endorsed, sponsored or approved by Roblox Corporation or the developers of the games covered. Roblox and the game names are trademarks of their respective owners and are used here only to identify the games.': 'UpdateOtter adalah situs penggemar independen. Situs ini tidak berafiliasi dengan, didukung, disponsori, atau disetujui oleh Roblox Corporation maupun pengembang game yang dibahas. Roblox dan nama-nama game adalah merek dagang milik pemiliknya masing-masing dan hanya dipakai di sini untuk menyebut game tersebut.',
     'Advertisement': 'Iklan',
     '%s sections': 'Bagian %s',
     'Updated %s': 'Diperbarui %s',
