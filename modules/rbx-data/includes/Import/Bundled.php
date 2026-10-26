@@ -245,7 +245,53 @@ final class Bundled {
 			$s = array_merge( $s, self::apply( $game, $run_id, $run ) );
 		}
 		self::save_state( $game, $s );
+		if ( $apply ) {
+			self::alert( $game, $s, $run );
+		}
 		return $s;
+	}
+
+	/**
+	 * Emails the owner (notifier recipients) after a deploy's import (Ali, 2026-10-26): which new
+	 * pets and eggs went live, or that the import is waiting or failed. Unchanged runs stay silent.
+	 *
+	 * @param array<string, mixed> $s   Saved state.
+	 * @param array<string, mixed> $run Run with plan.
+	 */
+	private static function alert( Game $game, array $s, array $run ): void {
+		if ( ! class_exists( '\RBX\Notifier\Alerts\Email' ) ) {
+			return;
+		}
+		$status = (string) ( $s['status'] ?? '' );
+		$new    = array();
+		$upd    = 0;
+		foreach ( (array) ( $run['plan']['ops'] ?? array() ) as $op ) {
+			if ( 'create' === ( $op['op'] ?? '' ) && in_array( $op['tab'] ?? '', array( 'pets', 'eggs', 'codes' ), true ) ) {
+				$new[] = (string) ( $op['rec']['name'] ?? $op['id'] ) . ' (' . $op['tab'] . ')';
+			} elseif ( 'update' === ( $op['op'] ?? '' ) ) {
+				++$upd;
+			}
+		}
+		if ( 'applied' === $status && ! $new && ! $upd ) {
+			return;
+		}
+		if ( 'applied' === $status ) {
+			$subject = sprintf( '%s: %d new, %d changed records are live', $game->name(), count( $new ), $upd );
+		} elseif ( in_array( $status, array( 'waiting', 'failed', 'error', 'applying' ), true ) ) {
+			$subject = sprintf( '%s: data import %s', $game->name(), $status );
+		} else {
+			return;
+		}
+		$lines = array( $subject, '' );
+		if ( $new ) {
+			$lines[] = 'New: ' . implode( ', ', array_slice( $new, 0, 40 ) ) . ( count( $new ) > 40 ? ' ...' : '' );
+		}
+		if ( ! empty( $s['message'] ) ) {
+			$lines[] = 'Note: ' . (string) $s['message'];
+		}
+		$lines[] = '';
+		$lines[] = 'Status: ' . home_url( '/wp-json/rbx/v1/bundled' );
+		\RBX\Notifier\Alerts\Email::send( $subject, implode( "\n", $lines ) );
 	}
 
 	/**
