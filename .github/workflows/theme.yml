@@ -25,6 +25,8 @@ jobs:
         run: python3 tools/data/check.py
       - name: Guides match the game data
         run: python3 tools/guides/check.py
+      - name: Auto-checked notes match the game data
+        run: python3 tools/notes/check.py
       - name: Guide queue and draft-link test
         run: php modules/rbx-data/tests/guides.test.php
       - name: Calculator PHP/JS parity

@@ -36,11 +36,16 @@ final class PageState {
 	/**
 	 * A note counts as reviewed only by a human editor: an id in content/author.json `reviewer_ids`
 	 * (or `opts['reviewer_ids']`). Without that list any reviewer except the AI drafter counts.
+	 * An `auto_check_ids` value (notes that passed tools/notes/check.py, Ali 2026-10-26) also counts.
 	 */
 	private function is_reviewer( string $who ): bool {
 		$who = strtolower( trim( $who ) );
 		if ( '' === $who ) {
 			return false;
+		}
+		$auto = isset( $this->opts['auto_check_ids'] ) ? (array) $this->opts['auto_check_ids'] : \RBX\Data\Render\Ui::auto_check_ids();
+		if ( in_array( $who, $auto, true ) ) {
+			return true;
 		}
 		$ids = isset( $this->opts['reviewer_ids'] ) ? (array) $this->opts['reviewer_ids'] : \RBX\Data\Render\Ui::reviewer_ids();
 		return $ids ? in_array( $who, $ids, true ) : 'claude' !== $who;
@@ -164,7 +169,8 @@ final class PageState {
 			$reasons[] = 'I-9';
 		}
 
-		// I-3 unique editorial block, reviewed by a person listed in content/author.json (UO-02).
+		// I-3 unique editorial block, reviewed by a person listed in content/author.json (UO-02),
+		// or written by Claude and passed by tools/notes/check.py (auto_check_ids, Ali 2026-10-26).
 		if ( $scoped_out ) {
 			// Nothing to compare.
 		} elseif ( isset( $def['fields']['notes__en'] ) ) {

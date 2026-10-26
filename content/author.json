@@ -3,5 +3,7 @@
   "name": "Ali Ahmad",
   "url": "/authors/ali-ahmad/",
   "_reviewers": "notes_reviewed_by values that count as a human editor's review (audit UO-02). Only these unlock indexing.",
-  "reviewer_ids": ["ali"]
+  "reviewer_ids": ["ali"],
+  "_auto_check": "notes_reviewed_by values for notes written by Claude that passed tools/notes/check.py (every claim matches the CSVs, no hand-typed numbers, unique). They unlock indexing too, but the page says the notes were checked automatically, never that a person reviewed them (Ali, 2026-10-26).",
+  "auto_check_ids": ["auto-check"]
 }

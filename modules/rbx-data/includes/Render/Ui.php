@@ -501,6 +501,22 @@ final class Ui {
 		return $ids;
 	}
 
+	/**
+	 * Auto-check ids from content/author.json `auto_check_ids`: notes Claude wrote that passed
+	 * tools/notes/check.py in CI (Ali, 2026-10-26). They count for indexing, never as a person's review.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function auto_check_ids(): array {
+		static $ids = null;
+		if ( null === $ids ) {
+			$file = get_template_directory() . '/content/author.json';
+			$site = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$ids  = is_array( $site['auto_check_ids'] ?? null ) ? array_values( array_map( static fn( $v ) => strtolower( trim( (string) $v ) ), $site['auto_check_ids'] ) ) : array();
+		}
+		return $ids;
+	}
+
 	public static function byline( int $post_id, string $reviewer = '' ): string {
 		$author = self::author( $post_id );
 		if ( ! $author ) {
@@ -509,7 +525,7 @@ final class Ui {
 		/* translators: %s: author name with link */
 		$html = sprintf( esc_html__( 'By %s', 'rbx-data' ), '<a href="' . esc_url( $author['url'] ) . '" rel="author">' . esc_html( $author['name'] ) . '</a>' );
 		// "claude" is not a reviewer name: say the notes were drafted with AI (methodology page, UO-02).
-		if ( 0 === strcasecmp( trim( $reviewer ), 'claude' ) ) {
+		if ( 0 === strcasecmp( trim( $reviewer ), 'claude' ) || in_array( strtolower( trim( $reviewer ) ), self::auto_check_ids(), true ) ) {
 			$html .= ' <span aria-hidden="true">·</span> <a href="' . esc_url( home_url( '/methodology/#ai' ) ) . '">' . esc_html__( 'Notes drafted with AI help', 'rbx-data' ) . '</a>';
 		} elseif ( '' !== $reviewer && 0 !== strcasecmp( trim( $reviewer ), $author['name'] ) && ! in_array( strtolower( trim( $reviewer ) ), self::reviewer_ids(), true ) ) {
 			/* translators: %s: reviewer name */
