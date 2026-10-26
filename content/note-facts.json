@@ -1,0 +1,4 @@
+{
+  "_doc": "Facts behind item notes marked notes_reviewed_by=auto-check (Ali, 2026-10-26). Per game folder, record id -> list of facts (fact types in tools/guides/check.py, plus [\"from_egg\", pet, egg]). tools/notes/check.py fails CI if a fact stops holding or the note names a pet, egg or biome that no fact backs.",
+  "steal-an-egg": {}
+}

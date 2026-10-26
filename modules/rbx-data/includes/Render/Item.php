@@ -411,6 +411,8 @@ final class Item {
 					? sprintf( esc_html__( 'notes drafted with AI help, reviewed by %1$s on %2$s', 'rbx-data' ), esc_html( $author['name'] ), Ui::date( $on ) )
 					/* translators: %s: reviewer name */
 					: sprintf( esc_html__( 'notes drafted with AI help, reviewed by %s', 'rbx-data' ), esc_html( $author['name'] ) );
+			} elseif ( '' !== $by && in_array( $by, Ui::auto_check_ids(), true ) ) {
+				$notes = esc_html__( 'notes drafted with AI help and checked against our data automatically, not reviewed by a person yet', 'rbx-data' );
 			} else {
 				$notes = esc_html__( 'notes drafted with AI help, not reviewed yet', 'rbx-data' );
 			}
