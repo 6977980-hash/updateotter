@@ -148,7 +148,11 @@ final class Item {
 
 	/** One plain sentence with the main number under the H1 (UO-23), the first sentence of the meta description. */
 	private static function lead( int $pid ): string {
-		$d = Seo::item_description( $pid );
+		$d    = Seo::item_description( $pid );
+		$post = get_post( $pid );
+		if ( $post && null !== Seo::item_seo( $post, 'answer' ) ) {
+			return preg_match( '/^(.+?\.\s+.+?\.)(?:\s|$)/u', $d, $m ) ? $m[1] : $d;
+		}
 		return preg_match( '/^(.+?\.)(?:\s|$)/u', $d, $m ) && ! str_starts_with( $m[1], 'Stats, sources' ) ? $m[1] : '';
 	}
 

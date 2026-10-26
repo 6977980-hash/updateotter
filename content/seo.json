@@ -204,5 +204,16 @@
     "noindex": true,
     "title": "Fish It! Mutations List & Chances | UpdateOtter",
     "description": "All Fish It! mutations with their chance per catch, how baits raise them, and how Shiny and Big tags differ."
+  },
+  "steal-an-egg/pets/voidseer-pumpkin": {
+    "answer": "To get the Voidseer Pumpkin, find a Voidseer Pumpkin Egg in the Halloween Dimension event zone and carry it out to hatch it."
+  },
+  "steal-an-egg/pets/aetheron": {
+    "title": "Aetheron in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the Aetheron from the Aetheron Egg in Angels & Demons; it is the top earner of that zone."
+  },
+  "steal-an-egg/pets/archangel": {
+    "title": "ArchAngel in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the ArchAngel from the ArchAngel Egg in Angels & Demons; the egg takes eighteen hours to hatch."
   }
 }

@@ -276,6 +276,10 @@ final class Seo {
 		if ( 'update' === $c['kind'] ) {
 			return Update::heading( $game, $rec ) . ' | ' . self::BRAND;
 		}
+		$own = self::item_seo( $c['post'], 'title' );
+		if ( null !== $own ) {
+			return $own;
+		}
 		$name  = (string) $rec['name'];
 		$parts = array();
 		switch ( $rec['entity'] ) {
@@ -405,7 +409,8 @@ final class Seo {
 		if ( '' !== $extra ) {
 			$bits[] = $extra;
 		}
-		if ( 'PET' === $rec['entity'] ) {
+		$answer = self::item_seo( $c['post'], 'answer' );
+		if ( 'PET' === $rec['entity'] && null === $answer ) {
 			$eggs = array();
 			foreach ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) as $d ) {
 				$eggs[] = (string) ( $ds->get( (string) $d['data']['egg_id'] )['name'] ?? '' );
@@ -421,11 +426,32 @@ final class Seo {
 			/* translators: %s: date */
 			$bits[] = sprintf( __( 'Wiki data as of %s.', 'rbx-data' ), wp_date( 'j M Y', (int) strtotime( $plv . ' 12:00 UTC' ), new \DateTimeZone( 'UTC' ) ) );
 		}
+		// A hand-written answer leads, then the number; the rest only while it fits.
+		if ( null !== $answer ) {
+			$out = array( $answer, array_shift( $bits ) );
+			foreach ( $bits as $b ) {
+				if ( mb_strlen( implode( ' ', $out ) . ' ' . $b ) <= 155 ) {
+					$out[] = $b;
+				}
+			}
+			return implode( ' ', $out );
+		}
 		// Too long: drop the middle sentences (never the number or the date) until it fits.
 		while ( count( $bits ) > 2 && mb_strlen( implode( ' ', $bits ) ) > 155 ) {
 			array_splice( $bits, count( $bits ) - 2, 1 );
 		}
 		return implode( ' ', $bits );
+	}
+
+	/**
+	 * Hand-written `title` or `answer` of one item page from `content/seo.json`, keyed by its path
+	 * (e.g. `steal-an-egg/pets/aetheron`). The answer is a number-free sentence put before the
+	 * generated description and under the H1, for pages whose searches ask how to get the item.
+	 */
+	public static function item_seo( \WP_Post $post, string $field ): ?string {
+		$path = trim( (string) wp_parse_url( (string) get_permalink( $post ), PHP_URL_PATH ), '/' );
+		// Game folder, section and slug, so a WordPress install in a subfolder still matches.
+		return preg_match( '#((?:id/)?[^/]+/[^/]+/[^/]+)$#', $path, $m ) ? self::seo_text( $m[1], $field ) : null;
 	}
 
 	/** "a Common", "an Epic", "an Uncommon" (UO-18). */
