@@ -1,0 +1,4 @@
+{
+  "_doc": "Google Analytics 4 (Ali, 2026-10-26). ga4_id: the G-XXXXXXX measurement ID; empty turns GA off. The site is child-directed, so the tag always runs with Google signals and ad personalisation OFF and ad storage denied (inc/head.php). EEA/UK/CH visitors stay analytics_storage denied (consent mode, cookieless pings) because the site has no consent banner. Logged-in editors are not tracked. Bump content/launch.json purge after changing this file.",
+  "ga4_id": "G-P7K1WTXRCS"
+}

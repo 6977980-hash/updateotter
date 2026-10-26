@@ -1,7 +1,7 @@
 <?php
 /**
  * <head> output in the order of TECH-38: consent default (POL-40), theme pre-paint (UX-28),
- * icon tags (UX-54), then the consent-gated GA4 loader.
+ * icon tags (UX-54), then the GA4 loader (content/analytics.json).
  *
  * @package UpdateOtter
  */
@@ -55,19 +55,30 @@ add_action(
 	2
 );
 
+/** GA4 measurement ID: content/analytics.json first, then the old settings option. */
+function updateotter_ga4_id(): string {
+	$file = get_template_directory() . '/content/analytics.json';
+	$json = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+	$id   = trim( (string) ( is_array( $json ) ? ( $json['ga4_id'] ?? '' ) : '' ) );
+	$id   = '' !== $id ? $id : (string) get_option( 'updateotter_ga4_id', '' );
+	return 1 === preg_match( '/^G-[A-Z0-9]{4,12}$/', $id ) ? $id : '';
+}
+
 /**
- * GA4 loads only after the CMP answers (POL-40, REV C-36): gdprApplies false, or purposes 1 and 8
- * consented. No CMP answer within 3 s means nothing loads. Off until a measurement ID is saved.
+ * GA4 (Ali, 2026-10-26). Consent mode defaults above decide storage: ads denied everywhere,
+ * analytics denied in the EEA/UK/CH (cookieless pings, no banner yet) and granted elsewhere.
+ * Child-directed site: Google signals and ad personalisation are always off. gtag.js is added
+ * after the load event so it never competes with the page's own resources (LCP/TBT).
  */
 add_action(
 	'wp_head',
 	static function (): void {
-		$id = (string) get_option( 'updateotter_ga4_id', '' );
-		if ( ! preg_match( '/^G-[A-Z0-9]{4,12}$/', $id ) || is_user_logged_in() ) {
+		$id = updateotter_ga4_id();
+		if ( '' === $id || is_user_logged_in() || is_preview() || updateotter_locked() ) {
 			return;
 		}
 		?>
-<script data-no-optimize="1">(function(){var id=<?php echo wp_json_encode( $id ); ?>,done=false,t0=Date.now();function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);gtag('js',new Date());gtag('config',id);}function ok(d){if(!d)return false;if(d.gdprApplies===false)return true;var p=d.purpose&&d.purpose.consents;return !!(p&&p[1]&&p[8]);}function wait(){if(typeof window.__tcfapi==='function'){window.__tcfapi('addEventListener',2,function(d,s){if(s&&(d.eventStatus==='tcloaded'||d.eventStatus==='useractioncomplete')&&ok(d))load();});return;}if(Date.now()-t0<3000)setTimeout(wait,100);}wait();})();</script>
+<script data-no-optimize="1" data-no-defer="1">(function(){var id=<?php echo wp_json_encode( $id ); ?>;gtag('js',new Date());gtag('config',id,{allow_google_signals:false,allow_ad_personalization_signals:false});function load(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);}if(document.readyState==='complete')load();else window.addEventListener('load',load);})();</script>
 		<?php
 	},
 	20
