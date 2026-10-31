@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Hardening {
 
-	public const HSTS_MAX_AGE = 300;
+	public const HSTS_MAX_AGE = 31536000;
 
 	public static function boot(): void {
 		add_filter( 'comments_open', '__return_false', 99 );
@@ -110,7 +110,7 @@ final class Hardening {
 		$h['Referrer-Policy']        = 'strict-origin-when-cross-origin';
 		$h['X-Frame-Options']        = 'SAMEORIGIN';
 		$h['Permissions-Policy']     = 'camera=(), microphone=(), geolocation=(), interest-cohort=()';
-		// TECH-02 phased HSTS: 300 s in week 1, raised to 31536000 after 7 clean days. No includeSubDomains or preload.
+		// TECH-02 phased HSTS: 300 s in week 1, raised to 31536000 on 2026-10-31 after 7 clean days (UO-64). No includeSubDomains or preload.
 		if ( is_ssl() ) {
 			$h['Strict-Transport-Security'] = 'max-age=' . self::HSTS_MAX_AGE;
 		}
