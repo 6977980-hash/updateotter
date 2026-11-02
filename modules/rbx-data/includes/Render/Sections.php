@@ -31,7 +31,7 @@ final class Sections {
 	/** Rows a list renders in the page; the rest load on demand (GR-24). */
 	public const LIST_ROWS = 100;
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'best_divine', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -114,6 +114,8 @@ final class Sections {
 					return self::latest_update( $game );
 				case 'top_tier':
 					return self::top_tier( $game, (int) ( $a['limit'] ?? 5 ) );
+				case 'best_divine':
+					return self::best_divine( $game );
 				case 'changes':
 					return self::page_changes( $game );
 				case 'corrections':
@@ -1008,6 +1010,37 @@ final class Sections {
 			$li .= '<li>' . Ui::icon( $ds, $r, 48 ) . Ui::link( $r ) . ' <span class="rbx-chip rbx-chip--tier">' . esc_html( (string) $r['data']['tier_list_rank'] ) . '</span></li>';
 		}
 		return '<ol class="rbx-top">' . $li . '</ol><p><a href="' . esc_url( home_url( '/' . $game->folder() . '/tier-list/' ) ) . '">' . esc_html__( 'See the full tier list', 'rbx-data' ) . '</a></p>';
+	}
+
+	/**
+	 * "Best Divine pet right now: X" (GSC review 3 Nov, E): the ranked permanent Divine pet with the
+	 * highest base income, from the same data as the tier list, so it follows every data change.
+	 */
+	private static function best_divine( Game $game ): string {
+		if ( null === $game->field( 'PET', 'tier_list_rank' ) ) {
+			return '';
+		}
+		$ds   = self::ds( $game );
+		$best = null;
+		$top  = 0.0;
+		foreach ( $ds->all( 'PET', array( 'live' ) ) as $r ) {
+			$rar = $ds->get( (string) ( $r['data']['rarity_id'] ?? '' ) );
+			if ( ! $rar || 'divine' !== ( $rar['slug'] ?? '' ) || '' === (string) ( $r['data']['tier_list_rank'] ?? '' ) ) {
+				continue;
+			}
+			$st = $ds->field_state( $r, 'base_income_per_s' );
+			if ( in_array( $st['state'], array( 'verified', 'community' ), true ) && is_numeric( $st['value'] ) && (float) $st['value'] > $top ) {
+				$top  = (float) $st['value'];
+				$best = $r;
+			}
+		}
+		if ( null === $best ) {
+			return '';
+		}
+		self::show( array( (string) $best['id'] ) );
+		$cur = $ds->get( (string) ( $best['data']['currency_id'] ?? '' ) );
+		/* translators: 1: pet with link, 2: income number, 3: currency */
+		return '<p><strong>' . esc_html__( 'Best Divine pet right now:', 'rbx-data' ) . '</strong> ' . sprintf( esc_html__( '%1$s, with %2$s %3$s/s base income.', 'rbx-data' ), Ui::link( $best ), Ui::number( $ds, $top + 0, 'abbr' ), esc_html( $cur ? (string) $cur['name'] : __( 'Cash', 'rbx-data' ) ) ) . '</p>';
 	}
 
 	/** "What changed" for the records this page displayed (rendered after the other sections). */
