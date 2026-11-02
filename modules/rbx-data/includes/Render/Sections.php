@@ -1013,34 +1013,45 @@ final class Sections {
 	}
 
 	/**
-	 * "Best Divine pet right now: X" (GSC review 3 Nov, E): the ranked permanent Divine pet with the
-	 * highest base income, from the same data as the tier list, so it follows every data change.
+	 * "Best Divine pet right now: X" and "Best Eternal pet right now: Y" (GSC review 3 Nov, E and
+	 * add-on 2): the ranked permanent pet of that rarity with the highest base income, from the
+	 * same data as the tier list, so the lines follow every data change.
 	 */
 	private static function best_divine( Game $game ): string {
 		if ( null === $game->field( 'PET', 'tier_list_rank' ) ) {
 			return '';
 		}
-		$ds   = self::ds( $game );
-		$best = null;
-		$top  = 0.0;
+		$ds    = self::ds( $game );
+		$lines = array(
+			'divine'  => __( 'Best Divine pet right now:', 'rbx-data' ),
+			'eternal' => __( 'Best Eternal pet right now:', 'rbx-data' ),
+		);
+		$best  = array();
+		$top   = array();
 		foreach ( $ds->all( 'PET', array( 'live' ) ) as $r ) {
-			$rar = $ds->get( (string) ( $r['data']['rarity_id'] ?? '' ) );
-			if ( ! $rar || 'divine' !== ( $rar['slug'] ?? '' ) || '' === (string) ( $r['data']['tier_list_rank'] ?? '' ) ) {
+			$rar  = $ds->get( (string) ( $r['data']['rarity_id'] ?? '' ) );
+			$slug = (string) ( $rar['slug'] ?? '' );
+			if ( ! isset( $lines[ $slug ] ) || '' === (string) ( $r['data']['tier_list_rank'] ?? '' ) ) {
 				continue;
 			}
 			$st = $ds->field_state( $r, 'base_income_per_s' );
-			if ( in_array( $st['state'], array( 'verified', 'community' ), true ) && is_numeric( $st['value'] ) && (float) $st['value'] > $top ) {
-				$top  = (float) $st['value'];
-				$best = $r;
+			if ( in_array( $st['state'], array( 'verified', 'community' ), true ) && is_numeric( $st['value'] ) && (float) $st['value'] > ( $top[ $slug ] ?? 0.0 ) ) {
+				$top[ $slug ]  = (float) $st['value'];
+				$best[ $slug ] = $r;
 			}
 		}
-		if ( null === $best ) {
-			return '';
+		$out = '';
+		foreach ( $lines as $slug => $label ) {
+			if ( ! isset( $best[ $slug ] ) ) {
+				continue;
+			}
+			$r = $best[ $slug ];
+			self::show( array( (string) $r['id'] ) );
+			$cur  = $ds->get( (string) ( $r['data']['currency_id'] ?? '' ) );
+			/* translators: 1: pet with link, 2: income number, 3: currency */
+			$out .= '<p><strong>' . esc_html( $label ) . '</strong> ' . sprintf( esc_html__( '%1$s, with %2$s %3$s/s base income.', 'rbx-data' ), Ui::link( $r ), Ui::number( $ds, $top[ $slug ] + 0, 'abbr' ), esc_html( $cur ? (string) $cur['name'] : __( 'Cash', 'rbx-data' ) ) ) . '</p>';
 		}
-		self::show( array( (string) $best['id'] ) );
-		$cur = $ds->get( (string) ( $best['data']['currency_id'] ?? '' ) );
-		/* translators: 1: pet with link, 2: income number, 3: currency */
-		return '<p><strong>' . esc_html__( 'Best Divine pet right now:', 'rbx-data' ) . '</strong> ' . sprintf( esc_html__( '%1$s, with %2$s %3$s/s base income.', 'rbx-data' ), Ui::link( $best ), Ui::number( $ds, $top + 0, 'abbr' ), esc_html( $cur ? (string) $cur['name'] : __( 'Cash', 'rbx-data' ) ) ) . '</p>';
+		return $out;
 	}
 
 	/** "What changed" for the records this page displayed (rendered after the other sections). */
