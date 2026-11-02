@@ -118,7 +118,7 @@ SAE-PET-0039,yeti,Yeti,,SAE-RAR-0008,5000000,SAE-CUR-0001,1500,,TRUE,,,,,"The Ye
 Its egg is a commitment: it takes well over an hour and a half to hatch. Put it in your pen before you log off or go farm elsewhere.
 
 The base weight is heavy. A Yeti is a long-term pet for a mid-game base, and only the Snow's Eternal, the Ice Dragon, beats it in the same biome.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Yeti,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0040,ice-dragon,Ice Dragon,,SAE-RAR-0009,65000000,SAE-CUR-0001,8500,,FALSE,,,,,"The Ice Dragon is the Snow biome's Eternal pet, a rarity above Secret. It earns more than ten times what the Yeti from the same biome does.
+SAE-PET-0040,ice-dragon,Ice Dragon,Eternal Ice Dragon,SAE-RAR-0009,65000000,SAE-CUR-0001,8500,,FALSE,,,,,"The Ice Dragon is the Snow biome's Eternal pet, a rarity above Secret. It earns more than ten times what the Yeti from the same biome does.
 
 That power comes with the longest wait of any Snow egg: about four hours to hatch. It makes sense to start one before a long break.
 
@@ -138,7 +138,7 @@ SAE-PET-0047,phoenix,Phoenix,,SAE-RAR-0009,85000000,SAE-CUR-0001,2500,,FALSE,,,,
 Its base weight is light for an Eternal, much lighter than the Lava Dragon's. That makes a heavy Phoenix especially valuable, because weight bonuses are measured against the pet's own base.
 
 Its egg takes about four and a half hours to hatch. For a player who can reach the Volcano, it is one of the best long-term pets in the biome.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Phoenix,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0048,lava-dragon,Lava Dragon,,SAE-RAR-0009,100000000,SAE-CUR-0001,14000,,FALSE,,,,,"The Lava Dragon is the best pet of the Volcano. It earns a little more than the Phoenix, the zone's other Eternal, and about twelve times what the Volcano's Secret, the Cerberus, makes.
+SAE-PET-0048,lava-dragon,Lava Dragon,Eternal Lava Dragon,SAE-RAR-0009,100000000,SAE-CUR-0001,14000,,FALSE,,,,,"The Lava Dragon is the best pet of the Volcano. It earns a little more than the Phoenix, the zone's other Eternal, and about twelve times what the Volcano's Secret, the Cerberus, makes.
 
 Its egg is a five-hour hatch, slightly longer than the Phoenix egg, so if you can only fit in one long hatch, the Lava Dragon gives you the most for it. The community wiki lists a large Cash reward for the egg, one hundred times the pet's base income, which matches the pattern of most biome eggs.
 
@@ -158,7 +158,7 @@ SAE-PET-0055,kraken,Kraken,,SAE-RAR-0008,15000000,SAE-CUR-0001,18000,,TRUE,,,,,"
 Its egg takes more than two hours to hatch and has a big Speed reward, which helps toward the Prehistoric biome.
 
 Its base weight is very heavy, so a big kg number is normal. The Abyss Ocean's Eternal, El Maja, earns far more, but its egg takes even longer.",ali,2026-10-23,live,community,https://stealanegg.fandom.com/wiki/Kraken,,Base income and weight from the wiki pet data module,2026-10-23,claude,,,,
-SAE-PET-0056,el-maja,El Maja,,SAE-RAR-0009,130000000,SAE-CUR-0001,90000,,FALSE,,,,,"El Maja is the Abyss Ocean's Eternal and the best pet you can hatch in that zone. It earns more than both Volcano Eternals and close to nine times as much as the Kraken, the Abyss Ocean's Secret.
+SAE-PET-0056,el-maja,El Maja,Eternal El Maja,SAE-RAR-0009,130000000,SAE-CUR-0001,90000,,FALSE,,,,,"El Maja is the Abyss Ocean's Eternal and the best pet you can hatch in that zone. It earns more than both Volcano Eternals and close to nine times as much as the Kraken, the Abyss Ocean's Secret.
 
 Its egg takes about five and a half hours to hatch. That is a long wait, but the gap to the next pet in the zone is so large that it is worth planning around.
 
