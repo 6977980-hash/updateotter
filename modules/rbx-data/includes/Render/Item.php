@@ -122,6 +122,12 @@ final class Item {
 		if ( $rar ) {
 			$parts[] = esc_html( $game->label( (string) $rec['entity'], 'rarity_id' ) ) . ': ' . esc_html( (string) $rar['name'] );
 		}
+		if ( 'PET' === $rec['entity'] && ! self::frozen( $pid ) ) {
+			$quick = self::pet_quick_answer( $ds, $rec );
+			if ( '' !== $quick ) {
+				return ( '' !== $lead ? '<p class="rbx-lead">' . esc_html( $lead ) . '</p>' : '' ) . $quick;
+			}
+		}
 		if ( 'PET' === $rec['entity'] ) {
 			$eggs = array();
 			foreach ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) as $d ) {
@@ -137,13 +143,67 @@ final class Item {
 		if ( 'EGG' === $rec['entity'] && ! empty( $rec['data']['biome_ids'] ) ) {
 			$parts[] = esc_html( $game->label( 'EGG', 'biome_ids' ) ) . ': ' . Ui::raw( $ds, array( 'type' => 'ref_list' ), $rec['data']['biome_ids'] );
 		}
-		if ( 'MUT' === $rec['entity'] ) {
+		if ( 'MUT' === $rec['entity'] && null === $game->entity( 'PLT' ) ) {
+			// GSC review 3 Nov (C): searches ask "how much multiplier is Fractured", so the first
+			// line under the H1 says it outright, then how to get it and the roll chance.
+			$st = $ds->field_state( $rec, 'income_mult' );
+			if ( in_array( $st['state'], array( 'verified', 'community' ), true ) && is_numeric( $st['value'] ) ) {
+				/* translators: 1: mutation, 2: multiplier such as ×2.75 */
+				$parts[] = '<strong>' . sprintf( esc_html__( '%1$s = %2$s income multiplier', 'rbx-data' ), esc_html( (string) preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ) ), Ui::raw( $ds, array( 'type' => 'mult' ), $st['value'] + 0 ) ) . '</strong>';
+			}
+			if ( ! empty( $rec['data']['obtain_method_text__en'] ) ) {
+				$parts[] = esc_html__( 'How to get it', 'rbx-data' ) . ': ' . Ui::text( rtrim( (string) $rec['data']['obtain_method_text__en'], '. ' ) );
+			}
+			$ch = $ds->field_state( $rec, 'chance_prob' );
+			if ( in_array( $ch['state'], array( 'verified', 'community' ), true ) && is_numeric( $ch['value'] ) ) {
+				$parts[] = esc_html__( 'Chance per hatch', 'rbx-data' ) . ': ' . Ui::number( $ds, $ch['value'] + 0, 'prob' );
+			}
+		} elseif ( 'MUT' === $rec['entity'] ) {
 			$st = $ds->field_state( $rec, 'income_mult' );
 			if ( 'verified' === $st['state'] && null !== $st['value'] ) {
 				$parts[] = esc_html( $game->label( 'MUT', 'income_mult' ) ) . ': ' . Ui::raw( $ds, array( 'type' => 'mult' ), $st['value'] );
 			}
 		}
 		return ( '' !== $lead ? '<p class="rbx-lead">' . esc_html( $lead ) . '</p>' : '' ) . ( $parts ? '<p class="rbx-summary">' . implode( ' <span aria-hidden="true">·</span> ', $parts ) . '</p>' : '' );
+	}
+
+	/**
+	 * Page kept exactly as it is (`"frozen"` in content/seo.json): the Voidseer Pumpkin page brings
+	 * most of the site's clicks, so template changes skip it (GSC review 3 Nov).
+	 */
+	private static function frozen( int $pid ): bool {
+		$post = get_post( $pid );
+		return $post && null !== Seo::item_seo( $post, 'frozen' );
+	}
+
+	/**
+	 * Quick answer under the H1 of a pet page (GSC review 3 Nov, A): base income, the egg with its
+	 * zone, and the rarity, for "how much does X make", "X base value" and "X egg" searches.
+	 */
+	private static function pet_quick_answer( Dataset $ds, array $rec ): string {
+		$game  = $ds->game();
+		$parts = array();
+		$st    = $ds->field_state( $rec, 'base_income_per_s' );
+		if ( in_array( $st['state'], array( 'verified', 'community' ), true ) && is_numeric( $st['value'] ) ) {
+			$cur     = $ds->get( (string) ( $rec['data']['currency_id'] ?? '' ) );
+			$parts[] = esc_html__( 'Base income', 'rbx-data' ) . ': <strong>' . Ui::number( $ds, $st['value'] + 0, 'abbr' ) . ' ' . esc_html( $cur ? (string) $cur['name'] : __( 'Cash', 'rbx-data' ) ) . '/s</strong>';
+		}
+		$eggs = array();
+		foreach ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) as $d ) {
+			$egg = $ds->get( (string) $d['data']['egg_id'] );
+			if ( $egg && ! isset( $eggs[ $egg['id'] ] ) ) {
+				$zone               = ! empty( $egg['data']['biome_ids'] ) ? Ui::raw( $ds, array( 'type' => 'ref_list' ), $egg['data']['biome_ids'], false ) : '';
+				$eggs[ $egg['id'] ] = Ui::link( $egg ) . ( '' !== $zone ? ' (' . $zone . ')' : '' );
+			}
+		}
+		if ( $eggs ) {
+			$parts[] = esc_html( _n( 'Egg', 'Eggs', count( $eggs ), 'rbx-data' ) ) . ': ' . implode( ', ', array_slice( $eggs, 0, 2 ) );
+		}
+		$rar = $ds->get( (string) ( $rec['data']['rarity_id'] ?? '' ) );
+		if ( $rar ) {
+			$parts[] = esc_html( $game->label( 'PET', 'rarity_id' ) ) . ': ' . esc_html( (string) $rar['name'] );
+		}
+		return count( $parts ) >= 2 ? '<p class="rbx-summary">' . implode( ' <span aria-hidden="true">·</span> ', $parts ) . '</p>' : '';
 	}
 
 	/** One plain sentence with the main number under the H1 (UO-23), the first sentence of the meta description. */
@@ -297,6 +357,7 @@ final class Item {
 		$game = $ds->game();
 		$li   = '';
 		if ( 'PET' === $rec['entity'] ) {
+			$frozen = self::frozen( (int) ( $rec['post_id'] ?? 0 ) );
 			foreach ( $ds->children( 'SRC', 'pet_id', (string) $rec['id'] ) as $s ) {
 				$ref  = $ds->get( (string) ( $s['data']['source_ref_id'] ?? '' ) );
 				$line = '<strong>' . esc_html( Ui::enum_label( (string) $s['data']['source_kind'] ) ) . '</strong>' . ( $ref ? ': ' . Ui::link( $ref ) : '' );
@@ -305,6 +366,9 @@ final class Item {
 						if ( $d['data']['pet_id'] === $rec['id'] && self::odds_known( $ds ) ) {
 							$line .= ', ' . self::odds( $ds, $d );
 						}
+					}
+					if ( ! $frozen ) {
+						$line .= self::egg_facts( $ds, $ref );
 					}
 				}
 				if ( ! empty( $s['data']['note__en'] ) ) {
@@ -337,6 +401,44 @@ final class Item {
 			return '';
 		}
 		return '<section class="rbx-where">' . Ui::h2( __( 'How to get it', 'rbx-data' ), 'how-to-get' ) . '<ul>' . $li . '</ul></section>';
+	}
+
+	/**
+	 * Where the egg is and how it behaves, on the pet page (GSC review 3 Nov, F): "X egg" searches
+	 * land on the pet page, while single egg pages stay out of search. Only fields we have.
+	 *
+	 * @param array<string, mixed> $egg EGG record.
+	 */
+	private static function egg_facts( Dataset $ds, array $egg ): string {
+		$bits = array();
+		$bio  = array();
+		foreach ( (array) ( $egg['data']['biome_ids'] ?? array() ) as $id ) {
+			$b = $ds->get( (string) $id );
+			if ( $b ) {
+				$bio[] = $b;
+			}
+		}
+		$name = esc_html( (string) $egg['name'] );
+		if ( $bio ) {
+			$where = implode( ', ', array_map( static fn( $b ) => Ui::link( $b ), $bio ) );
+			$sp    = 1 === count( $bio ) ? $ds->field_state( $bio[0], 'unlock_speed_required' ) : array( 'state' => 'unknown' );
+			if ( in_array( $sp['state'], array( 'verified', 'community' ), true ) && is_numeric( $sp['value'] ) && $sp['value'] > 0 ) {
+				/* translators: 1: egg, 2: zone, 3: Speed number */
+				$bits[] = sprintf( esc_html__( 'The %1$s spawns in %2$s (needs %3$s Speed to reach)', 'rbx-data' ), $name, $where, Ui::number( $ds, $sp['value'] + 0, 'abbr' ) );
+			} else {
+				/* translators: 1: egg, 2: zone */
+				$bits[] = sprintf( esc_html__( 'The %1$s spawns in %2$s', 'rbx-data' ), $name, $where );
+			}
+		}
+		$ch = $ds->field_state( $egg, 'spawn_chance_prob' );
+		if ( in_array( $ch['state'], array( 'verified', 'community' ), true ) && is_numeric( $ch['value'] ) ) {
+			$bits[] = esc_html__( 'Spawn chance', 'rbx-data' ) . ': ' . Ui::number( $ds, $ch['value'] + 0, 'prob' );
+		}
+		$ht = $ds->field_state( $egg, 'hatch_time_s' );
+		if ( in_array( $ht['state'], array( 'verified', 'community' ), true ) && is_numeric( $ht['value'] ) && $ht['value'] > 0 ) {
+			$bits[] = esc_html__( 'Hatch time', 'rbx-data' ) . ': ' . Ui::number( $ds, $ht['value'] + 0, 'duration' );
+		}
+		return $bits ? '. ' . implode( '. ', $bits ) : '';
 	}
 
 	/** Whether any egg drop of the game has official or observed odds (GR-11). */

@@ -8,8 +8,8 @@
     "description": "Fan-made Steal an Egg guide and calculator: every pet, egg, mutation and biome, with the source and last-checked date shown on each value."
   },
   "steal-an-egg/calculator": {
-    "title": "Steal an Egg Calculator: Pet Value & Income | UpdateOtter",
-    "description": "Work out a Steal an Egg pet's income per second from its base income, mutation and weight. Free, no download or sign-up, works on phones."
+    "title": "Steal an Egg Calculator: Pet Value, Income, Weight & Mutation",
+    "description": "Steal an Egg calculator for any pet: its value as Cash per second from base income, weight and mutation. Free, no download or sign-up, works on phones."
   },
   "steal-an-egg/speed-calculator": {
     "title": "Steal an Egg Speed Calculator: Biomes You Can Reach | UpdateOtter",
@@ -206,7 +206,8 @@
     "description": "All Fish It! mutations with their chance per catch, how baits raise them, and how Shiny and Big tags differ."
   },
   "steal-an-egg/pets/voidseer-pumpkin": {
-    "answer": "To get the Voidseer Pumpkin, find a Voidseer Pumpkin Egg in the Halloween Dimension event zone and carry it out to hatch it."
+    "answer": "To get the Voidseer Pumpkin, find a Voidseer Pumpkin Egg in the Halloween Dimension event zone and carry it out to hatch it.",
+    "frozen": "GSC review 3 Nov: most of the site's clicks; template changes skip this page. Do not change."
   },
   "steal-an-egg/pets/aetheron": {
     "title": "Aetheron in Steal an Egg: How to Get It, Egg & Income",
@@ -215,5 +216,33 @@
   "steal-an-egg/pets/archangel": {
     "title": "ArchAngel in Steal an Egg: How to Get It, Egg & Income",
     "answer": "Get the ArchAngel from the ArchAngel Egg in Angels & Demons; the egg takes eighteen hours to hatch."
+  },
+  "steal-an-egg/pets/spirit-world-guardian": {
+    "title": "Spirit World Guardian in Steal an Egg: How to Get & Income",
+    "answer": "Get the Spirit World Guardian from the Spirit World Guardian Egg in the Enchanted Forest, the farthest permanent zone."
+  },
+  "steal-an-egg/pets/world-burner": {
+    "title": "World Burner in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the World Burner from the World Burner Egg in Angels & Demons, the zone of the ArchAngel and Aetheron eggs."
+  },
+  "steal-an-egg/pets/nightflame": {
+    "title": "Nightflame in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the Nightflame from the Nightflame Egg, which spawns in the Titan Temple zone."
+  },
+  "steal-an-egg/pets/unicorn": {
+    "title": "Unicorn in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the Unicorn from the Unicorn Egg, which spawns in the Cosmic zone."
+  },
+  "steal-an-egg/pets/mosasaurus": {
+    "title": "Mosasaurus in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the Mosasaurus from the Mosasaurus Egg, which spawns in the Prehistoric zone."
+  },
+  "steal-an-egg/pets/cerberus": {
+    "title": "Cerberus in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the Cerberus from the Cerberus Egg, which spawns in the Volcano zone."
+  },
+  "steal-an-egg/pets/royal-sphinx": {
+    "title": "Royal Sphinx in Steal an Egg: How to Get It, Egg & Income",
+    "answer": "Get the Royal Sphinx from the Royal Sphinx Egg, which spawns in the Desert zone."
   }
 }
