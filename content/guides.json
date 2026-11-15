@@ -173,14 +173,24 @@
             "snow"
           ],
           [
-            "top_earner",
-            "spirit-world-guardian",
-            ""
-          ],
-          [
             "in_biome",
             "axolotl",
             "lake"
+          ],
+          [
+            "biome_before",
+            "enchanted-forest",
+            "alien-planet"
+          ],
+          [
+            "in_biome",
+            "prismare",
+            "alien-planet"
+          ],
+          [
+            "best_in_biome",
+            "enchanted-forest",
+            "spirit-world-guardian"
           ]
         ]
       },
@@ -281,11 +291,6 @@
             "best_in_biome",
             "enchanted-forest",
             "spirit-world-guardian"
-          ],
-          [
-            "top_earner",
-            "spirit-world-guardian",
-            ""
           ],
           [
             "rarity",
