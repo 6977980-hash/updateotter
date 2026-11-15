@@ -44,6 +44,8 @@
     "description": "Fan-made Grow a Garden wiki: every crop with its base value and weight, all crop mutations, a sell-value calculator and the codes list."
   },
   "grow-a-garden/calculator": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden Calculator: Crop Value with Mutations | UpdateOtter",
     "description": "Work out what a Grow a Garden fruit sells for from its crop, weight, variant and up to three mutations. Free, no sign-up, works on phones."
   },
@@ -52,6 +54,8 @@
     "description": "Every Grow a Garden crop by rarity with its base sell value, base weight and harvest type. Filter by rarity or sort by value."
   },
   "grow-a-garden/mutations": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden Mutations: Multipliers & Stacking | UpdateOtter",
     "description": "Every Grow a Garden crop mutation with its Sheckle multiplier and how to get it, plus how mutations and Gold or Rainbow variants stack."
   },
@@ -60,22 +64,32 @@
     "description": "Are there working Grow a Garden codes? The current list, the expired codes, how to redeem them and how to avoid fake code sites."
   },
   "grow-a-garden-2": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden 2 Guide & Calculator: Crops, Mutations, Codes | UpdateOtter",
     "description": "Fan-made Grow a Garden 2 wiki: every crop with its base value, all mutations, a fresh-value calculator, codes and what changed from the first game."
   },
   "grow-a-garden-2/calculator": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden 2 Calculator: Crop Value & Mutations | UpdateOtter",
     "description": "Work out what a fresh Grow a Garden 2 fruit sells for from its crop, weight and mutation. Free, no sign-up, works on phones."
   },
   "grow-a-garden-2/plants": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden 2 Crops List: Values, Weights & Tiers | UpdateOtter",
     "description": "Every Grow a Garden 2 crop by tier with its base sell value, base weight, sell currency and harvest type."
   },
   "grow-a-garden-2/mutations": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden 2 Mutations: Multipliers & Sources | UpdateOtter",
     "description": "Every Grow a Garden 2 mutation with its multiplier, harvest chance and where it comes from. Crops carry one mutation, so they never stack."
   },
   "grow-a-garden-2/codes": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Grow a Garden 2 Codes & Rewards: Reported List | UpdateOtter",
     "description": "Grow a Garden 2 codes reported on the community wiki, with rewards and how to redeem them. We mark the ones we have not redeemed ourselves."
   },
@@ -178,6 +192,8 @@
     "description": "Pet permanen Steal an Egg diurutkan dari S sampai B menurut pendapatan dasar, dengan tanggal dan cara kami mengurutkan. Pet event terbatas dicatat terpisah."
   },
   "fish-it": {
+    "_noindex": "Draft 2026-11-12 (GSC audit): 0 clicks, pos 20-60 since launch; kept out of search so Google sees only the strong pages. Ali approval needed before merge.",
+    "noindex": true,
     "title": "Fish It! Guide: Fish, Rods, Baits & Mutations | UpdateOtter",
     "description": "Fan-made Fish It! wiki: every fish with its rarity, chance and location, all rods and baits by Luck, and the mutation list. Sources shown on every value."
   },
