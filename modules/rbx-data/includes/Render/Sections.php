@@ -667,6 +667,8 @@ final class Sections {
 			if ( empty( $tiers[ $t ] ) ) {
 				continue;
 			}
+			// Highest base income first inside each tier, so the order matches "ranked by base income".
+			uasort( $tiers[ $t ], static fn( $a, $b ) => ( is_numeric( $b['data']['base_income_per_s'] ?? null ) ? (float) $b['data']['base_income_per_s'] : 0.0 ) <=> ( is_numeric( $a['data']['base_income_per_s'] ?? null ) ? (float) $a['data']['base_income_per_s'] : 0.0 ) ?: $ds->compare_records( $a, $b ) );
 			self::show( array_keys( $tiers[ $t ] ) );
 			$out .= '<section class="rbx-tier rbx-tier--' . esc_attr( strtolower( $t ) ) . '" aria-labelledby="tier-' . esc_attr( strtolower( $t ) ) . '"><h2 id="tier-' . esc_attr( strtolower( $t ) ) . '"><span class="rbx-tier__badge" aria-hidden="true">' . esc_html( $t ) . '</span> ' . esc_html( sprintf( /* translators: %s: tier letter */ __( '%s tier', 'rbx-data' ), $t ) ) . '</h2><ul class="rbx-tier__list">';
 			foreach ( $tiers[ $t ] as $r ) {
