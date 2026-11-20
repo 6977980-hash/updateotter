@@ -45,12 +45,67 @@
 <!-- /wp:shortcode -->
 
 <!-- wp:heading {"anchor":"worked-example"} -->
-<h2 class="wp-block-heading" id="worked-example">Worked example</h2>
+<h2 class="wp-block-heading" id="worked-example">Worked examples</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The calculator starts with a Shark at its base weight and no mutation. Its result is the Shark's base income: [rbx_value id="SAE-PET-0051" field="base_income_per_s"] Cash per second. With a Golden mutation, multiply that by [rbx_value id="SAE-MUT-0003" field="income_mult"].</p>
+<p>Each number below is worked out with the same formula as the calculator, so it changes when the pet data changes.</p>
 <!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3,"anchor":"example-golden"} -->
+<h3 class="wp-block-heading" id="example-golden">1. A lucky Golden hatch early on</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The calculator starts with a <a href="/steal-an-egg/pets/shark/">Shark</a> at its base weight and no mutation: [rbx_income pet="SAE-PET-0051"] Cash per second. Roll a <a href="/steal-an-egg/mutations/golden/">Golden</a> one and it earns [rbx_income pet="SAE-PET-0051" mutation="SAE-MUT-0003"] instead, because Golden multiplies income by [rbx_value id="SAE-MUT-0003" field="income_mult"]. A mutation is the quickest way to make an early pet worth keeping a little longer.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3,"anchor":"example-fusion"} -->
+<h3 class="wp-block-heading" id="example-fusion">2. Two pets or one fusion?</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>An <a href="/steal-an-egg/pets/archangel/">ArchAngel</a> and a <a href="/steal-an-egg/pets/world-burner/">World Burner</a> together earn [rbx_income pet="SAE-PET-0104" count="2"] Cash per second, since both have the same base income. Fusing them at the Secret Shrine uses up both and gives one <a href="/steal-an-egg/pets/aetheron/">Aetheron</a>, which earns [rbx_income pet="SAE-PET-0106"]. So the fusion costs you income. It is only worth it when your pen is full and the freed slot will hold a pet that earns more than the difference.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3,"anchor":"example-mutation-vs-upgrade"} -->
+<h3 class="wp-block-heading" id="example-mutation-vs-upgrade">3. A Rainbow pet against the top pet</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>A plain <a href="/steal-an-egg/pets/spirit-world-guardian/">Spirit World Guardian</a> earns [rbx_income pet="SAE-PET-0225"] Cash per second. A <a href="/steal-an-egg/mutations/rainbow/">Rainbow</a> one earns [rbx_income pet="SAE-PET-0225" mutation="SAE-MUT-0008"], and a plain <a href="/steal-an-egg/pets/xenorath/">Xenorath</a>, the top permanent pet, earns [rbx_income pet="SAE-PET-0273"]. Before you throw away a mutated pet for a "better" one, put both into the calculator: a strong mutation on an older pet can beat a plain pet from a newer zone.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"anchor":"top-earners"} -->
+<h2 class="wp-block-heading" id="top-earners">Top earners to check first</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>These are the permanent pets most players ask about. Click a pet for its income with every mutation and weight, or see why each one sits where it does on the <a href="/steal-an-egg/tier-list/">tier list</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/data-section {"game":"sae","section":"income_leaders","limit":10} /-->
+
+<!-- wp:heading {"anchor":"what-moves-income"} -->
+<h2 class="wp-block-heading" id="what-moves-income">What changes your number the most</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li><strong>The pet itself.</strong> Base income jumps a lot from one zone to the next, so reaching a newer zone is the steady way to earn more.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>The mutation.</strong> It multiplies the whole income: [rbx_value id="SAE-MUT-0001" field="income_mult"] for <a href="/steal-an-egg/mutations/silver/">Silver</a>, [rbx_value id="SAE-MUT-0003" field="income_mult"] for Golden and [rbx_value id="SAE-MUT-0008" field="income_mult"] for Rainbow. That is why a lucky hatch can be worth more than a step up in pets.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>The weight.</strong> It helps, but each extra kilogram adds less than the one before. Do not keep a weak pet only because it is heavy.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>How many you have.</strong> Every copy adds the same amount, so an empty pen slot costs you more than a weak pet in it. Fill every slot, then replace the weakest pet first.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
 
 <!-- wp:heading {"anchor":"inputs"} -->
 <h2 class="wp-block-heading" id="inputs">What each input means</h2>

@@ -116,6 +116,10 @@ final class Sections {
 					return self::top_tier( $game, (int) ( $a['limit'] ?? 5 ) );
 				case 'best_divine':
 					return self::best_divine( $game );
+				case 'income_leaders':
+					return self::licensed( $game, self::income_leaders( $game, (int) ( $a['limit'] ?? 10 ) ) );
+				case 'head_to_head':
+					return self::head_to_head( $game, (string) ( $a['pairs'] ?? '' ) );
 				case 'changes':
 					return self::page_changes( $game );
 				case 'corrections':
@@ -1052,6 +1056,193 @@ final class Sections {
 			$cur  = $ds->get( (string) ( $r['data']['currency_id'] ?? '' ) );
 			/* translators: 1: pet with link, 2: income number, 3: currency */
 			$out .= '<p><strong>' . esc_html( $label ) . '</strong> ' . sprintf( esc_html__( '%1$s, with %2$s %3$s/s base income.', 'rbx-data' ), Ui::link( $r ), Ui::number( $ds, $top[ $slug ] + 0, 'abbr' ), esc_html( $cur ? (string) $cur['name'] : __( 'Cash', 'rbx-data' ) ) ) . '</p>';
+		}
+		return $out;
+	}
+
+	/**
+	 * "Top earners" table (F4, 2026-11-20; plan C4): the permanent pets with the highest base
+	 * income, how you get each one, Cash per hour and the step to the next pet down. Links every
+	 * top pet from the calculator, hub and tier list (audit #5). All from the dataset.
+	 */
+	private static function income_leaders( Game $game, int $limit ): string {
+		$ds   = self::ds( $game );
+		// Same pool as the tier list: ranked permanent pets, so the two pages never disagree.
+		$pets = array_filter( Insights::ranked_pets( $ds, null ), static fn( $p ) => 'live' === ( $p['record']['status'] ?? '' ) && '' !== (string) ( $p['record']['data']['tier_list_rank'] ?? '' ) );
+		$all  = array_values( $pets );
+		$pets = array_slice( $all, 0, max( 3, $limit ) );
+		if ( count( $pets ) < 3 ) {
+			return '';
+		}
+		self::show( array_map( static fn( $p ) => (string) $p['record']['id'], $pets ) );
+		$rows  = '';
+		$other = 0;
+		foreach ( $pets as $i => $p ) {
+			$next = $all[ $i + 1 ] ?? null;
+			$how  = self::how_to_get( $ds, $p['record'] );
+			$other += $how['egg'] ? 0 : 1;
+			$step = $next && $next['income'] > 0
+				? ( Insights::same( $p['income'] / $next['income'] ) ? esc_html__( 'same as the next pet', 'rbx-data' ) : Insights::times( $ds, $p['income'] / $next['income'] ) )
+				: Ui::dash();
+			$rows .= '<tr><td class="rbx-num-cell">' . esc_html( number_format_i18n( $i + 1 ) ) . '</td><th scope="row">' . Ui::link( $p['record'] ) . '</th><td>' . $how['html'] . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'] * 3600, 'abbr' ) . '</td><td class="rbx-num-cell">' . $step . '</td></tr>';
+		}
+		$first = $pets[0];
+		$last  = end( $pets );
+		$lead  = sprintf(
+			/* translators: 1: pet link, 2: number of pets, 3: ratio such as 5, 4: pet link */
+			esc_html__( 'The top earner, %1$s, makes about %3$s times as much as the pet in place %2$s, %4$s.', 'rbx-data' ),
+			Ui::link( $first['record'] ),
+			esc_html( number_format_i18n( count( $pets ) ) ),
+			esc_html( Insights::ratio( $first['income'] / max( $last['income'], 1e-9 ) ) ),
+			Ui::link( $last['record'] )
+		);
+		if ( $other > 0 ) {
+			$lead .= ' ' . sprintf(
+				/* translators: 1: count, 2: count */
+				esc_html( _n( '%1$s of these %2$s pets does not hatch from a zone egg, so check how you get it before you plan for it.', '%1$s of these %2$s pets do not hatch from a zone egg, so check how you get them before you plan for them.', $other, 'rbx-data' ) ),
+				esc_html( number_format_i18n( $other ) ),
+				esc_html( number_format_i18n( count( $pets ) ) )
+			);
+		}
+		$cap   = sprintf( /* translators: %s: count */ __( 'The %s permanent pets with the highest base income', 'rbx-data' ), number_format_i18n( count( $pets ) ) );
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">#</th><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'How you get it', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per hour', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Compared with the next pet down', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		return '<p>' . $lead . '</p>' . $table . '<p class="rbx-note">' . esc_html__( 'Base income at base weight with no mutation, from the community wiki. Same pets as our tier list: limited event pets, and pets the wiki does not yet say how to get, are left out.', 'rbx-data' ) . '</p>';
+	}
+
+	/**
+	 * How a pet is obtained, for comparisons: its zone egg (and the Speed that zone needs), a lab
+	 * egg, a fusion, or the source note.
+	 *
+	 * @return array{html: string, egg: bool, speed: ?float, hatch: ?float}
+	 */
+	private static function how_to_get( Dataset $ds, array $rec ): array {
+		$id    = (string) $rec['id'];
+		$z     = Insights::zone_of( $ds, $id );
+		$fused = $ds->children( 'FUS', 'output_pet_id', $id );
+		if ( null !== $z ) {
+			[ $bio, $egg ] = $z;
+			$speed = is_numeric( $bio['data']['unlock_speed_required'] ?? null ) ? (float) $bio['data']['unlock_speed_required'] : null;
+			$hatch = is_numeric( $egg['data']['hatch_time_s'] ?? null ) && (float) $egg['data']['hatch_time_s'] > 0 ? (float) $egg['data']['hatch_time_s'] : null;
+			/* translators: %s: biome link */
+			$html = sprintf( esc_html__( 'Egg in %s', 'rbx-data' ), Ui::link( $bio ) );
+			if ( null !== $speed && $speed > 0 ) {
+				/* translators: %s: speed */
+				$html .= ' (' . sprintf( esc_html__( 'needs %s Speed', 'rbx-data' ), Ui::number( $ds, $speed, 'abbr' ) ) . ')';
+			}
+			if ( $fused ) {
+				$html .= ', ' . esc_html__( 'or by fusion', 'rbx-data' );
+			}
+			return array( 'html' => $html, 'egg' => true, 'speed' => $speed, 'hatch' => $hatch );
+		}
+		foreach ( $ds->children( 'SRC', 'pet_id', $id ) as $s ) {
+			$kind = (string) ( $s['data']['source_kind'] ?? '' );
+			$ref  = $ds->get( (string) ( $s['data']['source_ref_id'] ?? '' ) );
+			if ( 'lab' === $kind && $ref ) {
+				/* translators: %s: egg link */
+				return array( 'html' => sprintf( esc_html__( 'Lab egg: %s', 'rbx-data' ), Ui::link( $ref ) ), 'egg' => false, 'speed' => null, 'hatch' => null );
+			}
+			if ( 'fusion' === $kind ) {
+				return array( 'html' => esc_html__( 'Fusion', 'rbx-data' ) . ( ! empty( $s['data']['note__en'] ) && ! Lang::is_id() ? ': ' . Ui::text( rtrim( (string) $s['data']['note__en'], '. ' ) ) : '' ), 'egg' => false, 'speed' => null, 'hatch' => null );
+			}
+			if ( ! empty( $s['data']['note__en'] ) && ! Lang::is_id() ) {
+				return array( 'html' => Ui::text( rtrim( (string) $s['data']['note__en'], '. ' ) ), 'egg' => false, 'speed' => null, 'hatch' => null );
+			}
+		}
+		if ( $fused ) {
+			return array( 'html' => esc_html__( 'Fusion', 'rbx-data' ), 'egg' => false, 'speed' => null, 'hatch' => null );
+		}
+		return array( 'html' => Ui::dash(), 'egg' => false, 'speed' => null, 'hatch' => null );
+	}
+
+	/**
+	 * Head-to-head comparison of two pets (F4, 2026-11-20): income ratio, how many plain copies of
+	 * the weaker pet match one of the stronger, Speed and hatch time of their zones, and the
+	 * weakest mutation that lifts the weaker pet above a plain stronger one. Every claim is worked
+	 * out from the dataset, so the wording follows each import. $pairs: "PET-ID:PET-ID,...".
+	 */
+	private static function head_to_head( Game $game, string $pairs ): string {
+		$ds  = self::ds( $game );
+		$out = '';
+		foreach ( array_filter( array_map( 'trim', explode( ',', $pairs ) ) ) as $pair ) {
+			[ $ia, $ib ] = array_map( 'trim', explode( ':', $pair ) + array( '', '' ) );
+			$a           = $ds->get( $ia );
+			$b           = $ds->get( $ib );
+			if ( ! $a || ! $b || 'PET' !== ( $a['entity'] ?? '' ) || 'PET' !== ( $b['entity'] ?? '' ) ) {
+				continue;
+			}
+			$va = Insights::income( $ds, (string) $a['id'], null, null );
+			$vb = Insights::income( $ds, (string) $b['id'], null, null );
+			if ( null === $va || null === $vb || $va <= 0 || $vb <= 0 ) {
+				continue;
+			}
+			if ( $vb > $va ) { // Stronger pet first.
+				[ $a, $b, $va, $vb ] = array( $b, $a, $vb, $va );
+			}
+			self::show( array( (string) $a['id'], (string) $b['id'] ) );
+			$na  = (string) $a['name'];
+			$nb  = (string) $b['name'];
+			$la  = Ui::link( $a );
+			$lb  = Ui::link( $b );
+			$li  = array();
+			$tie = Insights::same( $va / $vb );
+			$li[] = $tie
+				/* translators: 1: pet, 2: pet, 3: income */
+				? sprintf( esc_html__( '%1$s and %2$s earn the same base income, %3$s Cash per second.', 'rbx-data' ), $la, $lb, Ui::number( $ds, $va, 'abbr' ) )
+				/* translators: 1: pet, 2: income, 3: pet, 4: income, 5: ratio */
+				: sprintf( esc_html__( '%1$s earns %2$s Cash per second and %3$s earns %4$s, so %1$s makes about %5$s times as much.', 'rbx-data' ), $la, Ui::number( $ds, $va, 'abbr' ), $lb, Ui::number( $ds, $vb, 'abbr' ), esc_html( Insights::ratio( $va / $vb ) ) );
+			if ( ! $tie ) {
+				$n = (int) ceil( $va / $vb - 1e-9 );
+				/* translators: 1: number, 2: pet, 3: pet */
+				$li[] = sprintf( esc_html__( 'In pen slots: it takes %1$s plain %2$s to earn as much as one plain %3$s.', 'rbx-data' ), esc_html( number_format_i18n( $n ) ), esc_html( $nb ), esc_html( $na ) );
+			}
+			$ha = self::how_to_get( $ds, $a );
+			$hb = self::how_to_get( $ds, $b );
+			/* translators: 1: pet, 2: how, 3: pet, 4: how */
+			$li[] = sprintf( esc_html__( 'How you get them: %1$s: %2$s. %3$s: %4$s.', 'rbx-data' ), esc_html( $na ), $ha['html'], esc_html( $nb ), $hb['html'] );
+			if ( null !== $ha['speed'] && null !== $hb['speed'] && abs( $ha['speed'] - $hb['speed'] ) > 0.5 ) {
+				$li[] = $hb['speed'] < $ha['speed']
+					/* translators: 1: pet, 2: pet */
+					? sprintf( esc_html__( 'The %1$s zone needs less Speed than the %2$s zone, so most players can farm %1$s first.', 'rbx-data' ), esc_html( $nb ), esc_html( $na ) )
+					: sprintf( esc_html__( 'The %1$s zone needs less Speed than the %2$s zone, so the stronger pet is also the easier one to reach.', 'rbx-data' ), esc_html( $na ), esc_html( $nb ) );
+			}
+			if ( null !== $ha['hatch'] && null !== $hb['hatch'] ) {
+				$li[] = abs( $ha['hatch'] - $hb['hatch'] ) < 0.5
+					/* translators: %s: duration */
+					? sprintf( esc_html__( 'Both eggs take %s to hatch.', 'rbx-data' ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $ha['hatch'] ) )
+					/* translators: 1: pet, 2: duration, 3: pet, 4: duration */
+					: sprintf( esc_html__( 'Hatch time: %1$s %2$s, %3$s %4$s.', 'rbx-data' ), esc_html( $na ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $ha['hatch'] ), esc_html( $nb ), Ui::raw( $ds, array( 'type' => 'duration_s' ), $hb['hatch'] ) );
+			}
+			if ( ! $tie ) {
+				// Only the colour mutations a pet can roll when its egg hatches (they have a roll chance),
+				// so the check answers "what if my hatch is lucky", not event or consumable mutations.
+				$flip = null;
+				$best = null;
+				foreach ( Insights::mutations( $ds ) as $mid => $m ) {
+					if ( ! is_numeric( $m['record']['data']['chance_prob'] ?? null ) ) {
+						continue;
+					}
+					$v = Insights::income( $ds, (string) $b['id'], (string) $mid, null );
+					if ( null === $v ) {
+						continue;
+					}
+					$best = array( $m['record'], $v );
+					if ( null === $flip && $v > $va ) {
+						$flip = array( $m['record'], $v );
+					}
+				}
+				if ( $flip ) {
+					/* translators: 1: mutation and pet such as "a Golden Prismare", 2: income, 3: pet, 4: income, 5: mutation */
+					$li[] = sprintf( esc_html__( 'Lucky hatch check: %1$s earns %2$s Cash per second, more than a plain %3$s (%4$s). %5$s is the weakest hatch mutation that is enough.', 'rbx-data' ), esc_html( Insights::a( (string) $flip[0]['name'] . ' ' . $nb, true ) ), Ui::number( $ds, $flip[1], 'abbr' ), esc_html( $na ), Ui::number( $ds, $va, 'abbr' ), Ui::link( $flip[0] ) );
+				} elseif ( $best ) {
+					/* translators: 1: mutation and pet, 2: income, 3: pet */
+					$li[] = sprintf( esc_html__( 'Lucky hatch check: even %1$s earns only %2$s Cash per second, still less than a plain %3$s.', 'rbx-data' ), esc_html( Insights::a( (string) $best[0]['name'] . ' ' . $nb ) ), Ui::number( $ds, $best[1], 'abbr' ), esc_html( $na ) );
+				}
+			}
+			$items = '';
+			foreach ( $li as $l ) {
+				$items .= '<li>' . $l . '</li>';
+			}
+			$out .= '<ul class="rbx-h2h">' . $items . '</ul>';
 		}
 		return $out;
 	}

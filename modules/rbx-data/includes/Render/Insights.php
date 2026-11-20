@@ -409,7 +409,7 @@ final class Insights {
 	 *
 	 * @return array{0: array<string, mixed>, 1: array<string, mixed>}|null [biome, egg]
 	 */
-	private static function zone_of( Dataset $ds, string $pet ): ?array {
+	public static function zone_of( Dataset $ds, string $pet ): ?array {
 		foreach ( self::egg_index( $ds )['by_pet'][ $pet ] ?? array() as $egg_id ) {
 			$egg = $ds->get( $egg_id );
 			$how = (string) ( $egg['data']['obtain_method'] ?? '' );
@@ -969,7 +969,7 @@ final class Insights {
 	}
 
 	/** Income per second from the live formula, or null when it cannot be computed. */
-	private static function income( Dataset $ds, string $pet, ?string $mut, ?float $weight ): ?float {
+	public static function income( Dataset $ds, string $pet, ?string $mut, ?float $weight ): ?float {
 		$key = self::formula_key( $ds );
 		if ( null === $key ) {
 			return null;
@@ -1002,7 +1002,7 @@ final class Insights {
 	 *
 	 * @return array<string, array{record: array<string, mixed>, income: float}>
 	 */
-	private static function ranked_pets( Dataset $ds, ?string $rarity, bool $published_only = false ): array {
+	public static function ranked_pets( Dataset $ds, ?string $rarity, bool $published_only = false ): array {
 		$out = array();
 		foreach ( $ds->all( 'PET', array( 'live', 'limited' ) ) as $id => $p ) {
 			if ( null !== $rarity && ( $p['data']['rarity_id'] ?? '' ) !== $rarity ) {
@@ -1032,7 +1032,7 @@ final class Insights {
 	 *
 	 * @return array<string, array{record: array<string, mixed>, mult: float}>
 	 */
-	private static function mutations( Dataset $ds ): array {
+	public static function mutations( Dataset $ds ): array {
 		$out = array();
 		foreach ( $ds->all( 'MUT', array( 'live', 'limited' ) ) as $id => $m ) {
 			if ( 'pet' !== ( $m['data']['applies_to'] ?? 'pet' ) ) {
@@ -1092,12 +1092,12 @@ final class Insights {
 	}
 
 	/** Two amounts that round to the same "about N times" are "the same" (GR-10). */
-	private static function same( float $r ): bool {
+	public static function same( float $r ): bool {
 		return $r > 0 && abs( $r - 1 ) < 0.05;
 	}
 
 	/** "×0.09", or "under ×0.01" instead of a bare "×0" (GR-10). */
-	private static function times( Dataset $ds, float $r ): string {
+	public static function times( Dataset $ds, float $r ): string {
 		if ( $r > 0 && $r < 0.01 ) {
 			/* translators: %s: multiplier such as ×0.01 */
 			return sprintf( esc_html__( 'under %s', 'rbx-data' ), Ui::number( $ds, 0.01, 'mult' ) );
@@ -1109,7 +1109,7 @@ final class Insights {
 	 * Name with "a" or "an" (GR-10: "A ArchAngel"). Judged by sound for the usual exceptions
 	 * ("a Unicorn", "an Hour"); $cap starts the sentence.
 	 */
-	private static function a( string $name, bool $cap = false ): string {
+	public static function a( string $name, bool $cap = false ): string {
 		$an = (bool) preg_match( '/^[aeiou]/i', $name ) && ! preg_match( '/^(uni|use|usu|uto|eu|one\b|once)/i', $name );
 		$an = $an || (bool) preg_match( '/^(hour|honest|honou?r|heir)/i', $name );
 		$w  = $an ? 'an' : 'a';
@@ -1133,7 +1133,7 @@ final class Insights {
 		return $joint ? sprintf( __( 'joint %s', 'rbx-data' ), $n . $suf ) : $n . $suf;
 	}
 
-	private static function ratio( float $r ): string {
+	public static function ratio( float $r ): string {
 		if ( $r >= 10 ) {
 			return number_format_i18n( round( $r ) );
 		}
