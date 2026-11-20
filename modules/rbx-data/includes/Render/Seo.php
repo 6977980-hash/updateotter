@@ -46,6 +46,11 @@ final class Seo {
 		add_filter( 'wp_sitemaps_posts_query_args', array( self::class, 'core_sitemap_query' ), 10, 2 );
 		add_filter( 'wp_sitemaps_posts_entry', array( self::class, 'core_sitemap_entry' ), 10, 2 );
 		add_action( 'template_redirect', array( self::class, 'sitemap_index_redirect' ), 1 );
+		// F1 (2026-11-20): no XSL stylesheet on the core sitemaps. The .xsl files answered 404 and
+		// Chrome showed the sitemap as a blank page; without them browsers show the plain XML tree.
+		// Sitemap contents for Google are unchanged.
+		add_filter( 'wp_sitemaps_stylesheet_url', '__return_false' );
+		add_filter( 'wp_sitemaps_stylesheet_index_url', '__return_false' );
 		add_action( 'template_redirect', array( self::class, 'last_modified_header' ), 20 );
 		add_action( 'template_redirect', array( self::class, 'clean_urls' ), 0 );
 		// GR-32: sitemaps carry their own cache tag, purged with every page-state change.
