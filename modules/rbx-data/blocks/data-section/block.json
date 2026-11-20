@@ -11,7 +11,8 @@
 		"game": { "type": "string", "default": "" },
 		"section": { "type": "string", "default": "" },
 		"entity": { "type": "string", "default": "" },
-		"limit": { "type": "number", "default": 5 }
+		"limit": { "type": "number", "default": 5 },
+		"pairs": { "type": "string", "default": "" }
 	},
 	"supports": { "html": false, "reusable": false, "align": [ "wide" ] },
 	"editorScript": "file:./editor.js",

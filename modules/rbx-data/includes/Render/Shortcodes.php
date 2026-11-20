@@ -27,6 +27,7 @@ final class Shortcodes {
 		add_shortcode( 'rbx_count', array( self::class, 'count_sc' ) );
 		add_shortcode( 'rbx_meta', array( self::class, 'meta_sc' ) );
 		add_shortcode( 'rbx_section', array( self::class, 'section_sc' ) );
+		add_shortcode( 'rbx_income', array( self::class, 'income_sc' ) );
 	}
 
 	/**
@@ -173,9 +174,56 @@ final class Shortcodes {
 				'section' => '',
 				'entity'  => '',
 				'limit'   => '5',
+				'pairs'   => '',
 			),
 			(array) $atts
 		);
 		return Sections::render( $a );
+	}
+
+	/**
+	 * Worked examples in page copy (F4, 2026-11-20): Cash per second from the live calculator
+	 * formula, so an example stays right after every import.
+	 * [rbx_income pet="SAE-PET-0225" mutation="SAE-MUT-0003" weight="" count="1" per="s|hour"]
+	 *
+	 * @param array<string, string>|string $atts Attributes.
+	 */
+	public static function income_sc( $atts ): string {
+		$a = shortcode_atts(
+			array(
+				'pet'      => '',
+				'mutation' => '',
+				'weight'   => '',
+				'count'    => '1',
+				'per'      => 's',
+			),
+			(array) $atts
+		);
+		$pet = (string) $a['pet'];
+		if ( ! preg_match( '/^([A-Z][A-Z0-9]{1,4})-PET-\d{4,6}$/', $pet, $m ) ) {
+			return '';
+		}
+		$game = Loader::by_code( $m[1] );
+		if ( null === $game ) {
+			return '';
+		}
+		$ds  = Repository::dataset( $game );
+		$mut = '' !== (string) $a['mutation'] ? (string) $a['mutation'] : null;
+		if ( null === $ds->get( $pet ) || ( null !== $mut && null === $ds->get( $mut ) ) ) {
+			self::lint( "Unknown record in rbx_income {$pet} {$mut}" );
+			return '';
+		}
+		$v = Insights::income( $ds, $pet, $mut, is_numeric( $a['weight'] ) ? (float) $a['weight'] : null );
+		if ( null === $v ) {
+			return esc_html__( 'not confirmed yet', 'rbx-data' );
+		}
+		$v *= max( 1, (int) $a['count'] );
+		if ( 'hour' === $a['per'] ) {
+			$v *= 3600;
+		}
+		$ladder = $ds->meta( 'suffix_ladder' );
+		$text   = Number::format( $v, 'abbr', \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null );
+		$exact  = Number::exact( $v, \RBX\Data\Content\Lang::num(), is_array( $ladder ) ? $ladder : null );
+		return $exact !== $text ? '<span class="rbx-num" data-exact="' . esc_attr( $exact ) . '" title="' . esc_attr( $exact ) . '">' . esc_html( $text ) . '</span>' : esc_html( $text );
 	}
 }
