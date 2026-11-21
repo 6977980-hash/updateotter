@@ -1,0 +1,1579 @@
+[
+ {
+  "name": "real 000000",
+  "data": {
+   "pets": [
+    {
+     "name": "Pegasus",
+     "income": 1300000000.0
+    },
+    {
+     "name": "Skeleton Horse",
+     "income": 1300000000.0
+    },
+    {
+     "name": "ArchAngel",
+     "income": 5000000000.0
+    },
+    {
+     "name": "World Burner",
+     "income": 5000000000.0
+    },
+    {
+     "name": "Obsidian Rex",
+     "income": 12500000000.0
+    },
+    {
+     "name": "Nebuloth Kraken",
+     "income": 8500000000.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "Equinox",
+     "income": 1800000000.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Aetheron",
+     "income": 6900000000.0,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Xenorath",
+     "income": 25000000000.0,
+     "inputs": [
+      {
+       "pet": 4,
+       "qty": 1
+      },
+      {
+       "pet": 5,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "expect": {
+   "ready": 0,
+   "total": 3,
+   "rows": [
+    {
+     "recipe": 2,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 4,
+       "need": 1
+      },
+      {
+       "pet": 5,
+       "need": 1
+      }
+     ],
+     "cost": 21000000000.0,
+     "change": 4000000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 0,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 0,
+       "need": 1
+      },
+      {
+       "pet": 1,
+       "need": 1
+      }
+     ],
+     "cost": 2600000000.0,
+     "change": -800000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 10000000000.0,
+     "change": -3100000000.0,
+     "slots": 1
+    }
+   ],
+   "missing": [
+    {
+     "pet": 4,
+     "need": 1,
+     "for": [
+      2
+     ]
+    },
+    {
+     "pet": 5,
+     "need": 1,
+     "for": [
+      2
+     ]
+    },
+    {
+     "pet": 0,
+     "need": 1,
+     "for": [
+      0
+     ]
+    },
+    {
+     "pet": 1,
+     "need": 1,
+     "for": [
+      0
+     ]
+    },
+    {
+     "pet": 2,
+     "need": 1,
+     "for": [
+      1
+     ]
+    },
+    {
+     "pet": 3,
+     "need": 1,
+     "for": [
+      1
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "real 111111",
+  "data": {
+   "pets": [
+    {
+     "name": "Pegasus",
+     "income": 1300000000.0
+    },
+    {
+     "name": "Skeleton Horse",
+     "income": 1300000000.0
+    },
+    {
+     "name": "ArchAngel",
+     "income": 5000000000.0
+    },
+    {
+     "name": "World Burner",
+     "income": 5000000000.0
+    },
+    {
+     "name": "Obsidian Rex",
+     "income": 12500000000.0
+    },
+    {
+     "name": "Nebuloth Kraken",
+     "income": 8500000000.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "Equinox",
+     "income": 1800000000.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Aetheron",
+     "income": 6900000000.0,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Xenorath",
+     "income": 25000000000.0,
+     "inputs": [
+      {
+       "pet": 4,
+       "qty": 1
+      },
+      {
+       "pet": 5,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "expect": {
+   "ready": 3,
+   "total": 3,
+   "rows": [
+    {
+     "recipe": 2,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 21000000000.0,
+     "change": 4000000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 0,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 2600000000.0,
+     "change": -800000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 10000000000.0,
+     "change": -3100000000.0,
+     "slots": 1
+    }
+   ],
+   "missing": []
+  }
+ },
+ {
+  "name": "real 101010",
+  "data": {
+   "pets": [
+    {
+     "name": "Pegasus",
+     "income": 1300000000.0
+    },
+    {
+     "name": "Skeleton Horse",
+     "income": 1300000000.0
+    },
+    {
+     "name": "ArchAngel",
+     "income": 5000000000.0
+    },
+    {
+     "name": "World Burner",
+     "income": 5000000000.0
+    },
+    {
+     "name": "Obsidian Rex",
+     "income": 12500000000.0
+    },
+    {
+     "name": "Nebuloth Kraken",
+     "income": 8500000000.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "Equinox",
+     "income": 1800000000.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Aetheron",
+     "income": 6900000000.0,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Xenorath",
+     "income": 25000000000.0,
+     "inputs": [
+      {
+       "pet": 4,
+       "qty": 1
+      },
+      {
+       "pet": 5,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   1,
+   0,
+   1,
+   0,
+   1,
+   0
+  ],
+  "expect": {
+   "ready": 0,
+   "total": 3,
+   "rows": [
+    {
+     "recipe": 2,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 5,
+       "need": 1
+      }
+     ],
+     "cost": 21000000000.0,
+     "change": 4000000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 0,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 1,
+       "need": 1
+      }
+     ],
+     "cost": 2600000000.0,
+     "change": -800000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 10000000000.0,
+     "change": -3100000000.0,
+     "slots": 1
+    }
+   ],
+   "missing": [
+    {
+     "pet": 5,
+     "need": 1,
+     "for": [
+      2
+     ]
+    },
+    {
+     "pet": 1,
+     "need": 1,
+     "for": [
+      0
+     ]
+    },
+    {
+     "pet": 3,
+     "need": 1,
+     "for": [
+      1
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "real 222222",
+  "data": {
+   "pets": [
+    {
+     "name": "Pegasus",
+     "income": 1300000000.0
+    },
+    {
+     "name": "Skeleton Horse",
+     "income": 1300000000.0
+    },
+    {
+     "name": "ArchAngel",
+     "income": 5000000000.0
+    },
+    {
+     "name": "World Burner",
+     "income": 5000000000.0
+    },
+    {
+     "name": "Obsidian Rex",
+     "income": 12500000000.0
+    },
+    {
+     "name": "Nebuloth Kraken",
+     "income": 8500000000.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "Equinox",
+     "income": 1800000000.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Aetheron",
+     "income": 6900000000.0,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Xenorath",
+     "income": 25000000000.0,
+     "inputs": [
+      {
+       "pet": 4,
+       "qty": 1
+      },
+      {
+       "pet": 5,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   2,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "expect": {
+   "ready": 3,
+   "total": 3,
+   "rows": [
+    {
+     "recipe": 2,
+     "ready": true,
+     "times": 2,
+     "missing": [],
+     "cost": 21000000000.0,
+     "change": 4000000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 0,
+     "ready": true,
+     "times": 2,
+     "missing": [],
+     "cost": 2600000000.0,
+     "change": -800000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": true,
+     "times": 2,
+     "missing": [],
+     "cost": 10000000000.0,
+     "change": -3100000000.0,
+     "slots": 1
+    }
+   ],
+   "missing": []
+  }
+ },
+ {
+  "name": "real 100000",
+  "data": {
+   "pets": [
+    {
+     "name": "Pegasus",
+     "income": 1300000000.0
+    },
+    {
+     "name": "Skeleton Horse",
+     "income": 1300000000.0
+    },
+    {
+     "name": "ArchAngel",
+     "income": 5000000000.0
+    },
+    {
+     "name": "World Burner",
+     "income": 5000000000.0
+    },
+    {
+     "name": "Obsidian Rex",
+     "income": 12500000000.0
+    },
+    {
+     "name": "Nebuloth Kraken",
+     "income": 8500000000.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "Equinox",
+     "income": 1800000000.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Aetheron",
+     "income": 6900000000.0,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "Xenorath",
+     "income": 25000000000.0,
+     "inputs": [
+      {
+       "pet": 4,
+       "qty": 1
+      },
+      {
+       "pet": 5,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "expect": {
+   "ready": 0,
+   "total": 3,
+   "rows": [
+    {
+     "recipe": 0,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 1,
+       "need": 1
+      }
+     ],
+     "cost": 2600000000.0,
+     "change": -800000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 2,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 4,
+       "need": 1
+      },
+      {
+       "pet": 5,
+       "need": 1
+      }
+     ],
+     "cost": 21000000000.0,
+     "change": 4000000000.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 10000000000.0,
+     "change": -3100000000.0,
+     "slots": 1
+    }
+   ],
+   "missing": [
+    {
+     "pet": 1,
+     "need": 1,
+     "for": [
+      0
+     ]
+    },
+    {
+     "pet": 4,
+     "need": 1,
+     "for": [
+      2
+     ]
+    },
+    {
+     "pet": 5,
+     "need": 1,
+     "for": [
+      2
+     ]
+    },
+    {
+     "pet": 2,
+     "need": 1,
+     "for": [
+      1
+     ]
+    },
+    {
+     "pet": 3,
+     "need": 1,
+     "for": [
+      1
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "edge 0000",
+  "data": {
+   "pets": [
+    {
+     "name": "A",
+     "income": 100.0
+    },
+    {
+     "name": "B",
+     "income": null
+    },
+    {
+     "name": "C",
+     "income": 50.0
+    },
+    {
+     "name": "D",
+     "income": 10.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "AA",
+     "income": 150.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 2
+      }
+     ]
+    },
+    {
+     "name": "AB",
+     "income": 500.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "ACD",
+     "income": 400.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "CD?",
+     "income": null,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "expect": {
+   "ready": 0,
+   "total": 4,
+   "rows": [
+    {
+     "recipe": 0,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 0,
+       "need": 2
+      }
+     ],
+     "cost": 200.0,
+     "change": -50.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 0,
+       "need": 1
+      },
+      {
+       "pet": 1,
+       "need": 1
+      }
+     ],
+     "cost": null,
+     "change": null,
+     "slots": 1
+    },
+    {
+     "recipe": 3,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 60.0,
+     "change": null,
+     "slots": 1
+    },
+    {
+     "recipe": 2,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 0,
+       "need": 1
+      },
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 160.0,
+     "change": 240.0,
+     "slots": 2
+    }
+   ],
+   "missing": [
+    {
+     "pet": 0,
+     "need": 2,
+     "for": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "pet": 1,
+     "need": 1,
+     "for": [
+      1
+     ]
+    },
+    {
+     "pet": 2,
+     "need": 1,
+     "for": [
+      3,
+      2
+     ]
+    },
+    {
+     "pet": 3,
+     "need": 1,
+     "for": [
+      3,
+      2
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "edge 1000",
+  "data": {
+   "pets": [
+    {
+     "name": "A",
+     "income": 100.0
+    },
+    {
+     "name": "B",
+     "income": null
+    },
+    {
+     "name": "C",
+     "income": 50.0
+    },
+    {
+     "name": "D",
+     "income": 10.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "AA",
+     "income": 150.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 2
+      }
+     ]
+    },
+    {
+     "name": "AB",
+     "income": 500.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "ACD",
+     "income": 400.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "CD?",
+     "income": null,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   1,
+   0,
+   0,
+   0
+  ],
+  "expect": {
+   "ready": 0,
+   "total": 4,
+   "rows": [
+    {
+     "recipe": 0,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 0,
+       "need": 1
+      }
+     ],
+     "cost": 200.0,
+     "change": -50.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 1,
+       "need": 1
+      }
+     ],
+     "cost": null,
+     "change": null,
+     "slots": 1
+    },
+    {
+     "recipe": 2,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 160.0,
+     "change": 240.0,
+     "slots": 2
+    },
+    {
+     "recipe": 3,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 60.0,
+     "change": null,
+     "slots": 1
+    }
+   ],
+   "missing": [
+    {
+     "pet": 0,
+     "need": 1,
+     "for": [
+      0
+     ]
+    },
+    {
+     "pet": 1,
+     "need": 1,
+     "for": [
+      1
+     ]
+    },
+    {
+     "pet": 2,
+     "need": 1,
+     "for": [
+      2,
+      3
+     ]
+    },
+    {
+     "pet": 3,
+     "need": 1,
+     "for": [
+      2,
+      3
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "edge 2111",
+  "data": {
+   "pets": [
+    {
+     "name": "A",
+     "income": 100.0
+    },
+    {
+     "name": "B",
+     "income": null
+    },
+    {
+     "name": "C",
+     "income": 50.0
+    },
+    {
+     "name": "D",
+     "income": 10.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "AA",
+     "income": 150.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 2
+      }
+     ]
+    },
+    {
+     "name": "AB",
+     "income": 500.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "ACD",
+     "income": 400.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "CD?",
+     "income": null,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   2,
+   1,
+   1,
+   1
+  ],
+  "expect": {
+   "ready": 4,
+   "total": 4,
+   "rows": [
+    {
+     "recipe": 2,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 160.0,
+     "change": 240.0,
+     "slots": 2
+    },
+    {
+     "recipe": 0,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 200.0,
+     "change": -50.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": null,
+     "change": null,
+     "slots": 1
+    },
+    {
+     "recipe": 3,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 60.0,
+     "change": null,
+     "slots": 1
+    }
+   ],
+   "missing": []
+  }
+ },
+ {
+  "name": "edge 5011",
+  "data": {
+   "pets": [
+    {
+     "name": "A",
+     "income": 100.0
+    },
+    {
+     "name": "B",
+     "income": null
+    },
+    {
+     "name": "C",
+     "income": 50.0
+    },
+    {
+     "name": "D",
+     "income": 10.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "AA",
+     "income": 150.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 2
+      }
+     ]
+    },
+    {
+     "name": "AB",
+     "income": 500.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "ACD",
+     "income": 400.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "CD?",
+     "income": null,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   5,
+   0,
+   1,
+   1
+  ],
+  "expect": {
+   "ready": 3,
+   "total": 4,
+   "rows": [
+    {
+     "recipe": 2,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 160.0,
+     "change": 240.0,
+     "slots": 2
+    },
+    {
+     "recipe": 0,
+     "ready": true,
+     "times": 2,
+     "missing": [],
+     "cost": 200.0,
+     "change": -50.0,
+     "slots": 1
+    },
+    {
+     "recipe": 3,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 60.0,
+     "change": null,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 1,
+       "need": 1
+      }
+     ],
+     "cost": null,
+     "change": null,
+     "slots": 1
+    }
+   ],
+   "missing": [
+    {
+     "pet": 1,
+     "need": 1,
+     "for": [
+      1
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "edge 3300",
+  "data": {
+   "pets": [
+    {
+     "name": "A",
+     "income": 100.0
+    },
+    {
+     "name": "B",
+     "income": null
+    },
+    {
+     "name": "C",
+     "income": 50.0
+    },
+    {
+     "name": "D",
+     "income": 10.0
+    }
+   ],
+   "recipes": [
+    {
+     "name": "AA",
+     "income": 150.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 2
+      }
+     ]
+    },
+    {
+     "name": "AB",
+     "income": 500.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 1,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "ACD",
+     "income": 400.0,
+     "inputs": [
+      {
+       "pet": 0,
+       "qty": 1
+      },
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    },
+    {
+     "name": "CD?",
+     "income": null,
+     "inputs": [
+      {
+       "pet": 2,
+       "qty": 1
+      },
+      {
+       "pet": 3,
+       "qty": 1
+      }
+     ]
+    }
+   ]
+  },
+  "owned": [
+   3,
+   3,
+   0,
+   0
+  ],
+  "expect": {
+   "ready": 2,
+   "total": 4,
+   "rows": [
+    {
+     "recipe": 0,
+     "ready": true,
+     "times": 1,
+     "missing": [],
+     "cost": 200.0,
+     "change": -50.0,
+     "slots": 1
+    },
+    {
+     "recipe": 1,
+     "ready": true,
+     "times": 3,
+     "missing": [],
+     "cost": null,
+     "change": null,
+     "slots": 1
+    },
+    {
+     "recipe": 2,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 160.0,
+     "change": 240.0,
+     "slots": 2
+    },
+    {
+     "recipe": 3,
+     "ready": false,
+     "times": 0,
+     "missing": [
+      {
+       "pet": 2,
+       "need": 1
+      },
+      {
+       "pet": 3,
+       "need": 1
+      }
+     ],
+     "cost": 60.0,
+     "change": null,
+     "slots": 1
+    }
+   ],
+   "missing": [
+    {
+     "pet": 2,
+     "need": 1,
+     "for": [
+      2,
+      3
+     ]
+    },
+    {
+     "pet": 3,
+     "need": 1,
+     "for": [
+      2,
+      3
+     ]
+    }
+   ]
+  }
+ }
+]

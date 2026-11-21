@@ -15,6 +15,10 @@
     "title": "Steal an Egg Speed Calculator: Biomes You Can Reach | UpdateOtter",
     "description": "Type your Steal an Egg Speed to see the farthest biome you can reach, how much Speed the next one needs and which eggs give the biggest Speed reward."
   },
+  "steal-an-egg/fusion-planner": {
+    "title": "Steal an Egg Fusion Planner: What Your Pets Can Fuse | UpdateOtter",
+    "description": "Tick the Steal an Egg pets you own to see which fusions you can make now, which pets the rest still need and how each fusion changes your income."
+  },
   "steal-an-egg/eggs": {
     "title": "Steal an Egg Eggs: Full List with Hatch Times | UpdateOtter",
     "description": "Every egg in Steal an Egg with its hatch time, rarity, zone and the pets it can hatch. Each value shows its source."
