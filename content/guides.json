@@ -15,6 +15,25 @@
         "summary": "Part 1 and Part 2 times, Candy Corn, Souls, Echo's quest and the Phantom Express, the Spectral mutation, and the best Halloween pets and eggs"
       },
       {
+        "slug": "winter-event",
+        "label": "Winter event guide",
+        "summary": "Frozen Awakening times, the limited-time winter biome, its eggs and the best event pets, plus Christmas news",
+        "queue": true,
+        "_hold": "Skeleton (2026-11-21). Event guide, not part of the weekly queue: never set reviewed_by here. To publish, fill the page (no rbx-todo left), remove queue and _hold, drop noindex in content/seo.json and bump publish in content/launch.json. See gag-seo/updates/PLAYBOOK.md section 6.",
+        "facts": [
+          [
+            "best_in_biome",
+            "snow",
+            "ice-dragon"
+          ],
+          [
+            "rarity",
+            "ice-dragon",
+            "eternal"
+          ]
+        ]
+      },
+      {
         "slug": "how-to-get-speed",
         "label": "How to get Speed fast",
         "summary": "The treadmill, trails, egg Speed rewards and the free gift, plus a simple loop to reach new biomes sooner",
