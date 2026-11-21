@@ -31,6 +31,8 @@ jobs:
         run: php modules/rbx-data/tests/guides.test.php
       - name: Calculator PHP/JS parity
         run: RBX_DATA_DIR=modules/rbx-data node --test modules/rbx-tools/tests/parity.test.mjs
+      - name: What to get next advisor rules
+        run: node --test modules/rbx-tools/tests/advisor.test.mjs
       - name: Report form personal-data check
         run: php modules/rbx-data/tests/report-pii.test.php
       - name: Players confirm vote rule
