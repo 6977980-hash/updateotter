@@ -393,6 +393,7 @@ final class Item {
 						. ( '' !== $station ? '. ' . Ui::text( \RBX\Data\Content\Lang::t( html_entity_decode( $station, ENT_QUOTES ) ) ) : '' ) . '</li>';
 				}
 			}
+			$planner = self::fusion_planner_note( $ds, $rec, (bool) $fusions_out );
 		} elseif ( 'EGG' === $rec['entity'] ) {
 			$drops = $ds->children( 'DRP', 'egg_id', (string) $rec['id'] );
 			if ( $drops ) {
@@ -414,10 +415,45 @@ final class Item {
 		} elseif ( 'MUT' === $rec['entity'] && ! empty( $rec['data']['obtain_method_text__en'] ) ) {
 			$li .= '<li>' . Ui::text( (string) $rec['data']['obtain_method_text__en'] ) . '</li>';
 		}
+		$planner = $planner ?? '';
 		if ( '' === $li ) {
+			return '' === $planner ? '' : '<section class="rbx-where">' . $planner . '</section>';
+		}
+		return '<section class="rbx-where">' . Ui::h2( __( 'How to get it', 'rbx-data' ), 'how-to-get' ) . '<ul>' . $li . '</ul>' . $planner . '</section>';
+	}
+
+	/**
+	 * Fusion planner link on the pets a recipe makes or uses: the result says "plan this fusion",
+	 * an ingredient names the fusions it goes into. Nothing while the planner page is not live.
+	 *
+	 * @param array<string, mixed> $rec PET record.
+	 */
+	private static function fusion_planner_note( Dataset $ds, array $rec, bool $is_result ): string {
+		$recipes = self::fusion_recipes( $ds, (string) $rec['id'] );
+		if ( ! $recipes ) {
 			return '';
 		}
-		return '<section class="rbx-where">' . Ui::h2( __( 'How to get it', 'rbx-data' ), 'how-to-get' ) . '<ul>' . $li . '</ul></section>';
+		$url = Breadcrumbs::page_url( $ds->game()->folder() . '/fusion-planner' );
+		if ( '' === $url ) {
+			return '';
+		}
+		$link = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'fusion planner', 'rbx-data' ) . '</a>';
+		if ( $is_result ) {
+			/* translators: %s: link to the fusion planner */
+			return '<p>' . sprintf( esc_html__( 'Tick the pets you own in our %s to see whether you can make this fusion and what it does to your income.', 'rbx-data' ), $link ) . '</p>';
+		}
+		$made = array();
+		foreach ( $recipes as $f ) {
+			$out = $ds->get( (string) ( $f['data']['output_pet_id'] ?? '' ) );
+			if ( $out && (string) $out['id'] !== (string) $rec['id'] ) {
+				$made[ (string) $out['id'] ] = Ui::link( $out );
+			}
+		}
+		if ( ! $made ) {
+			return '';
+		}
+		/* translators: 1: pet names, 2: link to the fusion planner */
+		return '<p>' . sprintf( esc_html__( 'This pet is an ingredient for %1$s. Our %2$s shows what you still need and how the fusion changes your income.', 'rbx-data' ), implode( ', ', $made ), $link ) . '</p>';
 	}
 
 	/**

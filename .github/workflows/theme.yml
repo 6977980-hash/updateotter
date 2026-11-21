@@ -31,6 +31,8 @@ jobs:
         run: php modules/rbx-data/tests/guides.test.php
       - name: Calculator PHP/JS parity
         run: RBX_DATA_DIR=modules/rbx-data node --test modules/rbx-tools/tests/parity.test.mjs
+      - name: Fusion planner PHP/JS twins match the recipes
+        run: python3 modules/rbx-tools/tests/fusion-make-vectors.py && git diff --exit-code modules/rbx-tools/tests/fusion-vectors.json && php modules/rbx-tools/tests/fusion.test.php && node --test modules/rbx-tools/tests/fusion.test.mjs
       - name: What to get next advisor rules
         run: node --test modules/rbx-tools/tests/advisor.test.mjs
       - name: Report form personal-data check

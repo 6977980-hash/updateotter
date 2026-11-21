@@ -254,6 +254,129 @@
 	}
 }
 
+/* Fusion planner: one column like the Speed calculator; pet boxes in a grid, tables follow. */
+.rbx-calc.rbx-fusion .rbx-calc__result {
+	position: static;
+}
+.rbx-fusion__pets {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0 var(--sp-3, 12px);
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.rbx-fusion__pets legend {
+	font-weight: 600;
+	padding: 0;
+	margin-bottom: var(--sp-1, 4px);
+}
+.rbx-fusion__pets .rbx-calc__field--check {
+	gap: var(--sp-2, 8px);
+}
+.rbx-fusion__inc,
+.rbx-fusion__station {
+	color: var(--text-muted, #4a5565);
+	font-size: var(--fs-sm, 0.875rem);
+	font-weight: 400;
+}
+.rbx-fusion__station {
+	display: block;
+}
+.rbx-fusion__summary {
+	margin: 0;
+	font-weight: 700;
+}
+.rbx-fusion__ins {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.rbx-fusion__yes {
+	color: var(--success, #15723a);
+}
+.rbx-fusion__no {
+	color: var(--danger, #b42318);
+}
+.rbx-fusion tr.is-ready td:nth-child(3) {
+	color: var(--success, #15723a);
+	font-weight: 700;
+}
+/* Planner tables stack as cards on phones (mobile first) and become real tables from 600 px. */
+.rbx-fusion .rbx-table thead {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+}
+.rbx-fusion .rbx-table,
+.rbx-fusion .rbx-table tbody,
+.rbx-fusion .rbx-table tr,
+.rbx-fusion .rbx-table th,
+.rbx-fusion .rbx-table td {
+	display: block;
+	width: 100%;
+}
+.rbx-fusion .rbx-table tr {
+	border-bottom: 1px solid var(--border, #d5dce5);
+	padding-block: var(--sp-2, 8px);
+}
+.rbx-fusion .rbx-table th,
+.rbx-fusion .rbx-table td {
+	border: 0;
+	padding: 2px 0;
+	text-align: start;
+}
+.rbx-fusion .rbx-table td[data-label]::before {
+	content: attr(data-label);
+	display: block;
+	color: var(--text-muted, #4a5565);
+	font-size: var(--fs-sm, 0.875rem);
+}
+@media (min-width: 600px) {
+	.rbx-fusion .rbx-table thead {
+		position: static;
+		width: auto;
+		height: auto;
+		overflow: visible;
+		clip: auto;
+	}
+	.rbx-fusion .rbx-table {
+		display: table;
+	}
+	.rbx-fusion .rbx-table thead {
+		display: table-header-group;
+	}
+	.rbx-fusion .rbx-table tbody {
+		display: table-row-group;
+	}
+	.rbx-fusion .rbx-table tr {
+		display: table-row;
+	}
+	.rbx-fusion .rbx-table th,
+	.rbx-fusion .rbx-table td {
+		display: table-cell;
+		width: auto;
+		border-bottom: 1px solid var(--border, #d5dce5);
+		padding: var(--sp-2, 8px) var(--sp-3, 12px);
+		vertical-align: top;
+	}
+	.rbx-fusion .rbx-table td[data-label]::before {
+		content: none;
+	}
+}
+@media (min-width: 900px) {
+	.rbx-calc.rbx-fusion {
+		display: block;
+	}
+	.rbx-calc.rbx-fusion .rbx-calc__result {
+		border-inline-start: 0;
+		padding-inline-start: 0;
+		margin-top: var(--sp-4, 16px);
+	}
+}
+
 /* "What to get next" advisor: one column like the Speed calculator; the result is not sticky. */
 .rbx-calc.rbx-advisor .rbx-calc__result {
 	position: static;
