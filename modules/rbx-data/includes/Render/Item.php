@@ -357,7 +357,9 @@ final class Item {
 		$game = $ds->game();
 		$li   = '';
 		if ( 'PET' === $rec['entity'] ) {
-			$frozen = self::frozen( (int) ( $rec['post_id'] ?? 0 ) );
+			$frozen      = self::frozen( (int) ( $rec['post_id'] ?? 0 ) );
+			$fusions_out = array_values( array_filter( self::fusion_recipes( $ds, (string) $rec['id'] ), static fn( $f ) => (string) ( $f['data']['output_pet_id'] ?? '' ) === (string) $rec['id'] ) );
+			$fused       = false;
 			foreach ( $ds->children( 'SRC', 'pet_id', (string) $rec['id'] ) as $s ) {
 				$ref  = $ds->get( (string) ( $s['data']['source_ref_id'] ?? '' ) );
 				$line = '<strong>' . esc_html( Ui::enum_label( (string) $s['data']['source_kind'] ) ) . '</strong>' . ( $ref ? ': ' . Ui::link( $ref ) : '' );
@@ -371,10 +373,25 @@ final class Item {
 						$line .= self::egg_facts( $ds, $ref );
 					}
 				}
+				$recipe = 'fusion' === (string) $s['data']['source_kind'] ? ( $fusions_out[0] ?? null ) : null;
+				if ( null !== $recipe ) {
+					$fused = true;
+				}
 				if ( ! empty( $s['data']['note__en'] ) ) {
-					$line .= '. ' . Ui::text( (string) $s['data']['note__en'] );
+					$line .= '. ' . self::link_names( $ds, Ui::text( (string) $s['data']['note__en'] ), $recipe );
+				} elseif ( null !== $recipe && ! $ref ) {
+					$line .= ': ' . self::fusion_inputs( $ds, $recipe );
 				}
 				$li .= '<li>' . $line . '</li>';
+			}
+			// Internal links audit #5: a pet that is also fused (the Aetheron hatches from its egg and
+			// comes from ArchAngel + World Burner) names its recipe, with links to both ingredients.
+			if ( ! $fused ) {
+				foreach ( $fusions_out as $f ) {
+					$station = trim( (string) ( $f['data']['station_text__en'] ?? '' ) );
+					$li     .= '<li><strong>' . esc_html( Ui::enum_label( 'fusion' ) ) . '</strong>: ' . self::fusion_inputs( $ds, $f )
+						. ( '' !== $station ? '. ' . Ui::text( \RBX\Data\Content\Lang::t( html_entity_decode( $station, ENT_QUOTES ) ) ) : '' ) . '</li>';
+				}
 			}
 		} elseif ( 'EGG' === $rec['entity'] ) {
 			$drops = $ds->children( 'DRP', 'egg_id', (string) $rec['id'] );
@@ -609,10 +626,87 @@ final class Item {
 		return '<section class="rbx-changes">' . Ui::h2( __( 'Change history', 'rbx-data' ), 'change-history' ) . '<ul>' . $li . '</ul></section>';
 	}
 
-	/** 3–6 related items picked automatically: same egg, then same rarity (CONT-32). */
+	/**
+	 * Live fusion recipes that make this pet or use it as an ingredient.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function fusion_recipes( Dataset $ds, string $pet_id ): array {
+		if ( null === $ds->game()->entity( 'FUS' ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $ds->all( 'FUS', array( 'live', 'limited' ) ) as $f ) {
+			$ids = array( (string) ( $f['data']['output_pet_id'] ?? '' ) );
+			foreach ( (array) ( $f['data']['inputs'] ?? array() ) as $in ) {
+				$ids[] = (string) ( $in['pet_id'] ?? '' );
+			}
+			if ( in_array( $pet_id, $ids, true ) ) {
+				$out[] = $f;
+			}
+		}
+		return $out;
+	}
+
+	/** "ArchAngel + World Burner", each name linked to its pet page. */
+	private static function fusion_inputs( Dataset $ds, array $recipe ): string {
+		$ins = array();
+		foreach ( (array) ( $recipe['data']['inputs'] ?? array() ) as $in ) {
+			$pet = $ds->get( (string) ( $in['pet_id'] ?? '' ) );
+			if ( $pet ) {
+				$ins[] = ( (int) ( $in['qty'] ?? 1 ) > 1 ? esc_html( number_format_i18n( (int) $in['qty'] ) ) . ' × ' : '' ) . Ui::link( $pet );
+			}
+		}
+		return implode( ' + ', $ins );
+	}
+
+	/**
+	 * Links the first mention of each fusion ingredient in an already escaped note
+	 * ("Fuse an Obsidian Rex and a Nebuloth Kraken."). Names the note does not mention are added
+	 * after it, so every ingredient gets a link.
+	 */
+	private static function link_names( Dataset $ds, string $html, ?array $recipe ): string {
+		if ( null === $recipe ) {
+			return $html;
+		}
+		$missing = array();
+		foreach ( (array) ( $recipe['data']['inputs'] ?? array() ) as $in ) {
+			$pet = $ds->get( (string) ( $in['pet_id'] ?? '' ) );
+			if ( ! $pet ) {
+				continue;
+			}
+			$name = esc_html( (string) $pet['name'] );
+			$pos  = '' !== $name ? strpos( $html, $name ) : false;
+			if ( false === $pos ) {
+				$missing[] = Ui::link( $pet );
+				continue;
+			}
+			$html = substr_replace( $html, Ui::link( $pet ), $pos, strlen( $name ) );
+		}
+		return $missing ? rtrim( $html, '. ' ) . ': ' . implode( ' + ', $missing ) : $html;
+	}
+
+	/**
+	 * 3–6 related items picked automatically: fusion partners, then same egg, then same rarity
+	 * (CONT-32). Fusion partners (the pet a recipe makes, its other ingredient, or the pets it is
+	 * made from) come first whatever their index state: they are the pets a reader of this page
+	 * needs next (internal links audit #5).
+	 */
 	private static function related( Dataset $ds, array $rec ): string {
 		$picked = array();
+		$fusion = array();
 		if ( 'PET' === $rec['entity'] ) {
+			foreach ( self::fusion_recipes( $ds, (string) $rec['id'] ) as $f ) {
+				$ids = array( (string) ( $f['data']['output_pet_id'] ?? '' ) );
+				foreach ( (array) ( $f['data']['inputs'] ?? array() ) as $in ) {
+					$ids[] = (string) ( $in['pet_id'] ?? '' );
+				}
+				foreach ( $ids as $pid ) {
+					if ( '' !== $pid && $pid !== (string) $rec['id'] ) {
+						$fusion[ $pid ] = true;
+					}
+				}
+			}
 			foreach ( $ds->children( 'DRP', 'pet_id', (string) $rec['id'] ) as $d ) {
 				foreach ( $ds->children( 'DRP', 'egg_id', (string) $d['data']['egg_id'] ) as $d2 ) {
 					$pid = (string) $d2['data']['pet_id'];
@@ -666,7 +760,7 @@ final class Item {
 				}
 			}
 		}
-		$picked = $first + $rest;
+		$picked = $fusion + $first + $rest;
 		$links  = array();
 		foreach ( array_slice( array_keys( $picked ), 0, 6 ) as $id ) {
 			$r = $ds->get( (string) $id );
