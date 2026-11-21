@@ -1,12 +1,12 @@
 {
-  "publish": "2026-10-24-google-review-e-image-credits",
+  "publish": "2026-11-21-fusion-planner",
   "go_live": "2026-10-23-launch",
   "dates": "2026-10-24-google-review-b1",
-  "purge": "2026-11-21-internal-links",
+  "purge": "2026-11-21-fusion-planner",
   "llms": "2026-10-23-remove-hostinger-llms",
   "favicon": "2026-10-24-root-favicon",
   "indexnow": "2026-10-23-first-ping",
-  "search_index": "2026-10-24-google-review-d",
+  "search_index": "2026-11-21-fusion-planner",
   "gate": "2026-10-25-update-changes",
   "db_error": "2026-10-24-gr02-503",
   "php_error": "2026-10-24-cr05-503"
