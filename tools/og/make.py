@@ -27,6 +27,7 @@ KIND = {
     'calculator': ('Calculator', 'Income from base value, mutation and weight'),
     'speed-calculator': ('Speed Calculator', 'Which biomes your Speed can reach'),
     'fusion-planner': ('Fusion Planner', 'Which fusions your pets can make'),
+    'what-to-get-next': ('What to Get Next', 'The best egg to hunt for your Speed'),
     'codes': ('Codes', 'When we last checked and what really works'),
     'eggs': ('Eggs List', 'Every egg with hatch time, zone and pets'),
     'pets': ('Pets List', 'Every pet by rarity, with base income'),

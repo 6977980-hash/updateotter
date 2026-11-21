@@ -376,3 +376,28 @@
 		margin-top: var(--sp-4, 16px);
 	}
 }
+
+/* "What to get next" advisor: one column like the Speed calculator; the result is not sticky. */
+.rbx-calc.rbx-advisor .rbx-calc__result {
+	position: static;
+}
+.rbx-advisor__hint {
+	margin: 0;
+	font-size: var(--fs-sm, 0.875rem);
+	color: var(--text-muted, #4b5563);
+}
+.rbx-advisor__pet {
+	display: block;
+	font-weight: 400;
+	font-size: var(--fs-sm, 0.875rem);
+}
+@media (min-width: 900px) {
+	.rbx-calc.rbx-advisor {
+		display: block;
+	}
+	.rbx-calc.rbx-advisor .rbx-calc__result {
+		border-inline-start: 0;
+		padding-inline-start: 0;
+		margin-top: var(--sp-4, 16px);
+	}
+}
