@@ -28,6 +28,18 @@ Fact types (slugs, not ids):
   ["mult_over", mutation, n]         income multiplier > n (for "worth more than two plain pets")
   ["biome_before", biome_a, biome_b] a needs less Speed than b
   ["rarer_rarity", rarity_a, rarity_b] sort order a > b
+Fisch fish (data/fsch, value = C$ per kg × average kg, the calculator with no mutation):
+  ["fish_rarity", fish, rarity]
+  ["fish_at", fish, location]        the location is one of the fish's spots
+  ["fish_worth_more", fish_a, fish_b] value at average weight a > b
+  ["fish_top_rarity", fish, rarity]  no live fish of that rarity is worth more at average weight
+  ["fish_top_at", location, fish]    no live fish at that spot is worth more at average weight
+  ["fish_heavier", fish_a, fish_b]   heaviest weight a > b
+  ["fish_needs", fish, "weather:Rain"] the condition list (time_of_day, weather, season) has the
+                                     value and is not "Any"
+  ["fish_any", fish, "season"]       the condition is "Any" (no requirement)
+  ["fish_bait", fish, bait]          the bait is one of the fish's preferred baits
+  ["fish_no_bait", fish, ""]         no bait needed
 """
 import csv
 import html
@@ -37,7 +49,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-GAME_DATA = {'steal-an-egg': 'sae', 'grow-a-garden': 'gag', 'grow-a-garden-2': 'gag2', 'fish-it': 'fish'}
+GAME_DATA = {'steal-an-egg': 'sae', 'grow-a-garden': 'gag', 'grow-a-garden-2': 'gag2', 'fish-it': 'fish', 'fisch': 'fsch'}
 LIVE = {'live', 'limited'}
 
 # Port of NumberLint::UNIT_RE / STAT_RE / BANNED.
@@ -167,9 +179,57 @@ class Data:
         if kind == 'biome_before':
             x, y = num(self.rec('biomes', a)['unlock_speed_required']) or 0, num(self.rec('biomes', b)['unlock_speed_required'])
             return y is not None and x < y, f'{a} {x} vs {b} {y}'
+        if kind.startswith('fish_'):
+            return self.fish_fact(f)
         if kind == 'rarer_rarity':
             x, y = int(self.rec('rarities', a)['sort_order']), int(self.rec('rarities', b)['sort_order'])
             return x > y, f'{a} {x} vs {b} {y}'
+        raise KeyError(f'unknown fact type {kind}')
+
+
+    def fish_value(self, fish):
+        v, w = num(fish.get('value_per_kg')), num(fish.get('weight_avg_kg'))
+        return None if v is None or w is None else v * w
+
+    def fish_fact(self, f):
+        kind, a, b = f[0], f[1], f[2]
+        live = list(self.slug.get('fish', {}).values())
+        if kind == 'fish_top_at':
+            loc = self.rec('locations', a)
+            fish = self.rec('fish', b)
+            mine = self.fish_value(fish)
+            at = [x for x in live if loc['id'] in (x.get('location_ids') or '').split('|')]
+            best = max((self.fish_value(x) or 0) for x in at) if at else None
+            return fish in at and mine is not None and mine >= best, f'{b} {mine} vs best at {a} {best}'
+        fish = self.rec('fish', a)
+        if kind == 'fish_rarity':
+            got = self.by_id.get(fish['rarity_id'], {}).get('slug', '')
+            return got == b, f'{a} is {got or "no rarity"}'
+        if kind == 'fish_at':
+            return self.rec('locations', b)['id'] in (fish.get('location_ids') or '').split('|'), f'{a} is not caught at {b}'
+        if kind == 'fish_worth_more':
+            x, y = self.fish_value(fish), self.fish_value(self.rec('fish', b))
+            return x is not None and y is not None and x > y, f'{a} {x} vs {b} {y}'
+        if kind == 'fish_heavier':
+            x, y = num(fish.get('weight_max_kg')), num(self.rec('fish', b).get('weight_max_kg'))
+            return x is not None and y is not None and x > y, f'{a} {x} vs {b} {y}'
+        if kind == 'fish_top_rarity':
+            rar = self.rec('rarities', b)
+            mine = self.fish_value(fish)
+            same = [self.fish_value(x) or 0 for x in live if x.get('rarity_id') == rar['id']]
+            return fish.get('rarity_id') == rar['id'] and mine is not None and mine >= max(same), f'{a} {mine} vs best {b} {max(same) if same else None}'
+        if kind in ('fish_needs', 'fish_any'):
+            field, _, want = b.partition(':')
+            if field not in ('time_of_day', 'weather', 'season'):
+                raise KeyError(f'unknown condition {field}')
+            got = [x for x in (fish.get(field) or '').split('|') if x]
+            if kind == 'fish_any':
+                return got == ['Any'], f'{a} {field} is {got}'
+            return want in got and 'Any' not in got, f'{a} {field} is {got}'
+        if kind == 'fish_bait':
+            return self.rec('baits', b)['id'] in (fish.get('bait_ids') or '').split('|'), f'{a} baits are {fish.get("bait_ids")}'
+        if kind == 'fish_no_bait':
+            return fish.get('bait_rule') == 'none', f'{a} bait rule is {fish.get("bait_rule")}'
         raise KeyError(f'unknown fact type {kind}')
 
 

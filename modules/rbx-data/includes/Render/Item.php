@@ -631,9 +631,10 @@ final class Item {
 				$ids = array_merge( $ids, array_keys( $ds->children( $rel[0], $rel[1], (string) $rec['id'] ) ) );
 			}
 		}
-		$rows = array_filter( Changelog::for_records( $ids, 60 ), static fn( $r ) => Ui::public_change( $ds, $r ) );
+		$rows  = array_filter( Changelog::for_records( $ids, 60 ), static fn( $r ) => Ui::public_change( $ds, $r ) );
+		$extra = 'FSH' === $rec['entity'] ? self::fish_history( $ds, $rec ) : '';
 		if ( ! $rows ) {
-			return '';
+			return '' === $extra ? '' : '<section class="rbx-changes">' . Ui::h2( __( 'Update history', 'rbx-data' ), 'change-history' ) . '<ul>' . $extra . '</ul></section>';
 		}
 		// UO-69: the drop and source rows of a new item were logged as their own "added" lines
 		// ("Chicken added / added / added"); the item's own line is enough, and repeats go.
@@ -656,10 +657,34 @@ final class Item {
 		}
 		// GR-01: "X added to UpdateOtter" alone is the same line on every page; the history shows
 		// once something about the item has changed since it was added.
-		if ( 1 === count( $seen ) && $own && 'create' === reset( $own )['change_kind'] && Ui::change_line( $ds, reset( $own ) ) === array_key_first( $seen ) ) {
+		if ( '' === $extra && 1 === count( $seen ) && $own && 'create' === reset( $own )['change_kind'] && Ui::change_line( $ds, reset( $own ) ) === array_key_first( $seen ) ) {
 			return '';
 		}
-		return '<section class="rbx-changes">' . Ui::h2( __( 'Change history', 'rbx-data' ), 'change-history' ) . '<ul>' . $li . '</ul></section>';
+		return '<section class="rbx-changes">' . Ui::h2( '' !== $extra ? __( 'Update history', 'rbx-data' ) : __( 'Change history', 'rbx-data' ), 'change-history' ) . '<ul>' . $extra . $li . '</ul></section>';
+	}
+
+	/**
+	 * Fisch B2: the game update that added the fish (when we know it) and the wiki edit our numbers
+	 * come from, so a reader sees how fresh the value is. Our own data changes follow below it.
+	 */
+	private static function fish_history( Dataset $ds, array $rec ): string {
+		$li  = '';
+		$upd = $ds->get( (string) ( $rec['data']['added_in_update'] ?? '' ) );
+		if ( $upd ) {
+			/* translators: %s: update with link */
+			$li .= '<li>' . sprintf( esc_html__( 'Added to the game in %s.', 'rbx-data' ), Ui::link( $upd ) ) . '</li>';
+		}
+		$lv  = (string) ( $rec['data']['last_verified'] ?? '' );
+		$rev = (string) ( $rec['data']['wiki_revision'] ?? '' );
+		if ( '' !== $lv ) {
+			$edit = preg_match( '/\((\d{4}-\d{2}-\d{2})\)/', $rev, $m ) ? $m[1] : '';
+			$li  .= '<li>' . ( '' !== $edit
+				/* translators: 1: date we checked, 2: date of the wiki edit */
+				? sprintf( esc_html__( '%1$s: we checked the value, weights and catch conditions against the community wiki page as last edited on %2$s.', 'rbx-data' ), Ui::date( $lv ), Ui::date( $edit ) )
+				/* translators: %s: date we checked */
+				: sprintf( esc_html__( '%s: we checked the value, weights and catch conditions against the community wiki.', 'rbx-data' ), Ui::date( $lv ) ) ) . '</li>';
+		}
+		return $li;
 	}
 
 	/**

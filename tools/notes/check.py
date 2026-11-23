@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(ROOT, 'tools', 'guides'))
 import check as guides  # noqa: E402
 
 DATE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
-NAMED = ('pets', 'eggs', 'biomes')
+NAMED = ('pets', 'eggs', 'biomes', 'fish', 'locations', 'baits')
 errors = []
 
 
@@ -59,7 +59,7 @@ def fact(data, f):
 
 
 def named(data, text):
-    """Slugs of the pets, eggs and biomes a note names, longest name first so "Fox Egg" is not also "Fox"."""
+    """Slugs of the pets, eggs, biomes (and Fisch fish, spots, baits) a note names, longest name first so "Fox Egg" is not also "Fox"."""
     names = []
     for kind in NAMED:
         for r in data.slug.get(kind, {}).values():
@@ -128,7 +128,7 @@ def main():
                     errors.append(f'{where}: no fact is about this record itself')
                 for kind, slug in sorted(named(data, text)):
                     if slug != r.get('slug') and slug not in covered:
-                        errors.append(f'{where}: the note names {kind[:-1]} "{slug}" but no fact backs it')
+                        errors.append(f'{where}: the note names {kind.rstrip("s") if kind != "fish" else kind} "{slug}" but no fact backs it')
                 mine = notes[r['id']]
                 for oid, other in notes.items():
                     if oid != r['id'] and jaccard(mine, other) >= 0.6:

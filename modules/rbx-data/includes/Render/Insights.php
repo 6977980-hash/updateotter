@@ -37,6 +37,8 @@ final class Insights {
 				return self::event_guide( $ds, $rec ) . self::pet_glance( $ds, $rec ) . self::pet_zone( $ds, $rec ) . self::pet_income( $ds, $rec ) . self::pet_weight( $ds, $rec );
 			case 'MUT':
 				return $ds->game()->entity( 'PLT' ) ? self::crop_mutation_effect( $ds, $rec ) : self::mutation_effect( $ds, $rec ) . self::mutation_equivalents( $ds, $rec );
+			case 'FSH':
+				return FishPage::blocks( $ds, $rec );
 			case 'PLT':
 				return self::plant_glance( $ds, $rec ) . self::plant_value( $ds, $rec ) . self::plant_weight( $ds, $rec );
 		}

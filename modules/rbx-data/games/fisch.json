@@ -155,8 +155,13 @@
       "label__en": "Fish",
       "plural__en": "Fish",
       "named": true,
-      "page": false,
-      "_page_decision": "Phase A: no fish pages. Phase B2 turns on pages only for fish with full data (value per kg and weights) and our own computed tables (plan section 4, B2).",
+      "post_type": "rbx_fish",
+      "path": "fish",
+      "page": true,
+      "page_requires": [
+        "notes__en"
+      ],
+      "_page_decision": "Phase B2 (2026-11-23): a fish gets its own page only when it has our own note (page_requires notes__en), so the ~1,280 fish do not all become thin pages. Notes are written for fish with full data (C$ per kg and weights); a page indexes only with a value and average weight (required_for_index) and a reviewed or auto-checked note (gate I-3). Every page leads with our own numbers: value at lightest/average/heaviest weight by mutation, appraise cost, catch checklist, same-spot fish.",
       "fields": {
         "aliases": {
           "type": "string",
@@ -228,7 +233,8 @@
           "label__en": "Average weight (kg)",
           "display_format": "abbr",
           "list": true,
-          "compare": true
+          "compare": true,
+          "required_for_index": true
         },
         "weight_max_kg": {
           "type": "decimal",
@@ -245,7 +251,8 @@
           ],
           "display_format": "abbr",
           "list": true,
-          "compare": true
+          "compare": true,
+          "required_for_index": true
         },
         "currency_id": {
           "type": "ref",
@@ -261,6 +268,21 @@
         "wiki_revision": {
           "type": "string",
           "label__en": "Wiki revision used",
+          "internal": true
+        },
+        "notes__en": {
+          "type": "text",
+          "label__en": "Our notes",
+          "editorial": true
+        },
+        "notes_reviewed_by": {
+          "type": "string",
+          "label__en": "Notes reviewed by",
+          "internal": true
+        },
+        "notes_reviewed_on": {
+          "type": "date",
+          "label__en": "Notes reviewed on",
           "internal": true
         }
       },

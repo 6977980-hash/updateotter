@@ -59,6 +59,10 @@ final class FishValue {
 
 	/** Fish name, linked to the calculator for that fish when it is live. */
 	public static function fish_link( Game $game, array $fish ): string {
+		// B2: a fish with its own page links there; the rest open the calculator with the fish.
+		if ( ! empty( $fish['post_id'] ) && 'publish' === get_post_status( (int) $fish['post_id'] ) ) {
+			return Ui::link( $fish );
+		}
 		$u = self::calc_url( $game, $fish );
 		return '' === $u ? esc_html( (string) $fish['name'] ) : '<a href="' . esc_url( $u ) . '">' . esc_html( (string) $fish['name'] ) . '</a>';
 	}
