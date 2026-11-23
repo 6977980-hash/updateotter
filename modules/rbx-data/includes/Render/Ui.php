@@ -443,7 +443,7 @@ final class Ui {
 	 * @param array<string, mixed>             $rec  Record.
 	 * @param array<int, array<string, mixed>> $more More records the same answer is about.
 	 */
-	public static function vote_box( Game $game, array $rec, array $more = array() ): string {
+	public static function vote_box( Game $game, array $rec, array $more = array(), string $question = '' ): string {
 		$ids = implode( ',', array_merge( array( (string) $rec['id'] ), array_map( static fn( $r ) => (string) $r['id'], $more ) ) );
 		$p   = 'rbx-vote-' . strtolower( (string) $rec['id'] );
 		$out = '<form class="rbx-vote" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" data-endpoint="' . esc_url( rest_url( 'rbx/v1/vote' ) ) . '" data-thanks="' . esc_attr( \RBX\Data\Reports\Votes::thanks() ) . '" data-error="' . esc_attr__( 'Could not send. Check your connection and try again.', 'rbx-data' ) . '" aria-labelledby="' . esc_attr( $p ) . '">'
@@ -453,7 +453,7 @@ final class Ui {
 			. '<input type="hidden" name="page_url" value="' . esc_attr( (string) get_permalink() ) . '">'
 			. '<input type="hidden" name="t" value="' . esc_attr( (string) ( time() * 1000 ) ) . '">'
 			. '<p class="rbx-hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'
-			. '<p id="' . esc_attr( $p ) . '" class="rbx-vote__q">' . esc_html__( 'Do these numbers match your game?', 'rbx-data' ) . '</p>'
+			. '<p id="' . esc_attr( $p ) . '" class="rbx-vote__q">' . esc_html( '' !== $question ? $question : __( 'Do these numbers match your game?', 'rbx-data' ) ) . '</p>'
 			. '<button type="submit" name="answer" value="yes" class="rbx-report-btn">' . esc_html__( 'Yes', 'rbx-data' ) . '</button>'
 			. '<button type="submit" name="answer" value="no" class="rbx-report-btn">' . esc_html__( 'No', 'rbx-data' ) . '</button>'
 			. '<p class="rbx-live" role="status"></p></form>';
