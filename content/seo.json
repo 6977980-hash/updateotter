@@ -239,10 +239,10 @@
     "description": "Every Fisch mutation with its value multiplier, what the strongest ones add to a real fish, and how often an appraisal gives a mutation, worked out by us."
   },
   "fisch/codes": {
-    "_noindex": "Kept out of search: reported codes only, none tested by us, and the codes SERP belongs to big sites (Fisch plan 1b, own-value rule 2b). Turn on once we have our own tested codes.",
+    "_noindex": "Kept out of search for now: codes are reported by the wiki, and player checks (Yes/No, last 48 h, added 2026-11-23) have no answers yet. Turn on once several codes show \"Verified by players\". Codes SERP belongs to big sites (Fisch plan 1b).",
     "noindex": true,
     "title": "Fisch Codes: Reported Codes & Rewards | UpdateOtter",
-    "description": "Fisch codes the community wiki lists as working, with their rewards, marked Not tested by us, the date we last checked and how to redeem them."
+    "description": "Fisch codes the community wiki lists as working, with their rewards, how many players each code worked for in the last 48 hours, and how to redeem them."
   },
   "steal-an-egg/pets/voidseer-pumpkin": {
     "answer": "To get the Voidseer Pumpkin, find a Voidseer Pumpkin Egg in the Halloween Dimension event zone and carry it out to hatch it.",

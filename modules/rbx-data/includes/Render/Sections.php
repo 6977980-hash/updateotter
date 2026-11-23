@@ -571,6 +571,19 @@ final class Sections {
 		} else {
 			$out .= '<p class="rbx-codes-status__head"><strong>' . esc_html( sprintf( /* translators: %s: number */ _n( 'Working codes: %s', 'Working codes: %s', count( $active ), 'rbx-data' ), number_format_i18n( count( $active ) ) ) ) . '</strong>' . ( '' !== $last ? ' ' . esc_html__( 'We tested them on', 'rbx-data' ) . ' ' . Ui::date( $last ) . '.' : '' ) . '</p>';
 		}
+		if ( $reported && ! empty( $game->raw()['code_votes'] ) ) {
+			$ok = 0;
+			foreach ( $reported as $c ) {
+				$t   = \RBX\Data\Reports\Votes::code_counts( $game->key(), (string) $c['id'] );
+				$ok += 'verified' === \RBX\Data\Reports\Votes::code_label( $t['y'], $t['n'] ) ? 1 : 0;
+			}
+			$out .= '<p>' . esc_html(
+				$ok
+					/* translators: 1: number of codes, 2: hours */
+					? sprintf( _n( '%1$s of them is verified by players in the last %2$s hours.', '%1$s of them are verified by players in the last %2$s hours.', $ok, 'rbx-data' ), number_format_i18n( $ok ), number_format_i18n( \RBX\Data\Reports\Votes::CODE_WINDOW / 3600 ) )
+					: __( 'No code is verified by players yet. Tried one? Answer below the code.', 'rbx-data' )
+			) . '</p>';
+		}
 		$out .= $checked . '</div>';
 		if ( $active ) {
 			$rows = '';
@@ -588,12 +601,15 @@ final class Sections {
 			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), Ui::asset_ver( 'assets/front/copy.js' ) );
 		}
 		if ( $reported ) {
-			$rows = '';
+			$rows  = '';
+			$votes = ! empty( $game->raw()['code_votes'] );
 			foreach ( $reported as $c ) {
 				$d     = $c['data'];
-				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> ' . self::copy_button( (string) $d['code'] ) . '</th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Status', 'rbx-data' ) . '"><span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested by us', 'rbx-data' ) . '</span></td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
+				$rows .= '<tr><th scope="row"><code class="rbx-code">' . esc_html( (string) $d['code'] ) . '</code> ' . self::copy_button( (string) $d['code'] ) . '</th><td data-label="' . esc_attr__( 'Reward', 'rbx-data' ) . '">' . Ui::text( (string) ( $d['reward_text__en'] ?? '' ) ) . '</td><td data-label="' . esc_attr__( 'Status', 'rbx-data' ) . '">' . ( $votes ? self::code_players( $game, $c ) : '<span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not tested by us', 'rbx-data' ) . '</span>' ) . '</td><td data-label="' . esc_attr__( 'Source', 'rbx-data' ) . '">' . Ui::source_link( $d['source_type'] ?? null, $d['source_url'] ?? null, null ) . '</td></tr>';
 			}
-			$out .= Ui::h2( __( 'Reported codes', 'rbx-data' ), 'reported-codes' ) . '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Status', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
+			$out .= Ui::h2( __( 'Reported codes', 'rbx-data' ), 'reported-codes' )
+				. ( $votes ? '<p>' . esc_html( sprintf( /* translators: 1: hours, 2: number of answers */ __( 'Tried a code? Tell other players if it worked. We count only answers from the last %1$s hours, because codes expire. A code shows "Verified by players" after %2$s players say it worked and few say it did not. We have not redeemed these codes ourselves.', 'rbx-data' ), number_format_i18n( \RBX\Data\Reports\Votes::CODE_WINDOW / 3600 ), number_format_i18n( \RBX\Data\Reports\Votes::CODE_MIN ) ) ) . '</p>' : '' )
+				. '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list"><thead><tr><th scope="col">' . esc_html__( 'Code', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Reward', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Status', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Source', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div><p class="rbx-live" role="status" data-rbx-copy-status></p>';
 			wp_enqueue_script_module( 'rbx-data-copy', RBX_DATA_URL . 'assets/front/copy.js', array(), Ui::asset_ver( 'assets/front/copy.js' ) );
 		}
 		if ( $expired ) {
@@ -622,6 +638,35 @@ final class Sections {
 		}
 		$out .= '<aside class="rbx-scam" role="note"><h2 id="fake-code-scams">' . esc_html__( 'Stay safe: fake code scams', 'rbx-data' ) . '</h2><p>' . esc_html__( 'No code, website, or video can give free Robux. Never enter your password or run scripts from “code” sites.', 'rbx-data' ) . '</p><ul><li>' . esc_html__( 'Codes are only typed inside the game.', 'rbx-data' ) . '</li><li>' . esc_html__( 'Never share your password with anyone.', 'rbx-data' ) . '</li><li>' . esc_html__( 'Do not download anything to get codes or pets.', 'rbx-data' ) . '</li></ul></aside>';
 		return $out;
+	}
+
+	/**
+	 * Status cell of a reported code with player answers (game config `code_votes`): the players'
+	 * verdict and counts from the last CODE_WINDOW hours, and "Did it work for you? Yes / No".
+	 * Never says "tested by us": these are other players' answers.
+	 *
+	 * @param array<string, mixed> $c Code record.
+	 */
+	private static function code_players( Game $game, array $c ): string {
+		$id = (string) $c['id'];
+		\RBX\Data\Cache\Purge::tag_record( strtolower( $id ) );
+		$t     = \RBX\Data\Reports\Votes::code_counts( $game->key(), $id );
+		$label = \RBX\Data\Reports\Votes::code_label( $t['y'], $t['n'] );
+		$hours = number_format_i18n( \RBX\Data\Reports\Votes::CODE_WINDOW / 3600 );
+		if ( 'verified' === $label ) {
+			$chip = '<span class="rbx-chip rbx-chip--success">' . esc_html__( 'Verified by players', 'rbx-data' ) . '</span>';
+		} elseif ( 'not_working' === $label ) {
+			$chip = '<span class="rbx-chip rbx-chip--danger">' . esc_html__( 'Players say it does not work', 'rbx-data' ) . '</span>';
+		} else {
+			$chip = '<span class="rbx-chip rbx-chip--warning">' . esc_html__( 'Not verified yet', 'rbx-data' ) . '</span>';
+		}
+		$total = $t['y'] + $t['n'];
+		$line  = $total >= \RBX\Data\Reports\Votes::CODE_SHOW
+			/* translators: 1: players it worked for, 2: players who answered, 3: hours */
+			? sprintf( __( 'Worked for %1$s of %2$s players in the last %3$s hours.', 'rbx-data' ), number_format_i18n( $t['y'] ), number_format_i18n( $total ), $hours )
+			/* translators: %s: hours */
+			: sprintf( __( 'Too few answers in the last %s hours.', 'rbx-data' ), $hours );
+		return $chip . '<span class="rbx-meta">' . esc_html( $line ) . '</span>' . Ui::vote_box( $game, $c, array(), __( 'Did this code work for you?', 'rbx-data' ) );
 	}
 
 	/**

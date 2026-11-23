@@ -33,6 +33,17 @@ final class Votes {
 	/** At most one no for every MAX_NO_PER_YES yes answers (80 % yes). */
 	public const MAX_NO_PER_YES = 4;
 	public const PER_HOUR = 20;
+
+	/**
+	 * Codes ("Did this code work for you?", Fisch 2026-11-23, Ali): codes expire, so only answers
+	 * from the last CODE_WINDOW seconds count. Counts show from CODE_SHOW answers; "Verified by
+	 * players" needs CODE_MIN yes and at most one no per MAX_NO_PER_YES yes; "Players say it does
+	 * not work" needs CODE_MIN no and at most one yes per MAX_NO_PER_YES no. One answer per
+	 * connection and code per window. Stored as hourly buckets: no row per vote, no IP.
+	 */
+	public const CODE_WINDOW = 172800;
+	public const CODE_SHOW   = 3;
+	public const CODE_MIN    = 5;
 	public const PER_DAY  = 300;
 
 	/** @var array<string, array<string, array<string, mixed>>> Loaded counts per game key. */
@@ -78,7 +89,8 @@ final class Votes {
 		$res  = self::handle( (array) $p );
 		$page = esc_url_raw( (string) ( $p['page_url'] ?? '' ) );
 		$back = (string) wp_parse_url( $page, PHP_URL_HOST ) === (string) wp_parse_url( home_url(), PHP_URL_HOST ) ? $page : home_url( '/' );
-		if ( 'no' === ( $p['answer'] ?? '' ) ) {
+		$is_code = (bool) preg_match( '/^[A-Z][A-Z0-9]{1,4}-COD-\d{4,6}$/', (string) ( $p['record_id'] ?? '' ) );
+		if ( 'no' === ( $p['answer'] ?? '' ) && ! $is_code ) {
 			$back = add_query_arg(
 				array_filter(
 					array(
@@ -89,7 +101,7 @@ final class Votes {
 				home_url( '/report/' )
 			);
 		}
-		wp_safe_redirect( is_wp_error( $res ) ? $back : $back . ( str_contains( $back, '/report/' ) ? '' : '#stats' ), 303 );
+		wp_safe_redirect( is_wp_error( $res ) ? $back : $back . ( str_contains( $back, '/report/' ) ? '' : ( $is_code ? '#reported-codes' : '#stats' ) ), 303 );
 		exit;
 	}
 
@@ -176,7 +188,8 @@ final class Votes {
 			}
 			$recs[] = $rec;
 		}
-		$who = self::visitor( implode( ',', $rids ) );
+		$code = 1 === count( $recs ) && 'COD' === ( $recs[0]['entity'] ?? '' );
+		$who  = $code ? self::visitor( implode( ',', $rids ), 'w' . intdiv( time(), self::CODE_WINDOW ) ) : self::visitor( implode( ',', $rids ) );
 		if ( get_transient( $who ) ) {
 			// Already answered this today: say thanks, count nothing.
 			return true;
@@ -184,8 +197,12 @@ final class Votes {
 		if ( ! self::rate_ok() ) {
 			return new \WP_Error( 'rate', __( 'Too many answers from this connection. Please try again later.', 'rbx-data' ), array( 'status' => 429 ) );
 		}
-		set_transient( $who, 1, DAY_IN_SECONDS );
+		set_transient( $who, 1, $code ? self::CODE_WINDOW : DAY_IN_SECONDS );
 		try {
+			if ( $code ) {
+				self::add_code( $ds, $recs[0], 'yes' === $answer );
+				return true;
+			}
 			self::add( $ds, $recs, 'yes' === $answer );
 		} catch ( \Throwable $e ) {
 			ErrorLog::add( 'vote', $e->getMessage() );
@@ -231,10 +248,69 @@ final class Votes {
 		}
 	}
 
-	private static function visitor( string $rid ): string {
+	/**
+	 * Yes and no answers on a code within the window ending at $now.
+	 *
+	 * @param array<int|string, array{0: int, 1: int}> $buckets Hour start (Unix time) => [yes, no].
+	 * @return array{y: int, n: int}
+	 */
+	public static function code_tally( array $buckets, int $now ): array {
+		$y = 0;
+		$n = 0;
+		foreach ( $buckets as $h => $c ) {
+			if ( (int) $h > $now - self::CODE_WINDOW && (int) $h <= $now ) {
+				$y += (int) ( $c[0] ?? 0 );
+				$n += (int) ( $c[1] ?? 0 );
+			}
+		}
+		return array(
+			'y' => $y,
+			'n' => $n,
+		);
+	}
+
+	/** 'verified', 'not_working' or '' for a code's tally. */
+	public static function code_label( int $y, int $n ): string {
+		if ( $y >= self::CODE_MIN && $n * self::MAX_NO_PER_YES <= $y ) {
+			return 'verified';
+		}
+		if ( $n >= self::CODE_MIN && $y * self::MAX_NO_PER_YES <= $n ) {
+			return 'not_working';
+		}
+		return '';
+	}
+
+	/** @return array{y: int, n: int} Answers on one code in the last CODE_WINDOW seconds. */
+	public static function code_counts( string $game_key, string $record_id ): array {
+		$all = function_exists( 'get_option' ) ? (array) get_option( 'rbx_codevotes_' . $game_key, array() ) : array();
+		return self::code_tally( (array) ( $all[ $record_id ] ?? array() ), time() );
+	}
+
+	/** @param array<string, mixed> $rec Code record. */
+	private static function add_code( Dataset $ds, array $rec, bool $yes ): void {
+		$opt = 'rbx_codevotes_' . $ds->game()->key();
+		$all = (array) get_option( $opt, array() );
+		$now = time();
+		$b   = array();
+		// Drop buckets that left the window, so the option stays small.
+		foreach ( (array) ( $all[ $rec['id'] ] ?? array() ) as $h => $c ) {
+			if ( (int) $h > $now - self::CODE_WINDOW ) {
+				$b[ (int) $h ] = $c;
+			}
+		}
+		$h       = $now - $now % 3600;
+		$b[ $h ] = $b[ $h ] ?? array( 0, 0 );
+		++$b[ $h ][ $yes ? 0 : 1 ];
+		$all[ $rec['id'] ] = $b;
+		update_option( $opt, $all, false );
+		// The codes page carries each code's record tag; refresh it so the counts are current.
+		do_action( 'litespeed_purge', 'rbx-rec-' . strtolower( (string) $rec['id'] ) );
+	}
+
+	private static function visitor( string $rid, string $period = '' ): string {
 		$ip   = (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		$fwd  = trim( explode( ',', (string) ( $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '' ) )[0] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$salt = (string) get_option( 'rbx_report_salt', 'rbx' ) . gmdate( 'Y-m-d' );
+		$salt = (string) get_option( 'rbx_report_salt', 'rbx' ) . ( '' !== $period ? $period : gmdate( 'Y-m-d' ) );
 		return 'rbx_vt_' . substr( hash( 'sha256', $ip . '|' . $fwd . '|' . $rid . $salt ), 0, 32 );
 	}
 
