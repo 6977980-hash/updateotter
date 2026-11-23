@@ -78,6 +78,14 @@ final class PageState {
 			|| ( empty( $d['source_url'] ) && empty( $d['evidence_media_id'] ) ) ) {
 			$reasons[] = 'G-3';
 		}
+		// G-4 (Fisch B2, 2026-11-23): an entity with `page_requires` gets a page only for records
+		// that fill those fields (a fish with our own note), so ~1,280 fish do not all become pages.
+		foreach ( (array) ( $def['page_requires'] ?? array() ) as $f ) {
+			if ( '' === trim( (string) ( $d[ (string) $f ] ?? '' ) ) ) {
+				$reasons[] = 'G-4';
+				break;
+			}
+		}
 		if ( $reasons ) {
 			return array(
 				'state'              => self::NOT_GENERATED,

@@ -333,6 +333,15 @@ final class Seo {
 				}
 				$lead = sprintf( /* translators: 1: crop, 2: game */ __( '%1$s Value in %2$s', 'rbx-data' ), $name, $game->name() );
 				break;
+			case 'FSH':
+				// Fisch B2: "fisch paradox piranha", "[fish] value", "how to catch [fish]" searches.
+				if ( $ds->field_state( $rec, 'value_per_kg' )['calc_usable'] ) {
+					$parts[] = __( 'Value', 'rbx-data' );
+					$parts[] = __( 'Mutations', 'rbx-data' );
+				}
+				$parts[] = __( 'How to Catch', 'rbx-data' );
+				$lead    = sprintf( /* translators: 1: fish, 2: game */ __( '%1$s in %2$s', 'rbx-data' ), $name, $game->name() );
+				break;
 			default:
 				$lead = sprintf( '%1$s in %2$s', $name, $game->name() );
 		}
@@ -403,6 +412,10 @@ final class Seo {
 			/* translators: 1: pet, 2: rarity, 3: income per second, 4: game */
 			$bits[] = sprintf( __( '%1$s (%2$s) earns %3$s Cash/s in %4$s.', 'rbx-data' ), $rec['name'], '' !== $rname ? $rname : $game->entity_label( 'PET' ), \RBX\Data\Format\Number::format( $inc['value'] + 0, 'abbr', 'en' ), $game->name() );
 			$extra  = __( 'Income for every mutation and weight.', 'rbx-data' );
+		} elseif ( 'FSH' === $rec['entity'] && null !== ( $fv = FishValue::value( $game, array( 'fish' => (string) $rec['id'] ) ) ) ) {
+			/* translators: 1: fish, 2: rarity, 3: value, 4: game */
+			$bits[] = sprintf( __( '%1$s (%2$s) sells for %3$s C$ at average weight in %4$s.', 'rbx-data' ), $rec['name'], '' !== $rname ? $rname : $game->entity_label( 'FSH' ), \RBX\Data\Format\Number::format( $fv, 'abbr', 'en' ), $game->name() );
+			$extra  = __( 'Value by weight and mutation, and a catch checklist.', 'rbx-data' );
 		} elseif ( $mul && is_numeric( $mul['value'] ) ) {
 			/* translators: 1: mutation, 2: multiplier, 3: game */
 			$bits[] = sprintf( __( 'The %1$s mutation multiplies income by %2$s in %3$s.', 'rbx-data' ), preg_replace( '/\s+mutation$/i', '', (string) $rec['name'] ), \RBX\Data\Format\Number::format( $mul['value'] + 0, 'mult', 'en' ), $game->name() );

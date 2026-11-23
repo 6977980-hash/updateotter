@@ -1,4 +1,305 @@
 {
   "_doc": "Facts behind item notes marked notes_reviewed_by=auto-check (Ali, 2026-10-26). Per game folder, record id -> list of facts (fact types in tools/guides/check.py, plus [\"from_egg\", pet, egg]). tools/notes/check.py fails CI if a fact stops holding or the note names a pet, egg or biome that no fact backs.",
-  "steal-an-egg": {}
+  "steal-an-egg": {},
+  "fisch": {
+    "FSCH-FSH-0014": [
+      ["fish_rarity", "abyssborn-monstrosity", "secret"],
+      ["fish_top_at", "cursed-isle", "abyssborn-monstrosity"],
+      ["fish_worth_more", "abyssborn-monstrosity", "dreaming-aberration"],
+      ["fish_needs", "abyssborn-monstrosity", "season:Winter"],
+      ["fish_bait", "abyssborn-monstrosity", "luminous-larva"]
+    ],
+    "FSCH-FSH-0021": [
+      ["fish_rarity", "aetherfin", "divine-secret"],
+      ["fish_top_at", "roslit-bay", "aetherfin"],
+      ["fish_worth_more", "aetherfin", "molten-ripple"],
+      ["fish_no_bait", "aetherfin", ""]
+    ],
+    "FSCH-FSH-0033": [
+      ["fish_rarity", "ancestral-pliosaur", "secret"],
+      ["fish_top_at", "collapsed-ruins", "ancestral-pliosaur"],
+      ["fish_at", "ancestral-pliosaur", "tidefall"],
+      ["fish_worth_more", "forbidden-plesiosaur", "ancestral-pliosaur"],
+      ["fish_worth_more", "ancestral-pliosaur", "pliosaur"],
+      ["fish_needs", "ancestral-pliosaur", "weather:Foggy"],
+      ["fish_needs", "pliosaur", "weather:Foggy"],
+      ["fish_bait", "ancestral-pliosaur", "shark-head"],
+      ["fish_bait", "pliosaur", "shark-head"]
+    ],
+    "FSCH-FSH-0041": [
+      ["fish_rarity", "ancient-kraken", "secret"],
+      ["fish_top_at", "atlantis", "ancient-kraken"],
+      ["fish_worth_more", "ancient-kraken", "the-kraken"],
+      ["fish_needs", "ancient-kraken", "time_of_day:Night"],
+      ["fish_bait", "ancient-kraken", "shark-head"],
+      ["fish_at", "the-kraken", "atlantis"]
+    ],
+    "FSCH-FSH-0071": [
+      ["fish_rarity", "awakened-omnithal", "secret"],
+      ["fish_top_at", "sunken-reliquary", "awakened-omnithal"],
+      ["fish_worth_more", "awakened-omnithal", "omnithal"],
+      ["fish_needs", "awakened-omnithal", "season:Winter"],
+      ["fish_bait", "awakened-omnithal", "luminous-larva"],
+      ["fish_heavier", "awakened-omnithal", "omnithal"]
+    ],
+    "FSCH-FSH-0102": [
+      ["fish_rarity", "beluga", "apex"],
+      ["fish_worth_more", "beluga", "great-white-shark"],
+      ["fish_needs", "beluga", "weather:Clear"],
+      ["fish_bait", "beluga", "squid"],
+      ["fish_heavier", "bloop-fish", "beluga"]
+    ],
+    "FSCH-FSH-0140": [
+      ["fish_rarity", "bloop-fish", "apex"],
+      ["fish_needs", "bloop-fish", "season:Autumn"],
+      ["fish_needs", "bloop-fish", "time_of_day:Night"],
+      ["fish_bait", "bloop-fish", "luminous-larva"],
+      ["fish_at", "bloop-fish", "the-ocean"],
+      ["fish_worth_more", "magician-narwhal", "bloop-fish"]
+    ],
+    "FSCH-FSH-0214": [
+      ["fish_rarity", "cataclysm-carp", "divine-secret"],
+      ["fish_top_at", "moosewood", "cataclysm-carp"],
+      ["fish_worth_more", "cataclysm-carp", "treble-bass"],
+      ["fish_no_bait", "cataclysm-carp", ""]
+    ],
+    "FSCH-FSH-0218": [
+      ["fish_rarity", "caustic-starwyrm", "secret"],
+      ["fish_top_at", "brine-pool", "caustic-starwyrm"],
+      ["fish_needs", "caustic-starwyrm", "weather:Rain"],
+      ["fish_any", "caustic-starwyrm", "season"],
+      ["fish_bait", "caustic-starwyrm", "truffle-worm"],
+      ["fish_worth_more", "caustic-starwyrm", "awakened-omnithal"]
+    ],
+    "FSCH-FSH-0314": [
+      ["fish_rarity", "crustal-colossus", "divine-secret"],
+      ["fish_top_at", "sunstone-island", "crustal-colossus"],
+      ["fish_worth_more", "crustal-colossus", "tartaruga"],
+      ["fish_any", "crustal-colossus", "time_of_day"]
+    ],
+    "FSCH-FSH-0437": [
+      ["fish_top_rarity", "forbidden-plesiosaur", "divine-secret"],
+      ["fish_top_at", "tidefall", "forbidden-plesiosaur"],
+      ["fish_no_bait", "forbidden-plesiosaur", ""],
+      ["fish_any", "forbidden-plesiosaur", "weather"]
+    ],
+    "FSCH-FSH-0464": [
+      ["fish_rarity", "frostwyrm", "exotic"],
+      ["fish_top_at", "boreal-pines", "frostwyrm"],
+      ["fish_needs", "frostwyrm", "weather:Rain"],
+      ["fish_bait", "frostwyrm", "frostnova-bait"],
+      ["fish_bait", "frostwyrm", "sapphire-krill"],
+      ["fish_worth_more", "rotbloom", "frostwyrm"]
+    ],
+    "FSCH-FSH-0478": [
+      ["fish_rarity", "gem-blobfish", "secret"],
+      ["fish_top_at", "treasure-island", "gem-blobfish"],
+      ["fish_worth_more", "gem-blobfish", "goldfin-octopus"],
+      ["fish_bait", "gem-blobfish", "golden-shrimp-bait"],
+      ["fish_any", "gem-blobfish", "season"]
+    ],
+    "FSCH-FSH-0499": [
+      ["fish_rarity", "glaciaseer-sturgeon", "mythical"],
+      ["fish_at", "glaciaseer-sturgeon", "everturn-forest"],
+      ["fish_worth_more", "floraseer-sturgeon", "glaciaseer-sturgeon"],
+      ["fish_needs", "glaciaseer-sturgeon", "season:Winter"],
+      ["fish_needs", "glaciaseer-sturgeon", "weather:Rain"],
+      ["fish_bait", "glaciaseer-sturgeon", "golden-shrimp-bait"],
+      ["fish_at", "floraseer-sturgeon", "everturn-forest"]
+    ],
+    "FSCH-FSH-0545": [
+      ["fish_rarity", "great-goldcursed-shark", "secret"],
+      ["fish_at", "great-goldcursed-shark", "castaway-cliffs"],
+      ["fish_worth_more", "scalloped-hammerhead", "great-goldcursed-shark"],
+      ["fish_needs", "great-goldcursed-shark", "weather:Foggy"],
+      ["fish_bait", "great-goldcursed-shark", "fish-head"]
+    ],
+    "FSCH-FSH-0547": [
+      ["fish_rarity", "great-white-shark", "mythical"],
+      ["fish_at", "great-white-shark", "the-ocean"],
+      ["fish_needs", "great-white-shark", "season:Autumn"],
+      ["fish_bait", "great-white-shark", "fish-head"],
+      ["fish_worth_more", "beluga", "great-white-shark"]
+    ],
+    "FSCH-FSH-0571": [
+      ["fish_rarity", "helios-sunray", "exotic"],
+      ["fish_top_at", "apollos-song-of-light", "helios-sunray"],
+      ["fish_needs", "helios-sunray", "weather:Clear"],
+      ["fish_bait", "helios-sunray", "golden-worm"],
+      ["fish_worth_more", "pliosaur", "helios-sunray"],
+      ["fish_worth_more", "helios-sunray", "omnithal"]
+    ],
+    "FSCH-FSH-0659": [
+      ["fish_rarity", "legionnaire-lamprey", "exotic"],
+      ["fish_top_at", "bellonas-frenzy-of-war", "legionnaire-lamprey"],
+      ["fish_any", "legionnaire-lamprey", "season"],
+      ["fish_bait", "legionnaire-lamprey", "nightmare-larva"],
+      ["fish_worth_more", "legionnaire-lamprey", "wyvern"]
+    ],
+    "FSCH-FSH-0661": [
+      ["fish_rarity", "leviathan", "exotic"],
+      ["fish_top_at", "cultist-lair", "leviathan"],
+      ["fish_needs", "leviathan", "season:Winter"],
+      ["fish_bait", "leviathan", "luminous-larva"],
+      ["fish_worth_more", "leviathan", "rotbloom"],
+      ["fish_worth_more", "livyatan", "leviathan"]
+    ],
+    "FSCH-FSH-0671": [
+      ["fish_rarity", "livyatan", "exotic"],
+      ["fish_top_at", "ancient-isle", "livyatan"],
+      ["fish_worth_more", "livyatan", "helicoprion"],
+      ["fish_worth_more", "livyatan", "leviathan"],
+      ["fish_needs", "livyatan", "time_of_day:Day"],
+      ["fish_bait", "livyatan", "shark-head"]
+    ],
+    "FSCH-FSH-0677": [
+      ["fish_rarity", "long-pike", "secret"],
+      ["fish_at", "long-pike", "the-ocean"],
+      ["fish_needs", "long-pike", "weather:Rain"],
+      ["fish_bait", "long-pike", "insect"],
+      ["fish_worth_more", "long-pike", "mustard"],
+      ["fish_needs", "mustard", "weather:Rain"]
+    ],
+    "FSCH-FSH-0687": [
+      ["fish_rarity", "lumilotl", "divine-secret"],
+      ["fish_top_at", "desolate-deep", "lumilotl"],
+      ["fish_no_bait", "lumilotl", ""],
+      ["fish_any", "lumilotl", "season"]
+    ],
+    "FSCH-FSH-0698": [
+      ["fish_top_rarity", "magician-narwhal", "apex"],
+      ["fish_top_at", "the-ocean", "magician-narwhal"],
+      ["fish_needs", "magician-narwhal", "season:Summer"],
+      ["fish_bait", "magician-narwhal", "golden-worm"],
+      ["fish_worth_more", "magician-narwhal", "bloop-fish"]
+    ],
+    "FSCH-FSH-0734": [
+      ["fish_rarity", "molten-ripple", "secret"],
+      ["fish_at", "molten-ripple", "roslit-bay"],
+      ["fish_worth_more", "aetherfin", "molten-ripple"],
+      ["fish_needs", "molten-ripple", "weather:Windy"],
+      ["fish_bait", "molten-ripple", "luminous-larva"]
+    ],
+    "FSCH-FSH-0771": [
+      ["fish_rarity", "mustard", "secret"],
+      ["fish_at", "mustard", "the-ocean"],
+      ["fish_needs", "mustard", "season:Summer"],
+      ["fish_bait", "mustard", "seaweed"],
+      ["fish_worth_more", "long-pike", "mustard"],
+      ["fish_worth_more", "mustard", "molten-ripple"]
+    ],
+    "FSCH-FSH-0804": [
+      ["fish_rarity", "olympian-devil", "secret"],
+      ["fish_top_at", "olympian-fissure", "olympian-devil"],
+      ["fish_worth_more", "scylla", "olympian-devil"],
+      ["fish_needs", "olympian-devil", "weather:Stormy"],
+      ["fish_bait", "olympian-devil", "obsidian-bone"],
+      ["fish_heavier", "olympian-devil", "ancestral-pliosaur"]
+    ],
+    "FSCH-FSH-0805": [
+      ["fish_rarity", "omnithal", "exotic"],
+      ["fish_at", "omnithal", "sunken-reliquary"],
+      ["fish_worth_more", "awakened-omnithal", "omnithal"],
+      ["fish_needs", "omnithal", "weather:Foggy"],
+      ["fish_bait", "omnithal", "luminous-larva"],
+      ["fish_worth_more", "omnithal", "legionnaire-lamprey"]
+    ],
+    "FSCH-FSH-0825": [
+      ["fish_rarity", "paradox-piranha", "divine-secret"],
+      ["fish_top_at", "lost-jungle", "paradox-piranha"],
+      ["fish_no_bait", "paradox-piranha", ""],
+      ["fish_any", "paradox-piranha", "weather"]
+    ],
+    "FSCH-FSH-0847": [
+      ["fish_rarity", "photic-terrosunder", "secret"],
+      ["fish_top_at", "drylands", "photic-terrosunder"],
+      ["fish_worth_more", "photic-terrosunder", "terrosunder-skull"],
+      ["fish_needs", "photic-terrosunder", "season:Summer"],
+      ["fish_needs", "photic-terrosunder", "time_of_day:Day"]
+    ],
+    "FSCH-FSH-0858": [
+      ["fish_rarity", "pirate-captains-goldfish", "secret"],
+      ["fish_top_at", "forsaken-shores", "pirate-captains-goldfish"],
+      ["fish_worth_more", "pirate-captains-goldfish", "captains-goldfish"],
+      ["fish_needs", "pirate-captains-goldfish", "season:Summer"],
+      ["fish_bait", "pirate-captains-goldfish", "truffle-worm"]
+    ],
+    "FSCH-FSH-0863": [
+      ["fish_rarity", "pliosaur", "exotic"],
+      ["fish_at", "pliosaur", "collapsed-ruins"],
+      ["fish_at", "pliosaur", "tidefall"],
+      ["fish_worth_more", "ancestral-pliosaur", "pliosaur"],
+      ["fish_needs", "pliosaur", "season:Winter"],
+      ["fish_bait", "pliosaur", "shark-head"],
+      ["fish_worth_more", "pliosaur", "helios-sunray"]
+    ],
+    "FSCH-FSH-0920": [
+      ["fish_rarity", "reef-titan", "exotic"],
+      ["fish_top_at", "coral-bastion", "reef-titan"],
+      ["fish_worth_more", "reef-titan", "sand-tiger-shark"],
+      ["fish_worth_more", "reef-titan", "wobbegong-shark"],
+      ["fish_any", "reef-titan", "weather"],
+      ["fish_bait", "reef-titan", "deep-coral"]
+    ],
+    "FSCH-FSH-0937": [
+      ["fish_rarity", "rotbloom", "exotic"],
+      ["fish_top_at", "toxic-grove", "rotbloom"],
+      ["fish_worth_more", "rotbloom", "toxified-crab"],
+      ["fish_worth_more", "rotbloom", "chlorophage"],
+      ["fish_needs", "rotbloom", "season:Autumn"],
+      ["fish_bait", "rotbloom", "luminous-larva"],
+      ["fish_at", "chlorophage", "toxic-grove"]
+    ],
+    "FSCH-FSH-0989": [
+      ["fish_top_rarity", "scylla", "secret"],
+      ["fish_top_at", "marianas-veil", "scylla"],
+      ["fish_top_at", "veil-of-the-forsaken", "scylla"],
+      ["fish_any", "scylla", "weather"],
+      ["fish_bait", "scylla", "shark-head"]
+    ],
+    "FSCH-FSH-1070": [
+      ["fish_rarity", "sovereign-oarfish", "mythical"],
+      ["fish_top_at", "enchanted-crevice", "sovereign-oarfish"],
+      ["fish_needs", "sovereign-oarfish", "weather:Stormy"],
+      ["fish_any", "sovereign-oarfish", "season"],
+      ["fish_bait", "sovereign-oarfish", "truffle-worm"]
+    ],
+    "FSCH-FSH-1159": [
+      ["fish_rarity", "terrosunder-skull", "mythical"],
+      ["fish_at", "terrosunder-skull", "drylands"],
+      ["fish_worth_more", "photic-terrosunder", "terrosunder-skull"],
+      ["fish_needs", "terrosunder-skull", "weather:Clear"],
+      ["fish_bait", "terrosunder-skull", "fish-head"],
+      ["fish_worth_more", "terrosunder-skull", "great-white-shark"]
+    ],
+    "FSCH-FSH-1184": [
+      ["fish_rarity", "toxic-guardian", "secret"],
+      ["fish_top_at", "living-garden", "toxic-guardian"],
+      ["fish_worth_more", "toxic-guardian", "diamond-daisy"],
+      ["fish_needs", "toxic-guardian", "weather:Rain"],
+      ["fish_bait", "toxic-guardian", "toxic-jelly-core"]
+    ],
+    "FSCH-FSH-1186": [
+      ["fish_rarity", "toxified-crab", "mythical"],
+      ["fish_at", "toxified-crab", "toxic-grove"],
+      ["fish_no_bait", "toxified-crab", ""],
+      ["fish_needs", "toxified-crab", "weather:Rain"],
+      ["fish_worth_more", "rotbloom", "toxified-crab"]
+    ],
+    "FSCH-FSH-1221": [
+      ["fish_rarity", "verdant-mirage", "secret"],
+      ["fish_top_at", "azure-lagoon", "verdant-mirage"],
+      ["fish_needs", "verdant-mirage", "weather:Foggy"],
+      ["fish_needs", "verdant-mirage", "season:Autumn"],
+      ["fish_bait", "verdant-mirage", "luminous-larva"]
+    ],
+    "FSCH-FSH-1264": [
+      ["fish_rarity", "wyvern", "exotic"],
+      ["fish_top_at", "above-the-clouds", "wyvern"],
+      ["fish_worth_more", "wyvern", "harmonic-dove"],
+      ["fish_needs", "wyvern", "weather:Rain"],
+      ["fish_bait", "wyvern", "starlight-worm"],
+      ["fish_bait", "wyvern", "truffle-worm"]
+    ]
+  }
 }

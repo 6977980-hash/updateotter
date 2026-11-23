@@ -34,6 +34,7 @@ final class Plugin {
 		'rbx_gear'     => array( 'Gear', 'Gear item' ),
 		'rbx_biome'    => array( 'Biomes', 'Biome' ),
 		'rbx_mount'    => array( 'Mounts', 'Mount' ),
+		'rbx_fish'     => array( 'Fish', 'Fish' ),
 		'rbx_update'   => array( 'Updates', 'Update' ),
 	);
 
