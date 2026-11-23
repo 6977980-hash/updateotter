@@ -35,6 +35,8 @@ jobs:
         run: python3 modules/rbx-tools/tests/fusion-make-vectors.py && git diff --exit-code modules/rbx-tools/tests/fusion-vectors.json && php modules/rbx-tools/tests/fusion.test.php && node --test modules/rbx-tools/tests/fusion.test.mjs
       - name: What to get next advisor rules
         run: node --test modules/rbx-tools/tests/advisor.test.mjs
+      - name: Fisch "What can I catch here" PHP/JS twins match the fish data
+        run: python3 modules/rbx-tools/tests/catch-make-vectors.py "$RUNNER_TEMP/catch-vectors.json" && php modules/rbx-tools/tests/catch.test.php "$RUNNER_TEMP/catch-vectors.json" && CATCH_VECTORS="$RUNNER_TEMP/catch-vectors.json" node --test modules/rbx-tools/tests/catch.test.mjs
       - name: Report form personal-data check
         run: php modules/rbx-data/tests/report-pii.test.php
       - name: Players confirm vote rule

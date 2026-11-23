@@ -28,6 +28,7 @@ final class Shortcodes {
 		add_shortcode( 'rbx_meta', array( self::class, 'meta_sc' ) );
 		add_shortcode( 'rbx_section', array( self::class, 'section_sc' ) );
 		add_shortcode( 'rbx_income', array( self::class, 'income_sc' ) );
+		add_shortcode( 'rbx_calc', array( FishValue::class, 'calc_sc' ) );
 	}
 
 	/**

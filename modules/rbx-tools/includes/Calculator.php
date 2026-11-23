@@ -227,7 +227,7 @@ final class Calculator {
 				$groups = array();
 				foreach ( $ds->all( $target ) as $rid => $r ) {
 					// A mutation with no known multiplier (disputed) is left out (GR-05).
-					if ( 'MUT' === $r['entity'] && null !== $ds->game()->field( 'MUT', 'income_mult' ) && ! is_numeric( $r['data']['income_mult'] ?? null ) ) {
+					if ( 'MUT' === $r['entity'] && self::no_mult( $ds, $r ) ) {
 						continue;
 					}
 					$g              = ! empty( $d['group_by'] ) ? (string) ( $r['data'][ $d['group_by'] ] ?? '' ) : '';
@@ -252,8 +252,8 @@ final class Calculator {
 					}
 					$gr    = '' !== $g ? $ds->get( $g ) : null;
 					// CR-15: records without a group (e.g. lab pets with no rarity) get an "Other" group when the list is grouped.
-					$label = $gr ? (string) $gr['name'] : ( count( $groups ) > 1 ? __( 'Other', 'rbx-tools' ) : '' );
-					$opts .= '' !== $label ? '<optgroup label="' . esc_attr( $label ) . '">' . $o . '</optgroup>' : $o;
+					$glabel = $gr ? (string) $gr['name'] : ( count( $groups ) > 1 ? __( 'Other', 'rbx-tools' ) : '' );
+					$opts  .= '' !== $glabel ? '<optgroup label="' . esc_attr( $glabel ) . '">' . $o . '</optgroup>' : $o;
 				}
 				if ( '' !== $popular ) {
 					$opts = '<optgroup label="' . esc_attr__( 'Popular', 'rbx-tools' ) . '">' . $popular . '</optgroup>' . $opts;
@@ -273,6 +273,16 @@ final class Calculator {
 				$shown = is_numeric( $value ) ? \RBX\Data\Format\Number::format( $value + 0, ! empty( $d['integer'] ) ? 'int' : 'plain' ) : '';
 				return '<div class="rbx-calc__field"><label for="' . esc_attr( $fid ) . '">' . $label . '</label><span class="rbx-calc__num"><input type="text" id="' . esc_attr( $fid ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $shown ) . '" inputmode="' . ( ! empty( $d['integer'] ) ? 'numeric' : 'decimal' ) . '" autocomplete="off" spellcheck="false" maxlength="24" enterkeyhint="done" data-rbx-input="' . esc_attr( $key ) . '" aria-describedby="' . esc_attr( $fid ) . '-e">' . $suffix . '</span>' . $err . '</div>';
 		}
+	}
+
+	/** True for a mutation whose multiplier field (income_mult, or value_mult in Fisch) has no number. */
+	private static function no_mult( Dataset $ds, array $r ): bool {
+		foreach ( array( 'income_mult', 'value_mult' ) as $f ) {
+			if ( null !== $ds->game()->field( 'MUT', $f ) ) {
+				return ! is_numeric( $r['data'][ $f ] ?? null );
+			}
+		}
+		return false;
 	}
 
 	/**
