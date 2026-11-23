@@ -1,0 +1,505 @@
+{
+  "game_code": "FSCH",
+  "name": "Fisch",
+  "short_name": "Fisch",
+  "nav_order": 5,
+  "folder": "fisch",
+  "wiki_url": "https://fisch.fandom.com/",
+  "wiki_name": "Fisch Wiki",
+  "roblox_universe_id": "5750914919",
+  "roblox_place_id": "16732694052",
+  "schema_version": "1.0",
+  "locales": [
+    "en"
+  ],
+  "freshness_days": 30,
+  "min_formula_tests": 1,
+  "community_single_source_calc": true,
+  "index_community_data": true,
+  "wiki_formula_ok": true,
+  "_owner_decision": "2026-11-23 Ali approved the Fisch plan (gag-seo/plans/fisch-plan-2026-11-23.md). Separate game from Fish It! (FISH, /fish-it/): own code FSCH, own folder /fisch/, no shared data or URLs. Facts come from the community wiki (fisch.fandom.com, CC BY-SA), no in-game checks are asked of Ali, so the calculator runs on the wiki's per-kg values (wiki_formula_ok) and every value shows 'Source: community wiki'. Own-value rule: every page leads with our own tool or computed numbers. Phase A ships data only: the game stays out of menus and the home page until its hub page is published (Phase B).",
+  "game_accent": "#00838F",
+  "notifier": {
+    "update_windows": []
+  },
+  "menu_order": [
+    "calculator",
+    "fish",
+    "mutations",
+    "codes"
+  ],
+  "sections": {
+    "calculator": {
+      "label__en": "Calculator",
+      "type": "tool",
+      "tool": "calculator"
+    },
+    "fish": {
+      "label__en": "Fish",
+      "type": "list",
+      "entity": "FSH"
+    },
+    "mutations": {
+      "label__en": "Mutations",
+      "type": "list",
+      "entity": "MUT"
+    },
+    "codes": {
+      "label__en": "Codes",
+      "type": "codes"
+    }
+  },
+  "entities": {
+    "CUR": {
+      "tab": "currencies",
+      "label__en": "Currency",
+      "plural__en": "Currencies",
+      "named": true,
+      "page": false,
+      "fields": {
+        "symbol_text": {
+          "type": "string",
+          "label__en": "Symbol"
+        },
+        "is_premium": {
+          "type": "bool",
+          "label__en": "Premium currency"
+        }
+      }
+    },
+    "RAR": {
+      "tab": "rarities",
+      "label__en": "Rarity",
+      "plural__en": "Rarities",
+      "named": true,
+      "page": false,
+      "fields": {
+        "sort_order": {
+          "type": "int",
+          "label__en": "Sort order",
+          "required": true
+        },
+        "ui_color_hex": {
+          "type": "string",
+          "label__en": "Colour",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "LOC": {
+      "tab": "locations",
+      "label__en": "Location",
+      "plural__en": "Locations",
+      "named": true,
+      "page": false,
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        }
+      }
+    },
+    "BAI": {
+      "tab": "baits",
+      "label__en": "Bait",
+      "plural__en": "Baits",
+      "named": true,
+      "page": false,
+      "fields": {
+        "rarity_id": {
+          "type": "ref",
+          "target": "RAR",
+          "label__en": "Rarity",
+          "list": true,
+          "facet": true
+        },
+        "preferred_luck_pct": {
+          "type": "decimal",
+          "label__en": "Preferred luck (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        },
+        "universal_luck_pct": {
+          "type": "decimal",
+          "label__en": "Universal luck (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        },
+        "lure_speed_pct": {
+          "type": "decimal",
+          "label__en": "Lure speed (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        },
+        "resilience_pct": {
+          "type": "decimal",
+          "label__en": "Resilience (%)",
+          "display_format": "decimal(0)",
+          "list": true,
+          "compare": true
+        }
+      }
+    },
+    "FSH": {
+      "tab": "fish",
+      "label__en": "Fish",
+      "plural__en": "Fish",
+      "named": true,
+      "page": false,
+      "_page_decision": "Phase A: no fish pages. Phase B2 turns on pages only for fish with full data (value per kg and weights) and our own computed tables (plan section 4, B2).",
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        },
+        "rarity_id": {
+          "type": "ref",
+          "target": "RAR",
+          "label__en": "Rarity",
+          "list": true,
+          "facet": true
+        },
+        "location_ids": {
+          "type": "ref_list",
+          "target": "LOC",
+          "label__en": "Where to catch",
+          "list": true,
+          "facet": true
+        },
+        "location_text__en": {
+          "type": "text",
+          "label__en": "Where to catch (as the wiki lists it)"
+        },
+        "bait_rule": {
+          "type": "enum",
+          "enum": [
+            "none",
+            "specific",
+            "unknown"
+          ],
+          "label__en": "Bait needed"
+        },
+        "bait_ids": {
+          "type": "ref_list",
+          "target": "BAI",
+          "label__en": "Preferred bait",
+          "list": true,
+          "facet": true
+        },
+        "bait_text__en": {
+          "type": "text",
+          "label__en": "Bait (as the wiki lists it)"
+        },
+        "time_of_day": {
+          "type": "string_list",
+          "label__en": "Time of day",
+          "list": true,
+          "facet": true
+        },
+        "weather": {
+          "type": "string_list",
+          "label__en": "Weather",
+          "list": true,
+          "facet": true
+        },
+        "season": {
+          "type": "string_list",
+          "label__en": "Season",
+          "list": true,
+          "facet": true
+        },
+        "weight_min_kg": {
+          "type": "decimal",
+          "label__en": "Lightest (kg)",
+          "display_format": "abbr",
+          "compare": true
+        },
+        "weight_avg_kg": {
+          "type": "decimal",
+          "label__en": "Average weight (kg)",
+          "display_format": "abbr",
+          "list": true,
+          "compare": true
+        },
+        "weight_max_kg": {
+          "type": "decimal",
+          "label__en": "Heaviest (kg)",
+          "display_format": "abbr",
+          "compare": true
+        },
+        "value_per_kg": {
+          "type": "decimal",
+          "label__en": "C$ per kg",
+          "currency_field": "currency_id",
+          "requires_mechanics": [
+            "value_formula"
+          ],
+          "display_format": "abbr",
+          "list": true,
+          "compare": true
+        },
+        "currency_id": {
+          "type": "ref",
+          "target": "CUR",
+          "label__en": "Currency"
+        },
+        "base_xp": {
+          "type": "int",
+          "label__en": "Base XP",
+          "display_format": "abbr",
+          "compare": true
+        },
+        "wiki_revision": {
+          "type": "string",
+          "label__en": "Wiki revision used",
+          "internal": true
+        }
+      },
+      "siblings_by": [
+        "rarity_id"
+      ]
+    },
+    "MUT": {
+      "tab": "mutations",
+      "label__en": "Mutation",
+      "plural__en": "Mutations",
+      "named": true,
+      "page": false,
+      "fields": {
+        "aliases": {
+          "type": "string",
+          "label__en": "Also called"
+        },
+        "value_mult": {
+          "type": "mult",
+          "label__en": "Value multiplier",
+          "requires_mechanics": [
+            "mutation_multiplier"
+          ],
+          "display_format": "mult",
+          "list": true,
+          "compare": true
+        },
+        "mult_range_text__en": {
+          "type": "text",
+          "label__en": "Multiplier range"
+        },
+        "mutation_group": {
+          "type": "enum",
+          "enum": [
+            "standard",
+            "event",
+            "admin",
+            "removed"
+          ],
+          "label__en": "Kind",
+          "list": true,
+          "facet": true
+        },
+        "event_name": {
+          "type": "string",
+          "label__en": "Event"
+        },
+        "appraisable": {
+          "type": "bool",
+          "label__en": "Can come from appraising",
+          "list": true,
+          "facet": true
+        },
+        "appraise_chance_prob": {
+          "type": "prob",
+          "label__en": "Chance per appraisal",
+          "display_format": "prob"
+        },
+        "added_in_version": {
+          "type": "string",
+          "label__en": "Added in game version"
+        }
+      }
+    },
+    "ATR": {
+      "tab": "attributes",
+      "label__en": "Attribute",
+      "plural__en": "Attributes",
+      "named": true,
+      "page": false,
+      "fields": {
+        "sort_order": {
+          "type": "int",
+          "label__en": "Sort order"
+        },
+        "value_mult": {
+          "type": "mult",
+          "label__en": "Value multiplier",
+          "requires_mechanics": [
+            "attribute_multiplier"
+          ],
+          "display_format": "mult"
+        },
+        "chance_prob": {
+          "type": "prob",
+          "label__en": "Chance per catch",
+          "display_format": "prob"
+        }
+      }
+    },
+    "COD": {
+      "tab": "codes",
+      "label__en": "Code",
+      "plural__en": "Codes",
+      "named": false,
+      "page": false,
+      "fields": {
+        "code": {
+          "type": "string",
+          "label__en": "Code",
+          "required": true
+        },
+        "reward_text__en": {
+          "type": "text",
+          "label__en": "Reward"
+        },
+        "reward_items": {
+          "type": "json",
+          "label__en": "Reward items",
+          "json_shape": "reward_items"
+        },
+        "level_required": {
+          "type": "string",
+          "label__en": "Level needed"
+        },
+        "code_status": {
+          "type": "enum",
+          "enum": [
+            "active",
+            "expired",
+            "unverified"
+          ],
+          "label__en": "Code status",
+          "required": true
+        },
+        "first_seen": {
+          "type": "date",
+          "label__en": "First seen"
+        },
+        "last_tested_at": {
+          "type": "datetime",
+          "label__en": "Last tested"
+        },
+        "tested_by": {
+          "type": "string",
+          "label__en": "Tested by"
+        },
+        "expires_at": {
+          "type": "datetime",
+          "label__en": "Expires",
+          "future_ok": true
+        }
+      }
+    },
+    "UPD": {
+      "tab": "updates",
+      "post_type": "rbx_update",
+      "path": "updates",
+      "label__en": "Update",
+      "plural__en": "Updates",
+      "named": false,
+      "slugged": true,
+      "page": true,
+      "fields": {
+        "title__en": {
+          "type": "text",
+          "label__en": "Title",
+          "required": true
+        },
+        "release_date": {
+          "type": "date",
+          "label__en": "Release date",
+          "required_for_index": true
+        },
+        "roblox_updated_at": {
+          "type": "datetime",
+          "label__en": "Roblox update time"
+        },
+        "official_source_url": {
+          "type": "url",
+          "label__en": "Official notes"
+        },
+        "summary__en": {
+          "type": "text",
+          "label__en": "Summary",
+          "required_for_index": true,
+          "editorial": true
+        },
+        "affected_record_ids": {
+          "type": "ref_list",
+          "target": "*",
+          "label__en": "Affected items"
+        }
+      },
+      "slug_pattern": "^\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(-[a-z0-9]+)*$",
+      "require_screenshot_for_index": false
+    }
+  },
+  "tools": [
+    {
+      "key": "calculator",
+      "path": "calculator",
+      "label__en": "Fisch Fish Value Calculator",
+      "formula_plain__en": [
+        "Sell value = C$ per kg × weight in kg × mutation multiplier × Shiny (×1.85) × Sparkling (×1.85), rounded.",
+        "No weight entered: the fish's average weight from the wiki is used. No mutation counts as ×1.",
+        "A fish carries at most one mutation; Shiny and Sparkling are attributes that come on top of it."
+      ],
+      "slices": [
+        "core",
+        "fish"
+      ],
+      "inputs": [
+        {
+          "key": "fish",
+          "type": "ref",
+          "target": "FSH",
+          "label__en": "Fish",
+          "group_by": "rarity_id"
+        },
+        {
+          "key": "weight",
+          "type": "number",
+          "label__en": "Weight in kg (optional)",
+          "optional": true,
+          "min": 0.01,
+          "max": 10000000
+        },
+        {
+          "key": "mutation",
+          "type": "ref",
+          "target": "MUT",
+          "label__en": "Mutation",
+          "optional": true,
+          "none_label__en": "No mutation"
+        },
+        {
+          "key": "attribute",
+          "type": "ref",
+          "target": "ATR",
+          "label__en": "Shiny or Sparkling",
+          "optional": true,
+          "none_label__en": "Neither"
+        },
+        {
+          "key": "attribute2",
+          "type": "ref",
+          "target": "ATR",
+          "label__en": "Second attribute",
+          "optional": true,
+          "none_label__en": "None",
+          "mini": false
+        }
+      ]
+    }
+  ]
+}

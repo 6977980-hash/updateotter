@@ -1,0 +1,3 @@
+id,slug,name,sort_order,value_mult,chance_prob,status,source_type,source_url,evidence_media_id,source_note,last_verified,verified_by,added_in_update,removed_in_update,change_update_id,slug_history
+FSCH-ATR-0001,shiny,Shiny,1,1.85,0.01,live,community,https://fisch.fandom.com/wiki/Mutations#Attributes,,"Attribute table on the wiki (rev 150741, 2026-05-28)",2026-11-23,claude,,,,
+FSCH-ATR-0002,sparkling,Sparkling,2,1.85,0.01,live,community,https://fisch.fandom.com/wiki/Mutations#Attributes,,"Attribute table on the wiki (rev 150741, 2026-05-28)",2026-11-23,claude,,,,

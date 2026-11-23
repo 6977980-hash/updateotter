@@ -135,7 +135,8 @@ final class Llms {
 
 	public static function build(): string {
 		$games = Loader::games();
-		$names = implode( ', ', array_map( static fn( Game $g ): string => $g->name(), $games ) );
+		// Only games with published pages (a new game's data can ship before its pages).
+		$names = implode( ', ', array_map( static fn( Game $g ): string => $g->name(), array_filter( $games, static fn( Game $g ): bool => (bool) self::game_pages( $g ) ) ) );
 		$l     = array();
 		$l[]   = '# ' . Seo::BRAND;
 		$l[]   = '';

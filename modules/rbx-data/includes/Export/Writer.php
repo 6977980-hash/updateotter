@@ -28,12 +28,13 @@ final class Writer {
 
 	/** Slice name => entity codes. Unknown entities are skipped per game. */
 	public const SLICES = array(
-		'core'    => array( 'CUR', 'RAR', 'BIO', 'MUT', 'SIZ', 'VAR', 'GPS', 'MNT' ),
+		'core'    => array( 'CUR', 'RAR', 'BIO', 'MUT', 'SIZ', 'VAR', 'GPS', 'MNT', 'ATR' ),
 		'pets'    => array( 'PET' ),
 		'eggs'    => array( 'EGG', 'DRP' ),
 		'recipes' => array( 'FUS', 'RIT', 'LAB' ),
 		'plants'  => array( 'PLT', 'SED' ),
 		'gear'    => array( 'GER' ),
+		'fish'    => array( 'FSH', 'LOC', 'BAI' ),
 	);
 
 	public static function base_dir(): string {
