@@ -3,3 +3,5 @@ FSCH-TST-0001,FSCH-FRM-0001,"{""fish"": ""paradox-piranha""}",30003,0.5,,,,claud
 FSCH-TST-0002,FSCH-FRM-0001,"{""fish"": ""paradox-piranha"", ""weight"": 100, ""mutation"": ""aether""}",9000,0.5,,,,claude,live
 FSCH-TST-0003,FSCH-FRM-0001,"{""fish"": ""paradox-piranha"", ""weight"": 100, ""mutation"": ""aether"", ""attribute"": ""shiny""}",16650,0.5,,,,claude,live
 FSCH-TST-0004,FSCH-FRM-0001,"{""fish"": ""paradox-piranha"", ""weight"": 10, ""attribute"": ""shiny"", ""attribute2"": ""sparkling""}",205,0.5,,,,claude,live
+FSCH-TST-0005,FSCH-FRM-0002,"{""fish"": ""paradox-piranha""}",9001,0.5,,,,claude,live
+FSCH-TST-0006,FSCH-FRM-0002,"{""fish"": ""paradox-piranha"", ""weight"": 100, ""mutation"": ""aether""}",2700,0.5,,,,claude,live

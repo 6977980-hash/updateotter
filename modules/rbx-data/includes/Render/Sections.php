@@ -31,7 +31,7 @@ final class Sections {
 	/** Rows a list renders in the page; the rest load on demand (GR-24). */
 	public const LIST_ROWS = 100;
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'best_divine', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'best_divine', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides', 'value_leaders', 'mutation_values', 'appraise_odds' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -120,6 +120,12 @@ final class Sections {
 					return self::licensed( $game, self::income_leaders( $game, (int) ( $a['limit'] ?? 10 ) ) );
 				case 'head_to_head':
 					return self::head_to_head( $game, (string) ( $a['pairs'] ?? '' ) );
+				case 'value_leaders':
+					return self::licensed( $game, FishValue::leaders( $game, (int) ( $a['limit'] ?? 10 ), (string) ( $a['pairs'] ?? '' ) ) );
+				case 'mutation_values':
+					return self::licensed( $game, FishValue::mutation_values( $game, (string) ( $a['pairs'] ?? '' ), (int) ( $a['limit'] ?? 10 ) ) );
+				case 'appraise_odds':
+					return self::licensed( $game, FishValue::appraise_odds( $game ) );
 				case 'changes':
 					return self::page_changes( $game );
 				case 'corrections':
@@ -149,25 +155,35 @@ final class Sections {
 		if ( false === strpos( $html, 'rbx-table--list' ) ) {
 			return $html;
 		}
-		return (string) preg_replace_callback(
-			'#<table class="rbx-table rbx-table--list">.*?</table>#s',
-			static function ( $m ) {
-				return strtr(
-					$m[0],
-					array(
-						'<table class="rbx-table rbx-table--list">' => '<table class="rbx-table rbx-table--list" role="table">',
-						'<thead>'                                  => '<thead role="rowgroup">',
-						'<tbody>'                                  => '<tbody role="rowgroup">',
-						'<tr>'                                     => '<tr role="row">',
-						'<tr '                                     => '<tr role="row" ',
-						'<th scope="col"'                          => '<th role="columnheader" scope="col"',
-						'<th scope="row"'                          => '<th role="rowheader" scope="row"',
-						'<td>'                                     => '<td role="cell">',
-						'<td '                                     => '<td role="cell" ',
-					)
-				);
-			},
-			$html
+		// A plain scan, not a regex: a 1,000-row list (Fisch fish, ~1.4 MB) exhausts PCRE's
+		// backtrack limit and preg_replace_callback() returned null, which emptied the section.
+		$open = '<table class="rbx-table rbx-table--list">';
+		$out  = '';
+		$pos  = 0;
+		while ( false !== ( $start = strpos( $html, $open, $pos ) ) ) {
+			$end = strpos( $html, '</table>', $start );
+			$end = false === $end ? strlen( $html ) : $end + 8;
+			$out .= substr( $html, $pos, $start - $pos ) . self::roles( substr( $html, $start, $end - $start ) );
+			$pos  = $end;
+		}
+		return $out . substr( $html, $pos );
+	}
+
+	/** ARIA roles for one list table (see table_roles()). */
+	private static function roles( string $table ): string {
+		return strtr(
+			$table,
+			array(
+				'<table class="rbx-table rbx-table--list">' => '<table class="rbx-table rbx-table--list" role="table">',
+				'<thead>'                                  => '<thead role="rowgroup">',
+				'<tbody>'                                  => '<tbody role="rowgroup">',
+				'<tr>'                                     => '<tr role="row">',
+				'<tr '                                     => '<tr role="row" ',
+				'<th scope="col"'                          => '<th role="columnheader" scope="col"',
+				'<th scope="row"'                          => '<th role="rowheader" scope="row"',
+				'<td>'                                     => '<td role="cell">',
+				'<td '                                     => '<td role="cell" ',
+			)
 		);
 	}
 

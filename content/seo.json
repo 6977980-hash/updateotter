@@ -218,6 +218,32 @@
     "title": "Fish It! Mutations List & Chances | UpdateOtter",
     "description": "All Fish It! mutations with their chance per catch, how baits raise them, and how Shiny and Big tags differ."
   },
+  "fisch": {
+    "title": "Fisch Calculator & Guide: Fish Values, Spots & Mutations | UpdateOtter",
+    "description": "Fan-made Fisch helper: a fish sell value calculator, a What can I catch here finder by spot, weather and season, the most valuable fish, mutations and codes."
+  },
+  "fisch/calculator": {
+    "title": "Fisch Calculator: Fish Sell Value by Weight & Mutation",
+    "description": "Work out what any Fisch fish sells for: pick the fish, type its weight, add its mutation, Shiny or Sparkling, and see the C$ value and the Appraiser's fee."
+  },
+  "fisch/what-can-i-catch": {
+    "title": "What Can I Catch in Fisch? Fish Finder by Spot & Weather | UpdateOtter",
+    "description": "Pick your Fisch fishing spot, time of day, weather and season to see every fish that can bite right now, the most valuable first, with the bait it needs."
+  },
+  "fisch/fish": {
+    "title": "Fisch Fish List: Most Valuable Fish, Value per kg & Spots | UpdateOtter",
+    "description": "The most valuable Fisch fish worked out at their average weight, then every fish with its C$ per kg, weight, spot, bait, time of day, weather and season."
+  },
+  "fisch/mutations": {
+    "title": "Fisch Mutations: Multipliers & What They Add to a Fish | UpdateOtter",
+    "description": "Every Fisch mutation with its value multiplier, what the strongest ones add to a real fish, and how often an appraisal gives a mutation, worked out by us."
+  },
+  "fisch/codes": {
+    "_noindex": "Kept out of search: reported codes only, none tested by us, and the codes SERP belongs to big sites (Fisch plan 1b, own-value rule 2b). Turn on once we have our own tested codes.",
+    "noindex": true,
+    "title": "Fisch Codes: Reported Codes & Rewards | UpdateOtter",
+    "description": "Fisch codes the community wiki lists as working, with their rewards, marked Not tested by us, the date we last checked and how to redeem them."
+  },
   "steal-an-egg/pets/voidseer-pumpkin": {
     "answer": "To get the Voidseer Pumpkin, find a Voidseer Pumpkin Egg in the Halloween Dimension event zone and carry it out to hatch it.",
     "frozen": "GSC review 3 Nov: most of the site's clicks; template changes skip this page. Do not change."

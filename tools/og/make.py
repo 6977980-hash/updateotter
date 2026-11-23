@@ -21,7 +21,7 @@ FONT = '/usr/share/fonts/opentype/inter/InterDisplay-Bold.otf'
 PRIMARY = (80, 50, 200)
 SOFT = (217, 209, 255)
 W, H = 1200, 630
-GAMES = {'steal-an-egg': 'sae', 'grow-a-garden': 'gag', 'grow-a-garden-2': 'gag2', 'fish-it': 'fish'}
+GAMES = {'steal-an-egg': 'sae', 'grow-a-garden': 'gag', 'grow-a-garden-2': 'gag2', 'fish-it': 'fish', 'fisch': 'fsch'}
 # Page kinds by last path part: share title suffix and subtitle.
 KIND = {
     'calculator': ('Calculator', 'Income from base value, mutation and weight'),
@@ -40,6 +40,16 @@ KIND = {
     'rods': ('Rods List', 'Every rod and its stats'),
     'baits': ('Baits List', 'Every bait and its stats'),
 }
+# Per-game wording where the shared one does not fit (Fisch sells fish by weight, no income).
+KIND_GAME = {
+    'fisch': {
+        'calculator': ('Calculator', 'Fish sell value from weight and mutation'),
+        'what-can-i-catch': ('Fish Finder', 'What can bite at your spot right now'),
+        'fish': ('Fish List', 'The most valuable fish and where to catch them'),
+        'mutations': ('Mutations', 'Every multiplier and what it adds'),
+        'codes': ('Codes', 'Reported codes and when we last checked'),
+    },
+}
 KIND_ID = {
     'calculator': ('Kalkulator', 'Pendapatan dari nilai dasar, mutasi dan berat'),
     'codes': ('Kode', 'Kapan terakhir dicek dan apa yang benar-benar berfungsi'),
@@ -53,6 +63,7 @@ HUB_SUB = {
     'grow-a-garden': 'Calculator · Crops · Mutations · Codes',
     'grow-a-garden-2': 'Calculator · Crops · Mutations · Codes',
     'fish-it': 'Fish · Rods · Baits · Mutations',
+    'fisch': 'Calculator · Fish finder · Mutations · Codes',
 }
 
 _base = None
@@ -155,7 +166,7 @@ def main():
                         title = (g or {}).get('label') or header(os.path.join(root, fn)).get('title') or last
                         card(title.split(':')[0], name + ' guide', os.path.join(OUT, rel + '.jpg'))
                     else:
-                        k = (KIND_ID if lang else KIND).get(last)
+                        k = (KIND_ID if lang else {**KIND, **KIND_GAME.get(folder, {})}).get(last)
                         if not k:
                             continue
                         card(name + ' ' + k[0], k[1], os.path.join(OUT, rel + '.jpg'))

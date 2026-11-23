@@ -17,13 +17,14 @@
   "community_single_source_calc": true,
   "index_community_data": true,
   "wiki_formula_ok": true,
-  "_owner_decision": "2026-11-23 Ali approved the Fisch plan (gag-seo/plans/fisch-plan-2026-11-23.md). Separate game from Fish It! (FISH, /fish-it/): own code FSCH, own folder /fisch/, no shared data or URLs. Facts come from the community wiki (fisch.fandom.com, CC BY-SA), no in-game checks are asked of Ali, so the calculator runs on the wiki's per-kg values (wiki_formula_ok) and every value shows 'Source: community wiki'. Own-value rule: every page leads with our own tool or computed numbers. Phase A ships data only: the game stays out of menus and the home page until its hub page is published (Phase B).",
+  "_owner_decision": "2026-11-23 Ali approved the Fisch plan (gag-seo/plans/fisch-plan-2026-11-23.md). Separate game from Fish It! (FISH, /fish-it/): own code FSCH, own folder /fisch/, no shared data or URLs. Facts come from the community wiki (fisch.fandom.com, CC BY-SA), no in-game checks are asked of Ali, so the calculator runs on the wiki's per-kg values (wiki_formula_ok) and every value shows 'Source: community wiki'. Own-value rule: every page leads with our own tool or computed numbers. Phase A shipped data only; Phase B (2026-11-23, Ali: \"han krdo\") adds the hub, calculator, What can I catch, fish, mutations and codes pages, and the game shows in menus and on the home page once the hub is published.",
   "game_accent": "#00838F",
   "notifier": {
     "update_windows": []
   },
   "menu_order": [
     "calculator",
+    "what-can-i-catch",
     "fish",
     "mutations",
     "codes"
@@ -33,6 +34,10 @@
       "label__en": "Calculator",
       "type": "tool",
       "tool": "calculator"
+    },
+    "what-can-i-catch": {
+      "label__en": "What can I catch",
+      "type": "page"
     },
     "fish": {
       "label__en": "Fish",
@@ -186,8 +191,7 @@
           "type": "ref_list",
           "target": "BAI",
           "label__en": "Preferred bait",
-          "list": true,
-          "facet": true
+          "list": true
         },
         "bait_text__en": {
           "type": "text",

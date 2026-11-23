@@ -401,3 +401,11 @@
 		margin-top: var(--sp-4, 16px);
 	}
 }
+
+/* Fisch "What can I catch here": its spot list is a plain select (no type-to-find box), so the
+   space GR-28 keeps free for that box above long selects is not needed. */
+@media (scripting: enabled) {
+	.rbx-calc.rbx-catch .rbx-calc__field:not(:has(> .rbx-calc__find)) > select:has(option:nth-child(31)) {
+		margin-top: 0;
+	}
+}

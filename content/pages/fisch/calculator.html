@@ -1,0 +1,162 @@
+<!-- uo:page {"title": "Fisch Calculator: Fish Sell Value by Weight & Mutation", "excerpt": "Pick a fish, type its weight and pick its mutation, Shiny or Sparkling: the Fisch calculator shows what it sells for in C$ and what the Appraiser charges for it."} -->
+<!-- rbx-allow-number: the Appraiser's 30% fee and the 2% agreement check we use on wiki numbers -->
+<!-- wp:paragraph -->
+<p>This Fisch calculator works out what a fish sells for: pick the fish, type its weight in kg and pick its mutation, and whether it is Shiny or Sparkling. It also shows what the Appraiser charges for that fish. To find out which fish can bite where you are, use <a href="/fisch/what-can-i-catch/">What can I catch here</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/calculator {"game":"fsch","tool":"calculator"} /-->
+
+<!-- wp:heading {"anchor":"how-to-use"} -->
+<h2 class="wp-block-heading" id="how-to-use">How to use it</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list">
+<!-- wp:list-item -->
+<li>Pick your fish. You can type to find it in the list.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Type the weight in kg from the fish card. Leave it empty to use the fish's average weight.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Pick its mutation, or leave "No mutation".</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>If the fish is Shiny or Sparkling (or both), pick that too.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Use "Copy link" to share the result.</li>
+<!-- /wp:list-item -->
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"anchor":"how-it-is-calculated"} -->
+<h2 class="wp-block-heading" id="how-it-is-calculated">How it is calculated</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Sell value = the fish's C$ per kg × its weight × the mutation multiplier × Shiny × Sparkling. The Appraiser charges 30% of that value. The exact formula and the date of the wiki data are shown under the calculator.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:shortcode -->
+[uo_ad slot="below-tool"]
+<!-- /wp:shortcode -->
+
+<!-- wp:heading {"anchor":"worked-example"} -->
+<h2 class="wp-block-heading" id="worked-example">Worked examples</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Each number below comes from the same formula as the calculator, so it changes when the fish data changes.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3,"anchor":"example-weight"} -->
+<h3 class="wp-block-heading" id="example-weight">1. Why weight matters so much</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>A Great White Shark sells for [rbx_value id="FSCH-FSH-0547" field="value_per_kg"] C$ per kg. At its average weight of [rbx_value id="FSCH-FSH-0547" field="weight_avg_kg"] kg it is worth [rbx_calc game="fsch" fish="FSCH-FSH-0547"] C$. At the heaviest weight the wiki lists, [rbx_value id="FSCH-FSH-0547" field="weight_max_kg"] kg, it is worth [rbx_calc game="fsch" fish="FSCH-FSH-0547" weight="3000"] C$. Same fish, same spot: only the weight is different.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3,"anchor":"example-mutation"} -->
+<h3 class="wp-block-heading" id="example-mutation">2. A mutation on a common catch</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>An <a href="/fisch/mutations/#abyssal">Abyssal</a> mutation multiplies the value by [rbx_value id="FSCH-MUT-0061" field="value_mult"]. That turns an average Great White Shark into [rbx_calc game="fsch" fish="FSCH-FSH-0547" mutation="FSCH-MUT-0061"] C$. An <a href="/fisch/mutations/#albino">Albino</a> one, at [rbx_value id="FSCH-MUT-0143" field="value_mult"], only reaches [rbx_calc game="fsch" fish="FSCH-FSH-0547" mutation="FSCH-MUT-0143"] C$. Not every mutation is worth celebrating.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3,"anchor":"example-shiny"} -->
+<h3 class="wp-block-heading" id="example-shiny">3. Shiny and Sparkling stack</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Shiny multiplies the value by [rbx_value id="FSCH-ATR-0001" field="value_mult"], and so does Sparkling. A fish with both is worth [rbx_calc game="fsch" fish="FSCH-FSH-0547" attribute="FSCH-ATR-0001" attribute2="FSCH-ATR-0002"] C$ as an average Great White Shark, and with Abyssal on top, [rbx_calc game="fsch" fish="FSCH-FSH-0547" mutation="FSCH-MUT-0061" attribute="FSCH-ATR-0001" attribute2="FSCH-ATR-0002"] C$.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"anchor":"appraise"} -->
+<h2 class="wp-block-heading" id="appraise">Should you appraise this fish?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The Appraiser in Moosewood rerolls a fish's weight and may give it a mutation, for 30% of the fish's value each time. The calculator shows that fee for your fish. Here are the odds, added up by us from the appraiser chances on the community wiki:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/data-section {"game":"fsch","section":"appraise_odds"} /-->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li><strong>Appraise clean fish.</strong> Appraising removes a mutation the fish already has (Shiny and Sparkling stay), and a mutated fish costs more to appraise. A fish that already has a strong mutation is usually best sold as it is.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Appraise light catches of valuable fish.</strong> The fee follows the fish's current value, so a light fish is a cheap try at a heavier weight.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Count the fees, not the tries.</strong> On average a mutation takes many tries, and all those fees add up to several times the fish's value, as the table shows.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"anchor":"top-value"} -->
+<h2 class="wp-block-heading" id="top-value">The most valuable fish to check first</h2>
+<!-- /wp:heading -->
+
+<!-- wp:rbx/data-section {"game":"fsch","section":"value_leaders","limit":10} /-->
+
+<!-- wp:heading {"anchor":"inputs"} -->
+<h2 class="wp-block-heading" id="inputs">What each input means</h2>
+<!-- /wp:heading -->
+
+<!-- wp:html -->
+<dl><dt>Fish</dt><dd>The fish you caught. Fish are grouped by rarity.</dd><dt>Weight in kg</dt><dd>The weight on the fish card. Empty means the fish's average weight.</dd><dt>Mutation</dt><dd>The mutation shown on the fish, such as Albino or Abyssal. A fish has at most one.</dd><dt>Shiny or Sparkling</dt><dd>These attributes come on top of the mutation. Pick both if your fish has both.</dd></dl>
+<!-- /wp:html -->
+
+<!-- wp:heading {"anchor":"limits"} -->
+<h2 class="wp-block-heading" id="limits">Limits and known gaps</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item -->
+<li>All prices, weights and multipliers come from the community wiki and are marked "Source: community wiki". We have not tested them in the game ourselves.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>We keep a fish's C$ per kg only when the wiki's price per kg times the average weight matches the wiki's own average sell value within 2%. Fish where the two disagree show "TBA".</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Some event mutations have no single multiplier on the wiki, so they show no value.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Boosts and server events that change sell prices are not included.</li>
+<!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"anchor":"faq"} -->
+<h2 class="wp-block-heading" id="faq">Questions</h2>
+<!-- /wp:heading -->
+
+<!-- wp:details {"className":"uo-faq"} -->
+<details class="wp-block-details uo-faq"><summary>Why does another Fisch value list show a different price?</summary><!-- wp:paragraph -->
+<p>Many lists copy old or mixed-up numbers, and some show trade values instead of sell values. We use the C$ per kg from the wiki only when it matches the wiki's own average value, and show "TBA" otherwise. If our number is far off from what the game pays you, use <a href="/report/">Report a wrong value</a> and tell us the fish, weight and mutation.</p>
+<!-- /wp:paragraph --></details>
+<!-- /wp:details -->
+
+<!-- wp:details {"className":"uo-faq"} -->
+<details class="wp-block-details uo-faq"><summary>Can a fish have two mutations?</summary><!-- wp:paragraph -->
+<p>No. According to the community wiki a fish carries at most one mutation. Shiny and Sparkling are attributes, so they can come on top of it.</p>
+<!-- /wp:paragraph --></details>
+<!-- /wp:details -->
+
+<!-- wp:details {"className":"uo-faq"} -->
+<details class="wp-block-details uo-faq"><summary>Is this calculator made by the Fisch developers?</summary><!-- wp:paragraph -->
+<p>No. UpdateOtter is a fan site and is not made by the game's developers. The values come from the community wiki, and the date of the data is shown under the calculator.</p>
+<!-- /wp:paragraph --></details>
+<!-- /wp:details -->
+
+<!-- wp:paragraph -->
+<p>The calculator reads the <a href="/fisch/fish/">fish list</a> and the <a href="/fisch/mutations/">mutations list</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:rbx/data-section {"game":"fsch","section":"changes"} /-->
