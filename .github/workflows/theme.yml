@@ -23,6 +23,8 @@ jobs:
         run: python3 tools/i18n/build.py && git diff --exit-code languages modules/rbx-data/languages modules/rbx-tools/languages
       - name: Game data CSVs are valid
         run: python3 tools/data/check.py
+      - name: Fisch auto import (watcher) plan and apply rules
+        run: python3 tools/data/fisch_watch.test.py
       - name: Guides match the game data
         run: python3 tools/guides/check.py
       - name: Auto-checked notes match the game data
