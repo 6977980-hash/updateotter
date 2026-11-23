@@ -1,0 +1,15 @@
+key,value,source_type,source_url,last_verified,verified_by
+game_code,FSCH,,,,
+schema_version,1.0,,,,
+roblox_universe_id,5750914919,official,https://games.roblox.com/v1/games?universeIds=5750914919,2026-11-23,claude
+roblox_place_id,16732694052,official,https://www.roblox.com/games/16732694052,2026-11-23,claude
+timezone_note,All times on this site are UTC.,,,,
+game_name,Fisch,official,https://www.roblox.com/games/16732694052,2026-11-23,claude
+developer_name,Fisching,official,https://www.roblox.com/communities/7381705,2026-11-23,claude
+developer_roblox_url,https://www.roblox.com/communities/7381705,official,https://www.roblox.com/games/16732694052,2026-11-23,claude
+official_channels,https://www.roblox.com/games/16732694052|https://www.roblox.com/communities/7381705,official,https://www.roblox.com/games/16732694052,2026-11-23,claude
+release_date,2024-03-13,official,https://games.roblox.com/v1/games?universeIds=5750914919,2026-11-23,claude
+genre,"Adventure, Simulation",official,https://games.roblox.com/v1/games?universeIds=5750914919,2026-11-23,claude
+redeem_ui_exists,yes,community,https://fisch.fandom.com/wiki/Codes,2026-11-23,claude
+suffix_ladder,"[{""s"":""K"",""e"":3},{""s"":""M"",""e"":6},{""s"":""B"",""e"":9},{""s"":""T"",""e"":12},{""s"":""Qa"",""e"":15},{""s"":""Qi"",""e"":18}]",community,https://fisch.fandom.com/wiki/C$,2026-11-23,claude
+calc_defaults,"{""calculator"": {""fish"": ""FSCH-FSH-0825""}}",,,2026-11-23,claude

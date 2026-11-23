@@ -10,9 +10,26 @@ declare( strict_types=1 );
 
 defined( 'ABSPATH' ) || exit;
 
-/** @return array<string, \RBX\Data\Config\Game> */
+/**
+ * Games shown in the header, game switcher, mobile menu and footer. A game whose English hub page
+ * is not published yet (a new game whose data ships before its pages, e.g. Fisch Phase A) stays
+ * out of the menus, the same way the home cards already skip it.
+ *
+ * @return array<string, \RBX\Data\Config\Game>
+ */
 function updateotter_games(): array {
-	return class_exists( '\RBX\Data\Api' ) ? \RBX\Data\Api::games() : array();
+	static $games = null;
+	if ( null === $games ) {
+		$all   = class_exists( '\RBX\Data\Api' ) ? \RBX\Data\Api::games() : array();
+		$games = array_filter(
+			$all,
+			static function ( \RBX\Data\Config\Game $g ): bool {
+				$hub = get_page_by_path( $g->folder(), OBJECT, 'page' );
+				return $hub instanceof \WP_Post && 'publish' === $hub->post_status;
+			}
+		);
+	}
+	return $games;
 }
 
 /** Site URL of a path; on Indonesian pages the Indonesian twin when one is published. */
