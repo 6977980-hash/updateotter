@@ -1,0 +1,228 @@
+/* Playful Gradient skin (2026-11-24, Ali chose option B). Visual only: colours, shadows, radius, hover.
+   Loaded last by tools/build-css.sh so it overrides tokens/components without touching markup or JS.
+   Delete this file and rebuild site.css to get the previous look back. */
+:root {
+	--r-lg: 20px;
+	--bg-page: #fbf8ff;
+	--card-bg: #ffffff;
+	--card-border: #ece4fb;
+	--primary: #6d28d9;
+	--link: #5b21b6;
+	--primary-bg: #f3ecff;
+	--elev-1: 0 2px 6px rgb(109 40 217 / 0.06), 0 8px 20px rgb(109 40 217 / 0.06);
+	--elev-2: 0 14px 34px rgb(109 40 217 / 0.18);
+	--hero-bg: linear-gradient(120deg, #f5edff 0%, #ffeef6 50%, #fff3e6 100%);
+	--hero-border: #f0e2ff;
+	--title-grad: linear-gradient(90deg, #6d28d9, #c0267a 55%, #c2410c);
+	--mono-bg: linear-gradient(135deg, #7c3aed, #db2777);
+	--mono-color: #ffffff;
+	--pill-bg: #faf5ff;
+	--pill-border: #e3d3fb;
+	--input-bg: #ffffff;
+	--header-bg: #ffffff;
+	--header-shadow: 0 2px 14px rgb(109 40 217 / 0.08);
+	--card-band-bg: linear-gradient(90deg, var(--game-accent), #db2777, #f59e0b);
+	--btn-bg: linear-gradient(90deg, #7c3aed, #c026d3);
+	--btn-shadow: 0 6px 16px rgb(124 58 237 / 0.35);
+	--th-bg: #f7f1ff;
+	--footer-bg: #f6f0ff;
+	--result-bg: linear-gradient(120deg, #f3ecff, #ffeef6);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg-page: #0f0b1a;
+		--card-bg: #191329;
+		--card-border: #2e2448;
+		--primary: #c4a6ff;
+		--link: #d0b8ff;
+		--primary-bg: #261b40;
+		--elev-1: 0 6px 18px rgb(0 0 0 / 0.4);
+		--elev-2: 0 14px 36px rgb(124 58 237 / 0.3);
+		--hero-bg: linear-gradient(120deg, #2a1650 0%, #3a1238 55%, #3a2010 100%);
+		--hero-border: #3b2b5e;
+		--title-grad: linear-gradient(90deg, #c4a6ff, #f9a8d4 55%, #fdba74);
+		--pill-bg: transparent;
+		--pill-border: #3e3160;
+		--input-bg: #130e20;
+		--header-bg: #140f22;
+		--header-shadow: none;
+		--btn-bg: linear-gradient(90deg, #a78bfa, #f0abfc);
+		--btn-shadow: none;
+		--th-bg: #211a35;
+		--footer-bg: #140f22;
+		--result-bg: linear-gradient(120deg, #261b40, #351634);
+	}
+}
+
+:root[data-theme="dark"] {
+	--bg-page: #0f0b1a;
+	--card-bg: #191329;
+	--card-border: #2e2448;
+	--primary: #c4a6ff;
+	--link: #d0b8ff;
+	--primary-bg: #261b40;
+	--elev-1: 0 6px 18px rgb(0 0 0 / 0.4);
+	--elev-2: 0 14px 36px rgb(124 58 237 / 0.3);
+	--hero-bg: linear-gradient(120deg, #2a1650 0%, #3a1238 55%, #3a2010 100%);
+	--hero-border: #3b2b5e;
+	--title-grad: linear-gradient(90deg, #c4a6ff, #f9a8d4 55%, #fdba74);
+	--pill-bg: transparent;
+	--pill-border: #3e3160;
+	--input-bg: #130e20;
+	--header-bg: #140f22;
+	--header-shadow: none;
+	--btn-bg: linear-gradient(90deg, #a78bfa, #f0abfc);
+	--btn-shadow: none;
+	--th-bg: #211a35;
+	--footer-bg: #140f22;
+	--result-bg: linear-gradient(120deg, #261b40, #351634);
+}
+
+body {
+	background: var(--bg-page);
+	-webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+	letter-spacing: -0.02em;
+}
+h1 {
+	font-weight: 850;
+}
+
+/* Header and footer */
+.site-header {
+	background: var(--header-bg);
+	box-shadow: var(--header-shadow);
+}
+.site-footer {
+	background: var(--footer-bg);
+}
+.game-menu__list a[aria-current="page"] {
+	color: var(--primary);
+}
+
+/* Home hero title */
+.home .page-head {
+	padding: var(--sp-6) var(--sp-5);
+	margin-top: var(--sp-3);
+	border-radius: var(--r-lg);
+	background: var(--hero-bg);
+	border: 1px solid var(--hero-border);
+	box-shadow: var(--elev-2);
+}
+.home .page-head h1 {
+	background: var(--title-grad);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+@media (forced-colors: active) {
+	.home .page-head h1 {
+		-webkit-text-fill-color: currentColor;
+	}
+}
+
+/* Cards */
+.rbx-game-card,
+.rbx-update-card,
+.rbx-calc,
+.rbx-tier,
+.rbx-related__item,
+.rbx-tile:not(.rbx-tile--tool),
+.rbx-card {
+	background: var(--card-bg);
+	border-color: var(--card-border);
+	border-radius: var(--r-lg);
+	box-shadow: var(--elev-1);
+	transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.rbx-game-card {
+	position: relative;
+	overflow: hidden;
+	padding: var(--sp-5);
+}
+.rbx-game-card::before {
+	content: "";
+	position: absolute;
+	inset: 0 0 auto 0;
+	height: 6px;
+	background: var(--card-band-bg);
+}
+.rbx-game-card:hover,
+.rbx-related__item:hover,
+.rbx-tile:hover,
+.rbx-update-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--elev-2);
+	border-color: var(--primary);
+}
+.rbx-game-card__mono {
+	border-inline-start: 0;
+	background: var(--mono-bg);
+	color: var(--mono-color);
+	border-radius: 14px;
+	box-shadow: var(--elev-1);
+}
+
+/* Pills */
+.rbx-game-card__links a,
+.rbx-popular a {
+	border-color: var(--pill-border);
+	background: var(--pill-bg);
+	transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.rbx-game-card__links a:hover,
+.rbx-popular a:hover {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: var(--on-primary);
+}
+
+/* Buttons and inputs */
+.button,
+button.button,
+.rbx-tile--tool {
+	background: var(--btn-bg);
+	border-color: transparent;
+	box-shadow: var(--btn-shadow);
+	border-radius: var(--r-pill);
+}
+.rbx-tile--tool {
+	border-radius: var(--r-lg);
+}
+.button-secondary,
+button.button-secondary,
+.button.button-secondary {
+	background: transparent;
+	border-color: var(--border-strong);
+	box-shadow: none;
+}
+input[type="text"],
+input[type="search"],
+input[type="email"],
+select,
+textarea,
+body .rbx-calc select,
+body .rbx-calc input[type="text"] {
+	background: var(--input-bg);
+	border-radius: 10px;
+}
+
+/* Calculator result and tables */
+body .rbx-calc__result {
+	background: var(--result-bg);
+	border-radius: var(--r-md);
+	padding-inline: var(--sp-3);
+}
+.rbx-table-wrap {
+	border-radius: var(--r-lg);
+	box-shadow: var(--elev-1);
+	border: 1px solid var(--card-border);
+	background: var(--card-bg);
+}
+.rbx-table thead th {
+	background: var(--th-bg);
+}

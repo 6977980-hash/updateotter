@@ -4,6 +4,6 @@
 set -e
 cd "$(dirname "$0")/.."
 {
-	echo "/* Built by tools/build-css.sh from tokens.css, base.css, layout.css, components.css. Do not edit. */"
-	cat assets/css/tokens.css assets/css/base.css assets/css/layout.css assets/css/components.css
+	echo "/* Built by tools/build-css.sh from tokens.css, base.css, layout.css, components.css, skin.css. Do not edit. */"
+	cat assets/css/tokens.css assets/css/base.css assets/css/layout.css assets/css/components.css assets/css/skin.css
 } > assets/css/site.css

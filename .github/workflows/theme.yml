@@ -18,7 +18,7 @@ jobs:
       - name: site.css is up to date
         run: sh tools/build-css.sh && git diff --exit-code assets/css/site.css
       - name: Only min-width media queries
-        run: "! grep -rn 'max-width:' assets/css/tokens.css assets/css/base.css assets/css/layout.css assets/css/components.css | grep '@media'"
+        run: "! grep -rn 'max-width:' assets/css/tokens.css assets/css/base.css assets/css/layout.css assets/css/components.css assets/css/skin.css | grep '@media'"
       - name: Indonesian translation files are up to date
         run: python3 tools/i18n/build.py && git diff --exit-code languages modules/rbx-data/languages modules/rbx-tools/languages
       - name: Game data CSVs are valid
