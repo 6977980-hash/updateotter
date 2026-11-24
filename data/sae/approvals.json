@@ -6,7 +6,8 @@
     "meta_provenance": "calc_defaults is our own editorial choice, not a game fact.",
     "large_change": "Light Dove and Flame Sprite base income fixed from 225 to 225000: our seed dropped the 'k' from the wiki's $225k/s (the egg's cash reward on the wiki is 100x that value, like every other biome egg). 2026-10-25: four base incomes follow the wiki pet data module (admin-protected, edited 24 Oct 2026): Night Fang 4M to 160K (matches its 16M egg reward, so a correction), Toxic Hedgehog 1.75B to 1.75M (wiki typo fix, correction), Spirit World Guardian 26B to 15B and Voidseer Pumpkin 12.5B to 14B (wiki changed both; not tied to an update because the game did not say).",
     "outlier": "Egg spawn chances (spawn_chance_prob, 2026-10-24) are per-biome shares from the wiki Drop Rates list (game files). They do not follow rarity across biomes, so rarity outlier flags are expected.",
-    "slug_change": "2026-10-25: the wiki renamed Abomination Kong to Gorillastein (same pet, same income). The record keeps its ID; the old pet and egg slugs stay in slug_history so the old URLs 301 to the new ones."
+    "slug_change": "2026-10-25: the wiki renamed Abomination Kong to Gorillastein (same pet, same income). The record keeps its ID; the old pet and egg slugs stay in slug_history so the old URLs 301 to the new ones.",
+    "stale": "2026-11-24, Ali chose 'both' on the stale-records card: the seed rows' last_verified (2026-10-23/24) passed the 30-day freshness window on 2026-11-23. Approving the warning lets new imports run; it does not change page states (PageState I-2 still applies). The watcher is re-checking the stale records against the wiki and bumps last_verified only where the wiki still matches (follow-up PR)."
   },
   "large": [
     "SAE-FRM-0001",
