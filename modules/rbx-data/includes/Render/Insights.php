@@ -389,11 +389,41 @@ final class Insights {
 			}
 			$facts[] = $line . '.';
 		}
-		$rows = '';
+		$mine_hunt = self::hunt( $ds, (string) $rec['id'] );
+		$hunts     = array();
+		foreach ( $pets as $id => $p ) {
+			$hv = self::hunt( $ds, (string) $id );
+			if ( null !== $hv ) {
+				$hunts[ (string) $id ] = array(
+					'record' => $p['record'],
+					'value'  => $hv['value'],
+				);
+			}
+		}
+		if ( null !== $mine_hunt && count( $hunts ) > 1 ) {
+			uasort( $hunts, static fn( $a, $b ) => ( $b['value'] <=> $a['value'] ) ?: strcmp( (string) $a['record']['id'], (string) $b['record']['id'] ) );
+			$best_id = (string) array_key_first( $hunts );
+			$line    = sprintf(
+				/* translators: 1: "1 in N", 2: zone, 3: hunt value per second, 4: pet */
+				esc_html__( 'Hunt value: its egg is about %1$s of the eggs in %2$s, so on average each egg you steal there is worth %3$s of income (%4$s income × spawn chance).', 'rbx-data' ),
+				esc_html( self::one_in( $mine_hunt['chance'] ) ),
+				esc_html( (string) $bio['name'] ),
+				self::hunt_text( $ds, $mine_hunt['value'] ),
+				esc_html( $name )
+			);
+			$line .= ' ' . ( $best_id === (string) $rec['id']
+				/* translators: %s: count */
+				? sprintf( esc_html__( 'That is the best hunt value of the %s eggs in this zone, so it is the egg worth hunting every trip.', 'rbx-data' ), esc_html( number_format_i18n( count( $hunts ) ) ) )
+				/* translators: 1: rank such as "the 3rd highest", 2: count, 3: pet link */
+				: sprintf( esc_html__( 'That is %1$s hunt value of the %2$s eggs in this zone; %3$s has the best.', 'rbx-data' ), esc_html( self::rank( self::place( $hunts, (string) $rec['id'], 'value' ), count( $hunts ), __( 'highest', 'rbx-data' ), __( 'lowest', 'rbx-data' ) ) ), esc_html( number_format_i18n( count( $hunts ) ) ), Ui::link( $hunts[ $best_id ]['record'] ) ) );
+			$facts[] = $line;
+		}
+		$show_hunt = count( $hunts ) > 1;
+		$rows      = '';
 		foreach ( $pets as $id => $p ) {
 			$me    = $id === (string) $rec['id'];
 			$h     = $hatch( $p['egg'] );
-			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' .	( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : Ui::dash() ) . '</td><td class="rbx-num-cell">' . ( $me ? esc_html__( 'this pet', 'rbx-data' ) : self::times( $ds, $p['income'] / $base ) ) . '</td></tr>';
+			$rows .= '<tr' . ( $me ? ' class="rbx-row--current" aria-current="true"' : '' ) . '><th scope="row">' . ( $me ? esc_html( (string) $p['record']['name'] ) : Ui::link( $p['record'] ) ) . '</th><td class="rbx-num-cell">' . Ui::number( $ds, $p['income'], 'abbr' ) . '</td><td class="rbx-num-cell">' .	( null !== $h ? Ui::raw( $ds, array( 'type' => 'duration_s' ), $h ) : Ui::dash() ) . '</td>' . ( $show_hunt ? '<td class="rbx-num-cell">' . ( isset( $hunts[ $id ] ) ? self::hunt_text( $ds, $hunts[ $id ]['value'] ) : Ui::dash() ) . '</td>' : '' ) . '<td class="rbx-num-cell">' . ( $me ? esc_html__( 'this pet', 'rbx-data' ) : self::times( $ds, $p['income'] / $base ) ) . '</td></tr>';
 		}
 		$li = '';
 		foreach ( $facts as $f ) {
@@ -401,7 +431,7 @@ final class Insights {
 		}
 		/* translators: %s: zone */
 		$cap   = sprintf( __( 'Pets whose eggs spawn in %s, by base income', 'rbx-data' ), (string) $bio['name'] );
-		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Hatch time', 'rbx-data' ) . '</th><th scope="col">' . esc_html( sprintf( /* translators: %s: pet */ __( 'Compared with %s', 'rbx-data' ), $name ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Cash per second', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Hatch time', 'rbx-data' ) . '</th>' . ( $show_hunt ? '<th scope="col">' . esc_html__( 'Hunt value', 'rbx-data' ) . '</th>' : '' ) . '<th scope="col">' . esc_html( sprintf( /* translators: %s: pet */ __( 'Compared with %s', 'rbx-data' ), $name ) ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 		/* translators: %s: pet */
 		return '<section class="rbx-zone">' . Ui::h2( sprintf( __( 'Is the %s worth it?', 'rbx-data' ), $name ), 'worth-it' ) . '<ul>' . $li . '</ul>' . $table . self::source_note() . '</section>';
 	}
@@ -997,6 +1027,72 @@ final class Insights {
 
 	private static function base_income( Dataset $ds, array $rec ): ?float {
 		return self::income( $ds, (string) $rec['id'], null, null );
+	}
+
+	/**
+	 * Hunt value (our own number, not on the wiki): base income × the spawn chance of the pet's
+	 * biome egg, so the Cash per second one egg stolen from that nest adds on average. Eggs are
+	 * stolen, not bought, so this is the "return per trip" of a pet. Only for biome-spawn eggs that
+	 * hatch this one pet and have a known spawn chance; null otherwise.
+	 *
+	 * @return array{value: float, chance: float, income: float, egg: array<string, mixed>, biome: array<string, mixed>|null}|null
+	 */
+	public static function hunt( Dataset $ds, string $pet ): ?array {
+		static $cache = array();
+		$key = spl_object_id( $ds ) . '|' . $pet;
+		if ( array_key_exists( $key, $cache ) ) {
+			return $cache[ $key ];
+		}
+		$cache[ $key ] = null;
+		$rec           = $ds->get( $pet );
+		if ( ! $rec || 'PET' !== ( $rec['entity'] ?? '' ) || null === $ds->game()->field( 'EGG', 'spawn_chance_prob' ) ) {
+			return null;
+		}
+		$st = $ds->field_state( $rec, 'base_income_per_s' );
+		if ( ! $st['calc_usable'] || ! is_numeric( $st['value'] ) || (float) $st['value'] <= 0 ) {
+			return null;
+		}
+		foreach ( self::egg_index( $ds )['by_pet'][ $pet ] ?? array() as $egg_id ) {
+			$egg = $ds->get( $egg_id );
+			if ( ! $egg || 'biome_spawn' !== ( $egg['data']['obtain_method'] ?? '' ) || ! in_array( $egg['status'] ?? '', array( 'live', 'limited' ), true ) ) {
+				continue;
+			}
+			if ( 1 !== count( $ds->children( 'DRP', 'egg_id', $egg_id ) ) ) {
+				continue;
+			}
+			$p = $egg['data']['spawn_chance_prob'] ?? null;
+			if ( ! is_numeric( $p ) || (float) $p <= 0 ) {
+				continue;
+			}
+			$bio = null;
+			foreach ( (array) ( $egg['data']['biome_ids'] ?? array() ) as $bid ) {
+				$b = $ds->get( (string) $bid );
+				if ( $b ) {
+					$bio = $b;
+					break;
+				}
+			}
+			$cache[ $key ] = array(
+				'value'  => (float) $st['value'] * (float) $p,
+				'chance' => (float) $p,
+				'income' => (float) $st['value'],
+				'egg'    => $egg,
+				'biome'  => $bio,
+			);
+			break;
+		}
+		return $cache[ $key ];
+	}
+
+	/** Hunt value as "0.34/s" style text (abbr, two decimals under 10). */
+	public static function hunt_text( Dataset $ds, float $v ): string {
+		return Ui::number( $ds, $v >= 100 ? round( $v ) : ( $v >= 10 ? round( $v, 1 ) : round( $v, 2 ) ), 'abbr' ) . esc_html__( '/s', 'rbx-data' );
+	}
+
+	/** "1 in 25" for a spawn chance. */
+	public static function one_in( float $p ): string {
+		/* translators: %s: number of eggs */
+		return sprintf( __( '1 in %s', 'rbx-data' ), number_format_i18n( max( 1, (int) floor( 1 / $p + 0.5 ) ) ) );
 	}
 
 	/**
