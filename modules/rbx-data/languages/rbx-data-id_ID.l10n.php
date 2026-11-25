@@ -69,6 +69,8 @@ return array( 'domain' => 'rbx-data', 'language' => 'id_ID', 'plural-forms' => '
 	'Home' => 'Beranda',
 	'How to get' => 'Cara mendapatkan',
 	'How we check for codes' => 'Cara kami mengecek kode',
+	'Hunt value' => 'Nilai berburu',
+	'Hunt value, highest first' => 'Nilai berburu, tertinggi dulu',
 	'Item' => 'Item',
 	'Item removed' => 'Item sudah dihapus',
 	'Last checked:' => 'Terakhir dicek:',

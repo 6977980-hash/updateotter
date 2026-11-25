@@ -202,6 +202,8 @@ RBX_DATA = {
     'A faster pick has to hatch in half the time or less and still earn at least a twentieth as much as the best pet. "None worth it" means no other pet in that zone passes both.': 'Pilihan lebih cepat harus menetas dalam separuh waktu atau kurang dan tetap menghasilkan setidaknya seperdua puluh dari pet terbaik. "Tidak ada yang sepadan" berarti tidak ada pet lain di zona itu yang memenuhi keduanya.',
     'Event: %s': 'Event: %s',
     'The strongest event pets while the event zone is open. They are limited, so they leave the game when the event ends.': 'Pet event terkuat selama zona event masih buka. Pet ini terbatas, jadi hilang dari game saat event selesai.',
+    'Hunt value': 'Nilai berburu',
+    'Hunt value, highest first': 'Nilai berburu, tertinggi dulu',
     'Best pet means the highest base income from the community wiki. Hatch times are from the wiki too; the 2x Growth Speed pass halves them.': 'Pet terbaik artinya pendapatan dasar tertinggi menurut wiki komunitas. Waktu menetas juga dari wiki; pass 2x Growth Speed membuatnya jadi separuh.',
 }
 

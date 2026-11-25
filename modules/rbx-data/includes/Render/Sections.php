@@ -254,6 +254,11 @@ final class Sections {
 			$numeric = $ds->is_numeric_field( $entity, $f );
 			$head   .= '<th scope="col"' . ( $numeric ? ' data-sort-key="' . esc_attr( $f ) . '"' : '' ) . '>' . esc_html( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '</th>';
 		}
+		// Hunt value (our own number): base income × the spawn chance of the pet's biome egg.
+		$hunt_col = 'PET' === $entity && (bool) array_filter( array_keys( $recs ), static fn( $rid ) => null !== Insights::hunt( $ds, (string) $rid ) );
+		if ( $hunt_col ) {
+			$head .= '<th scope="col" data-sort-key="hunt_value">' . esc_html__( 'Hunt value', 'rbx-data' ) . '</th>';
+		}
 		if ( 'PET' === $entity ) {
 			$head .= '<th scope="col">' . esc_html__( 'Source egg', 'rbx-data' ) . '</th>';
 		}
@@ -294,6 +299,10 @@ final class Sections {
 				$cell = Ui::cell( $ds, $r, $f );
 				$dash = $dash || str_contains( $cell, '—' );
 				$row .= '<td data-label="' . esc_attr( Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) . '"' . $sort . '>' . $cell . '</td>';
+			}
+			if ( $hunt_col ) {
+				$hv   = Insights::hunt( $ds, (string) $id );
+				$row .= '<td data-label="' . esc_attr__( 'Hunt value', 'rbx-data' ) . '"' . ( null !== $hv ? ' data-sort="' . esc_attr( (string) $hv['value'] ) . '">' . Insights::hunt_text( $ds, $hv['value'] ) : '>' . Ui::dash() ) . '</td>';
 			}
 			if ( 'PET' === $entity ) {
 				$eggs = array();
@@ -344,6 +353,9 @@ final class Sections {
 				/* translators: %s: field label */
 				$controls .= '<option value="' . esc_attr( $f ) . '-desc">' . esc_html( sprintf( __( '%s, highest first', 'rbx-data' ), Lang::t( (string) ( $fd['label__en'] ?? $f ) ) ) ) . '</option>';
 			}
+		}
+		if ( $hunt_col ) {
+			$controls .= '<option value="hunt_value-desc">' . esc_html__( 'Hunt value, highest first', 'rbx-data' ) . '</option>';
 		}
 		$controls .= '</select></label>'
 			. ( $has_removed ? '<button type="button" class="rbx-chip-btn" aria-pressed="false" data-rbx-removed>' . esc_html__( 'Show removed', 'rbx-data' ) . '</button>' : '' )
