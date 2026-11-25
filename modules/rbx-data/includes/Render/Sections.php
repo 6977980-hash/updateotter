@@ -31,7 +31,7 @@ final class Sections {
 	/** Rows a list renders in the page; the rest load on demand (GR-24). */
 	public const LIST_ROWS = 100;
 
-	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'best_divine', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides', 'value_leaders', 'mutation_values', 'appraise_odds' );
+	public const NAMES = array( 'count', 'list', 'mutations', 'sizes', 'stacking', 'codes', 'updates', 'update_history', 'tier_list', 'tier_stages', 'reference_note', 'hub_tiles', 'hub_glance', 'glossary', 'biomes', 'mounts', 'game_passes', 'fusions', 'latest_update', 'top_tier', 'best_divine', 'corrections', 'image_credits', 'report_form', 'changes', 'home_games', 'home_latest', 'home_guides', 'value_leaders', 'mutation_values', 'appraise_odds' );
 
 	/** @var array<int, string> Record IDs displayed during this request (for trust strip and last_changed). */
 	private static array $shown = array();
@@ -90,6 +90,8 @@ final class Sections {
 					return self::codes( $game );
 				case 'updates':
 					return self::updates( $game );
+				case 'update_history':
+					return self::licensed( $game, self::update_history( $game ) );
 				case 'tier_list':
 					return self::licensed( $game, self::tier_list( $game ) );
 				case 'tier_stages':
@@ -721,6 +723,138 @@ final class Sections {
 			$out  .= '<li class="rbx-update-card"><h3>' . Ui::link( $u, '', false ) . '</h3><p class="rbx-meta">' . Ui::date( (string) ( $u['data']['release_date'] ?? '' ) ) . ( '' !== $guide ? ' · <a href="' . esc_url( home_url( $guide ) ) . '">' . esc_html__( 'Event guide', 'rbx-data' ) . '</a>' : '' ) . '</p>' . ( ! empty( $u['data']['summary__en'] ) ? '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $u['data']['summary__en'] ), 40 ) ) . '</p>' : '' ) . '</li>';
 		}
 		return $out . '</ol>';
+	}
+
+	/**
+	 * Update history (our own table, not on the wiki): every update in release order with what it
+	 * added to our lists, its strongest new pet and how that pet compares with the best base income
+	 * in the game before it ("power creep"), and the days since the update before. Built from the
+	 * records' `added_in_update` links, so it follows every import. Records with no update link are
+	 * counted as the game as it was before the first listed update.
+	 */
+	private static function update_history( Game $game ): string {
+		$ds   = self::ds( $game );
+		$upds = $ds->all( 'UPD', array( 'live', 'limited' ) );
+		$upds = array_filter( $upds, static fn( $u ) => '' !== (string) ( $u['data']['release_date'] ?? '' ) );
+		if ( count( $upds ) < 2 ) {
+			return '';
+		}
+		uasort( $upds, static fn( $a, $b ) => strcmp( (string) $a['data']['release_date'], (string) $b['data']['release_date'] ) ?: strcmp( (string) $a['id'], (string) $b['id'] ) );
+		$has_income = null !== $game->field( 'PET', 'base_income_per_s' );
+		$added      = array();
+		$best_pet   = array();
+		$base_top   = 0.0;
+		$base_pets  = 0;
+		foreach ( array( 'PET', 'EGG', 'BIO', 'MUT' ) as $ent ) {
+			if ( null === $game->entity( $ent ) ) {
+				continue;
+			}
+			foreach ( $ds->all( $ent, array( 'live', 'limited', 'removed_from_game' ) ) as $rid => $r ) {
+				$u = (string) ( $r['data']['added_in_update'] ?? '' );
+				$v = null;
+				if ( 'PET' === $ent && $has_income ) {
+					$st = $ds->field_state( $r, 'base_income_per_s' );
+					$v  = is_numeric( $st['value'] ) && 'disputed' !== $st['state'] ? (float) $st['value'] : null;
+				}
+				if ( '' === $u || ! isset( $upds[ $u ] ) ) {
+					// Base game: an unlinked pet whose egg spawns in a biome no update added. Other
+					// unlinked pets (no zone egg) have no known date and stay out of the history.
+					$z = 'PET' === $ent ? Insights::zone_of( $ds, (string) $rid ) : null;
+					if ( null !== $z && 'biome_spawn' === ( $z[1]['data']['obtain_method'] ?? '' ) && '' === (string) ( $z[0]['data']['added_in_update'] ?? '' ) ) {
+						++$base_pets;
+						$base_top = max( $base_top, (float) $v );
+					}
+					continue;
+				}
+				$added[ $u ][ $ent ] = ( $added[ $u ][ $ent ] ?? 0 ) + 1;
+				if ( null !== $v && ( ! isset( $best_pet[ $u ] ) || $v > $best_pet[ $u ][1] ) ) {
+					$best_pet[ $u ] = array( $r, $v );
+				}
+			}
+		}
+		self::show( array_keys( $upds ) );
+		$rows  = '';
+		$prev  = null;
+		$top   = $base_top;
+		$gaps  = array();
+		$first = null;
+		$jumps = 0;
+		$total = 0;
+		$max_v = 0.0;
+		foreach ( $best_pet as $bp ) {
+			$max_v = max( $max_v, $bp[1] );
+		}
+		foreach ( $upds as $uid => $u ) {
+			$date = (string) $u['data']['release_date'];
+			$t    = (int) strtotime( $date . ' 12:00:00 UTC' );
+			$gap  = null === $prev ? null : (int) round( ( $t - $prev ) / DAY_IN_SECONDS );
+			if ( null !== $gap ) {
+				$gaps[] = $gap;
+			}
+			$prev  = $t;
+			$first = $first ?? $date;
+			$n     = $added[ $uid ] ?? array();
+			$total += (int) ( $n['PET'] ?? 0 );
+			$parts = array();
+			foreach ( array( 'BIO', 'EGG', 'MUT' ) as $ent ) {
+				if ( ! empty( $n[ $ent ] ) ) {
+					$parts[] = number_format_i18n( (int) $n[ $ent ] ) . ' ' . strtolower( $game->entity_label( $ent, $n[ $ent ] > 1 ) );
+				}
+			}
+			$best = Ui::dash();
+			$vs   = Ui::dash();
+			if ( isset( $best_pet[ $uid ] ) ) {
+				[ $br, $bv ] = $best_pet[ $uid ];
+				$w           = $max_v > 1 && $bv > 1 ? max( 4, (int) round( 100 * log10( $bv ) / log10( $max_v ) ) ) : 4;
+				$best        = Ui::link( $br ) . ' <span class="rbx-num-cell">' . Ui::number( $ds, $bv, 'abbr' ) . '</span><span class="rbx-hist-bar" style="--w:' . $w . '%" aria-hidden="true"></span>';
+				if ( $top > 0 ) {
+					$r  = $bv / $top;
+					$vs = $r > 1 && ! Insights::same( $r )
+						/* translators: %s: multiplier such as ×3.5 */
+						? sprintf( esc_html__( 'New best: %s the old top', 'rbx-data' ), Insights::times( $ds, $r ) )
+						: ( Insights::same( $r ) ? esc_html__( 'Same as the old top', 'rbx-data' ) : sprintf( /* translators: %s: multiplier */ esc_html__( '%s of the top pet', 'rbx-data' ), Insights::times( $ds, $r ) ) );
+					if ( $r > 1 && ! Insights::same( $r ) ) {
+						++$jumps;
+					}
+				}
+				$top = max( $top, $bv );
+			}
+			$rows .= '<tr><th scope="row">' . Ui::link( $u, '', false ) . '</th>'
+				. '<td data-label="' . esc_attr__( 'Date', 'rbx-data' ) . '">' . Ui::date( $date ) . ( null !== $gap ? '<br><span class="rbx-meta">' . esc_html( sprintf( /* translators: %s: number of days */ _n( '%s day after the last one', '%s days after the last one', $gap, 'rbx-data' ), number_format_i18n( $gap ) ) ) . '</span>' : '' ) . '</td>'
+				. '<td data-label="' . esc_attr__( 'New pets', 'rbx-data' ) . '" class="rbx-num-cell">' . esc_html( number_format_i18n( (int) ( $n['PET'] ?? 0 ) ) ) . '</td>'
+				. '<td data-label="' . esc_attr__( 'Also added', 'rbx-data' ) . '">' . ( $parts ? esc_html( implode( ', ', $parts ) ) : Ui::dash() ) . '</td>'
+				. '<td data-label="' . esc_attr__( 'Strongest new pet', 'rbx-data' ) . '">' . $best . '</td>'
+				. '<td data-label="' . esc_attr__( 'Against the best pet before it', 'rbx-data' ) . '">' . $vs . '</td></tr>';
+		}
+		$lead = sprintf(
+			/* translators: 1: number of updates, 2: date, 3: number of pets */
+			esc_html__( 'We track %1$s updates since %2$s. Together they added %3$s pets to our lists.', 'rbx-data' ),
+			esc_html( number_format_i18n( count( $upds ) ) ),
+			Ui::date( (string) $first ),
+			esc_html( number_format_i18n( $total ) )
+		);
+		if ( $gaps ) {
+			$lead .= ' ' . sprintf(
+				/* translators: %s: number of days */
+				esc_html__( 'On average a new update came every %s days.', 'rbx-data' ),
+				esc_html( number_format_i18n( array_sum( $gaps ) / count( $gaps ), 1 ) )
+			);
+		}
+		if ( $base_top > 0 && $top > $base_top ) {
+			$lead .= ' ' . sprintf(
+				/* translators: 1: income, 2: income, 3: ratio, 4: number of updates */
+				esc_html__( 'The best base income went from %1$s Cash per second in the original biomes to %2$s now, about %3$s times as much; %4$s of the updates brought a new top pet.', 'rbx-data' ),
+				Ui::number( $ds, $base_top, 'abbr' ),
+				Ui::number( $ds, $top, 'abbr' ),
+				esc_html( Insights::ratio( $top / $base_top ) ),
+				esc_html( number_format_i18n( $jumps ) )
+			);
+		}
+		$cap   = __( 'Update history', 'rbx-data' );
+		$table = '<div class="rbx-table-wrap"><table class="rbx-table rbx-table--list rbx-hist"><caption>' . esc_html( $cap ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Update', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Date', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'New pets', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Also added', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Strongest new pet', 'rbx-data' ) . '</th><th scope="col">' . esc_html__( 'Against the best pet before it', 'rbx-data' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+		/* translators: %s: number of pets */
+		$note = '<p class="rbx-note">' . esc_html( sprintf( __( 'Counts are the items in our lists that name the update they came with. The first comparison starts from the %s pets of the original biomes, which came before Update 1. Pets the wiki gives no date or zone egg for are left out. Incomes are base incomes from the community wiki; the bar is on a log scale, so each step is a multiple.', 'rbx-data' ), number_format_i18n( $base_pets ) ) ) . '</p>';
+		return '<p>' . $lead . '</p>' . $table . $note;
 	}
 
 	/** Tier list S..D with one-line reasons (CONT-27, UX-12). */
