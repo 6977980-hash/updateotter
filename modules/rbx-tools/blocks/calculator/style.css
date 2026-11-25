@@ -409,3 +409,35 @@
 		margin-top: 0;
 	}
 }
+/* Pet compare */
+.rbx-calc.rbx-compare {
+	display: block;
+}
+.rbx-calc.rbx-compare .rbx-calc__form {
+	display: grid;
+	gap: var(--sp-3, 12px);
+}
+.rbx-compare__lines {
+	margin-block: var(--sp-4, 16px);
+}
+.rbx-compare__table td,
+.rbx-compare__table th {
+	vertical-align: top;
+}
+.rbx-compare__best {
+	font-weight: 700;
+}
+.rbx-compare__mark {
+	display: inline-block;
+	padding: 0 6px;
+	border-radius: 999px;
+	font-size: var(--fs-sm, 0.875rem);
+	font-weight: 600;
+	background: var(--success-bg, #e6f4ea);
+	color: var(--success, #15723a);
+}
+@media (min-width: 600px) {
+	.rbx-calc.rbx-compare .rbx-calc__form {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
