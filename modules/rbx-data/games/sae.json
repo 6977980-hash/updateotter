@@ -23,12 +23,13 @@
     { "label__en": "End game" }
   ],
   "notifier": { "update_windows": [] },
-  "menu_order": ["calculator", "speed-calculator", "fusion-planner", "what-to-get-next", "pets", "eggs", "mutations", "codes", "updates", "tier-list"],
+  "menu_order": ["calculator", "speed-calculator", "fusion-planner", "what-to-get-next", "pet-compare", "pets", "eggs", "mutations", "codes", "updates", "tier-list"],
   "sections": {
     "calculator": { "label__en": "Calculator", "type": "tool", "tool": "calculator" },
     "speed-calculator": { "label__en": "Speed calculator", "type": "page" },
     "fusion-planner": { "label__en": "Fusion planner", "type": "page" },
     "what-to-get-next": { "label__en": "What to get next", "type": "page" },
+    "pet-compare": { "label__en": "Pet compare", "type": "page" },
     "pets": { "label__en": "Pets", "type": "list", "entity": "PET" },
     "eggs": { "label__en": "Eggs", "type": "list", "entity": "EGG" },
     "mutations": { "label__en": "Mutations", "type": "mutations", "entity": "MUT" },
