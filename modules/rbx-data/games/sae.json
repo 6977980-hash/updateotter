@@ -262,5 +262,15 @@
       ]
     }
   ],
+  "_gone_redirects_note": "2026-11-25: pets the wiki dropped (Module:Pets/Data rev 3174, pages deleted by a wiki moderator); Ali chose to remove them with a 301 to the pet list.",
+  "gone_redirects": {
+    "PET": {
+      "riptide-octopus": "/steal-an-egg/pets/",
+      "hellhound": "/steal-an-egg/pets/",
+      "depths-riptide-octopus": "/steal-an-egg/pets/",
+      "hazardhog": "/steal-an-egg/pets/",
+      "toxic-crocodile": "/steal-an-egg/pets/"
+    }
+  },
   "sibling_game": null
 }

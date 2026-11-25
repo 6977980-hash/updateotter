@@ -99,10 +99,12 @@ final class Router {
 				self::$redirect = home_url( $game->item_path( $entity, $new ) );
 				return array( 'error' => '404' );
 			}
+			self::gone( $game, $entity, $slug );
 			return array( 'error' => '404' );
 		}
 		$post_id = (int) $rec['post_id'];
 		if ( ! $post_id || ( 'publish' !== get_post_status( $post_id ) && ! current_user_can( 'edit_post', $post_id ) ) ) {
+			self::gone( $game, $entity, $slug );
 			return array( 'error' => '404' );
 		}
 		return array(
@@ -110,6 +112,14 @@ final class Router {
 			'post_type' => (string) $game->post_type( $entity ),
 			'rbx_game'  => $game->key(),
 		);
+	}
+
+	/** A removed item with a configured target 301s there (e.g. pets the wiki dropped → the pet list). */
+	private static function gone( Game $game, string $entity, string $slug ): void {
+		$target = $game->gone_redirect( $entity, $slug );
+		if ( null !== $target ) {
+			self::$redirect = home_url( $target );
+		}
 	}
 
 	/** Old slug → current slug (DATA-03). */

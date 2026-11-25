@@ -27,5 +27,20 @@
     "SAE-PET-0131:base_income_per_s",
     "SAE-PET-0213:base_income_per_s"
   ],
-  "missing": {}
+  "missing": {
+    "SAE-DRP-0218": "draft",
+    "SAE-DRP-0219": "draft",
+    "SAE-DRP-0220": "draft",
+    "SAE-PET-0237": "draft",
+    "SAE-PET-0238": "draft",
+    "SAE-PET-0248": "draft",
+    "SAE-PET-0249": "draft",
+    "SAE-PET-0250": "draft",
+    "SAE-SRC-0237": "draft",
+    "SAE-SRC-0238": "draft",
+    "SAE-SRC-0248": "draft",
+    "SAE-SRC-0249": "draft",
+    "SAE-SRC-0250": "draft"
+  },
+  "_missing_note": "2026-11-25, Ali chose 'remove (301)': the wiki moderator dropped Hellhound, Riptide Octopus, Depths Riptide Octopus, Toxic Crocodile and Hazardhog from Module:Pets/Data (rev 3174) and deleted their pages. The rows are removed; the import hides the old records as draft and their URLs 301 to the pet list (gone_redirects in games/sae.json)."
 }

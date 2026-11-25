@@ -276,6 +276,16 @@ final class Game {
 		return '/' . $this->folder() . '/' . $this->path( $code ) . '/' . $slug . '/';
 	}
 
+	/**
+	 * Where an item URL goes once the record is gone (deleted, or hidden as draft): config
+	 * `gone_redirects.{ENTITY}.{slug}` = a site path such as "/steal-an-egg/pets/". Null when unset.
+	 */
+	public function gone_redirect( string $code, string $slug ): ?string {
+		$map    = (array) ( $this->config['gone_redirects'][ $code ] ?? array() );
+		$target = isset( $map[ $slug ] ) ? (string) $map[ $slug ] : '';
+		return str_starts_with( $target, '/' ) ? $target : null;
+	}
+
 	/** Reserved slugs for an entity path (DATA-03). @return array<int, string> */
 	public function reserved_slugs( string $code ): array {
 		$reserved = array( 'rarity', 'biome', 'compare', 'all', 'new', 'page', 'feed', 'calculator', 'list', 'tier-list', 'values', 'amp' );
