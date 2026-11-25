@@ -1271,6 +1271,15 @@ a.rbx-chip {
 .rbx-updates {
 	grid-template-columns: 1fr;
 }
+.rbx-hist-bar {
+	display: block;
+	width: var(--w, 4%);
+	height: 6px;
+	margin-top: var(--sp-1);
+	border-radius: 999px;
+	background: var(--accent, currentColor);
+	opacity: 0.7;
+}
 .rbx-tier {
 	border: 1px solid var(--border);
 	border-radius: var(--r-md);
