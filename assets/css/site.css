@@ -1932,3 +1932,257 @@ body .rbx-calc__result {
 	font-size: var(--fs-sm);
 	line-height: 1.2;
 }
+/* Home blocks + footer (Ali chose option 1, 2026-11-25): guide cards, updates timeline,
+   data-source boxes, dark gradient footer. Selectors hang off the existing heading ids. */
+.home .entry-content > h2.wp-block-heading {
+	margin-top:var(--sp-7);
+	position:relative;
+	padding-bottom:var(--sp-2)
+}
+.home .entry-content > h2.wp-block-heading::after {
+	content:"";
+	position:absolute;
+	left:0;
+	bottom:0;
+	width:56px;
+	height:4px;
+	border-radius:4px;
+	background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b)
+}
+.home #guides + .rbx-latest,.home #latest-updates + .rbx-latest,.home #how-we-check + .wp-block-list {
+	list-style:none;
+	padding:0;
+	margin-top:var(--sp-4)
+}
+.home #guides + .rbx-latest a,.home #latest-updates + .rbx-latest a {
+	font-weight:700;
+	text-decoration:none;
+	color:var(--text)
+}
+.home #guides + .rbx-latest a:hover,.home #latest-updates + .rbx-latest a:hover {
+	color:var(--primary);
+	text-decoration:underline
+}
+.home #guides + .rbx-latest {
+	display:grid;
+	grid-auto-flow:column;
+	grid-auto-columns:82%;
+	gap:var(--sp-3);
+	overflow-x:auto;
+	scroll-snap-type:x mandatory;
+	padding-bottom:var(--sp-3);
+	max-width:none
+}
+@media (min-width:900px) {
+	.home #guides + .rbx-latest {
+	grid-auto-flow:row;
+	grid-template-columns:repeat(3,minmax(0,1fr));
+	overflow:visible
+}
+}
+.home #guides + .rbx-latest li {
+	scroll-snap-align:start;
+	position:relative;
+	display:flex;
+	flex-direction:column;
+	gap:var(--sp-3);
+	padding:var(--sp-6) var(--sp-4) var(--sp-4);
+	background:var(--card-bg);
+	border:1px solid var(--card-border);
+	border-radius:var(--r-lg);
+	box-shadow:var(--elev-1);
+	overflow:hidden;
+	transition:transform .18s,box-shadow .18s
+}
+.home #guides + .rbx-latest li:hover {
+	transform:translateY(-2px);
+	box-shadow:var(--elev-2)
+}
+.home #guides + .rbx-latest li::before {
+	content:"";
+	position:absolute;
+	inset:0 0 auto;
+	height:6px;
+	background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b)
+}
+.home #guides + .rbx-latest li .rbx-meta {
+	order:-1;
+	align-self:flex-start;
+	font-size:var(--fs-xs);
+	font-weight:700;
+	padding:2px 10px;
+	border-radius:999px;
+	background:var(--primary-bg);
+	color:var(--primary)
+}
+.home #guides + .rbx-latest li a {
+	font-size:var(--fs-lg);
+	line-height:1.35;
+	flex:1
+}
+.home #guides + .rbx-latest li a::after {
+	content:"";
+	position:absolute;
+	inset:0
+}
+.home #guides + .rbx-latest li::after {
+	content:"Read guide →";
+	font-weight:700;
+	font-size:var(--fs-sm);
+	color:var(--primary)
+}
+.home #latest-updates + .rbx-latest {
+	position:relative;
+	padding-left:var(--sp-6)
+}
+.home #latest-updates + .rbx-latest::before {
+	content:"";
+	position:absolute;
+	left:11px;
+	top:8px;
+	bottom:8px;
+	width:2px;
+	background:linear-gradient(#7c3aed,#db2777,#f59e0b);
+	border-radius:2px
+}
+.home #latest-updates + .rbx-latest li {
+	position:relative;
+	display:flex;
+	flex-direction:column-reverse;
+	gap:2px;
+	padding:var(--sp-3) var(--sp-4);
+	margin-bottom:var(--sp-3);
+	background:var(--card-bg);
+	border:1px solid var(--card-border);
+	border-radius:var(--r-md);
+	box-shadow:var(--elev-1)
+}
+.home #latest-updates + .rbx-latest li::before {
+	content:"";
+	position:absolute;
+	left:calc(-1 * var(--sp-6) + 4px);
+	top:50%;
+	width:16px;
+	height:16px;
+	margin-top:-8px;
+	border-radius:50%;
+	background:var(--card-bg);
+	border:4px solid #a855f7
+}
+.home #latest-updates + .rbx-latest li:first-child::before {
+	border-color:#db2777;
+	box-shadow:0 0 0 5px rgb(219 39 119/.2)
+}
+.home #latest-updates + .rbx-latest li:first-child a::after {
+	content:"NEW";
+	margin-left:var(--sp-2);
+	font-size:11px;
+	font-weight:800;
+	letter-spacing:.06em;
+	padding:2px 8px;
+	border-radius:999px;
+	background:linear-gradient(90deg,#db2777,#f59e0b);
+	color:#fff;
+	vertical-align:middle;
+	display:inline-block;
+	text-decoration:none
+}
+.home #latest-updates + .rbx-latest .rbx-meta {
+	font-size:var(--fs-xs);
+	font-weight:600;
+	color:var(--text-muted)
+}
+.home #how-we-check + .wp-block-list {
+	display:grid;
+	gap:var(--sp-3);
+	padding:var(--sp-4);
+	border-radius:var(--r-lg);
+	background:var(--hero-bg);
+	border:1px solid var(--hero-border);
+	counter-reset:t;
+	max-width:none
+}
+@media (min-width:900px) {
+	.home #how-we-check + .wp-block-list {
+	grid-template-columns:repeat(3,1fr)
+}
+}
+.home #how-we-check + .wp-block-list li {
+	position:relative;
+	padding:var(--sp-7) var(--sp-4) var(--sp-4);
+	background:var(--card-bg);
+	border-radius:var(--r-md);
+	box-shadow:var(--elev-1);
+	font-size:var(--fs-sm);
+	margin:0
+}
+.home #how-we-check + .wp-block-list li::before {
+	position:absolute;
+	top:var(--sp-4);
+	left:var(--sp-4);
+	width:36px;
+	height:36px;
+	display:grid;
+	place-items:center;
+	border-radius:12px;
+	background:var(--mono-bg);
+	color:#fff;
+	font-size:18px
+}
+.home #how-we-check + .wp-block-list li:nth-child(1)::before {
+	content:"📖"
+}
+.home #how-we-check + .wp-block-list li:nth-child(2)::before {
+	content:"🎮"
+}
+.home #how-we-check + .wp-block-list li:nth-child(3)::before {
+	content:"⏱"
+}
+.site-footer {
+	background:linear-gradient(160deg,#1e1038,#2a0f33 55%,#341a12);
+	color:#e9e3ff;
+	border-top:0;
+	position:relative;
+	padding-top:var(--sp-7)
+}
+.site-footer::before {
+	content:"";
+	position:absolute;
+	inset:0 0 auto;
+	height:5px;
+	background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b)
+}
+.site-footer a {
+	color:#e4d7ff
+}
+.site-footer a:hover {
+	color:#fff
+}
+.site-footer .footer-col h2 {
+	color:#fff;
+	font-size:var(--fs-sm);
+	letter-spacing:.08em;
+	text-transform:uppercase
+}
+.site-footer .footer-disclaimer {
+	color:#c9bfe0;
+	font-size:var(--fs-xs);
+	border-top:1px solid rgb(255 255 255/.12);
+	padding-top:var(--sp-3)
+}
+.site-footer .footer-bottom {
+	color:#c9bfe0;
+	border-color:rgb(255 255 255/.12)
+}
+.site-footer .theme-toggle button {
+	color:#e9e3ff;
+	border-color:rgb(255 255 255/.25);
+	background:transparent
+}
+.site-footer .theme-toggle button[aria-pressed=true] {
+	background:#fff;
+	color:#2a0f33
+}
+.site-footer .footer-col button {
+	color:#e4d7ff
+}
