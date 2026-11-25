@@ -28,6 +28,7 @@ final class Plugin {
 		add_shortcode( 'rbx_advisor', array( Advisor::class, 'shortcode' ) );
 		add_shortcode( 'rbx_catch_finder', array( CatchFinder::class, 'shortcode' ) );
 		add_shortcode( 'rbx_pet_compare', array( PetCompare::class, 'shortcode' ) );
+		add_shortcode( 'rbx_goal', array( Goal::class, 'shortcode' ) );
 		add_filter( 'rbx_data_item_after_card', array( Calculator::class, 'mini_for_item' ), 10, 4 );
 	}
 
@@ -47,6 +48,7 @@ final class Plugin {
 		wp_register_script_module( 'rbx-fusion', RBX_TOOLS_URL . 'assets/js/fusion.js', array( RBX_TOOLS_URL . 'assets/js/format.js' ), self::ver( 'assets/js/fusion.js' ) );
 		wp_register_script_module( 'rbx-advisor', RBX_TOOLS_URL . 'assets/js/advisor.js', array( RBX_TOOLS_URL . 'assets/js/parse-input.js', RBX_TOOLS_URL . 'assets/js/format.js' ), self::ver( 'assets/js/advisor.js' ) );
 		wp_register_script_module( 'rbx-compare', RBX_TOOLS_URL . 'assets/js/compare.js', array( RBX_TOOLS_URL . 'assets/js/format.js' ), self::ver( 'assets/js/compare.js' ) );
+		wp_register_script_module( 'rbx-goal', RBX_TOOLS_URL . 'assets/js/goal.js', array( RBX_TOOLS_URL . 'assets/js/parse-input.js', RBX_TOOLS_URL . 'assets/js/format.js' ), self::ver( 'assets/js/goal.js' ) );
 		wp_register_script_module( 'rbx-catch', RBX_TOOLS_URL . 'assets/js/catch.js', array( RBX_TOOLS_URL . 'assets/js/format.js' ), self::ver( 'assets/js/catch.js' ) );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/calculator' );
 		register_block_type( RBX_TOOLS_DIR . '/blocks/mini-calculator' );

@@ -29,6 +29,7 @@ KIND = {
     'fusion-planner': ('Fusion Planner', 'Which fusions your pets can make'),
     'what-to-get-next': ('What to Get Next', 'The best egg to hunt for your Speed'),
     'pet-compare': ('Pet Compare', 'Any two or three pets side by side'),
+    'time-to-goal': ('Time to Goal', 'How long to your Cash goal, and how to go faster'),
     'codes': ('Codes', 'When we last checked and what really works'),
     'eggs': ('Eggs List', 'Every egg with hatch time, zone and pets'),
     'pets': ('Pets List', 'Every pet by rarity, with base income'),
