@@ -300,6 +300,13 @@
       ["fish_needs", "wyvern", "weather:Rain"],
       ["fish_bait", "wyvern", "starlight-worm"],
       ["fish_bait", "wyvern", "truffle-worm"]
+    ],
+    "FSCH-FSH-1281": [
+      ["fish_rarity", "birthday-isonade", "limited"],
+      ["fish_worth_more", "birthday-isonade", "birthday-pinata"],
+      ["fish_any", "birthday-isonade", "season"],
+      ["fish_any", "birthday-isonade", "weather"],
+      ["fish_any", "birthday-isonade", "time_of_day"]
     ]
   }
 }
