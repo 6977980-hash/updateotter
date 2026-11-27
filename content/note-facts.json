@@ -307,6 +307,20 @@
       ["fish_any", "birthday-isonade", "season"],
       ["fish_any", "birthday-isonade", "weather"],
       ["fish_any", "birthday-isonade", "time_of_day"]
+    ],
+    "FSCH-FSH-1282": [
+      ["fish_rarity", "oakling-turkey", "limited"],
+      ["fish_needs", "oakling-turkey", "season:Autumn"],
+      ["fish_any", "oakling-turkey", "weather"],
+      ["fish_any", "oakling-turkey", "time_of_day"],
+      ["fish_worth_more", "the-great-turkey", "oakling-turkey"],
+      ["fish_heavier", "the-great-turkey", "oakling-turkey"]
+    ],
+    "FSCH-FSH-1283": [
+      ["fish_rarity", "the-great-turkey", "limited"],
+      ["fish_needs", "the-great-turkey", "season:Autumn"],
+      ["fish_heavier", "the-great-turkey", "oakling-turkey"],
+      ["fish_worth_more", "the-great-turkey", "oakling-turkey"]
     ]
   }
 }
